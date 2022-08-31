@@ -1,0 +1,7 @@
+próximo:
+
+- recibir las actividades en js y configurar el onchange que falta.
+- incorporar valor automático de la stage.
+- testear que todo funciona bien en términos de creación y edición de bloques.
+
+- implementar submissions y feedback
