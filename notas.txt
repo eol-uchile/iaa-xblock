@@ -1,7 +1,37 @@
 próximo:
 
-- recibir las actividades en js y configurar el onchange que falta.
-- incorporar valor automático de la stage.
+- incorporar valores automáticos que faltan.
+- conectar el submit y la actualización de campos en el xblock
 - testear que todo funciona bien en términos de creación y edición de bloques.
 
 - implementar submissions y feedback
+- cambiar todos los iterativeassessed a iaaxblock
+
+
+
+
+
+
+
+Activity
+id (PK)
+id_course
+activity_name
+last_stage
+
+Submission
+id (PK)
+id_activity (FK)
+id_student
+stage
+submission
+submission_time
+
+Feedback
+id (PK)
+id_activity (FK)
+id_instructor
+id_student
+stage
+feedback
+feedback_time

@@ -1,5 +1,6 @@
 """TO-DO: Write a description of what this XBlock is."""
 
+import json
 import pkg_resources
 from xblock.core import XBlock
 from django.db import IntegrityError
@@ -104,13 +105,15 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         id_course = "ID_course"
         activities = get_activities(id_course)['result']
-
+        js_context = {
+            "activity_name": self.activity_name,
+            "block_type": self.block_type,
+            "activity_stage": str(self.activity_stage),
+            "activities": json.dumps(activities)
+        }
         context.update(
             {
-                "activity_name": self.activity_name,
-                "block_type": self.block_type,
-                "activity_stage": self.activity_stage,
-                "activities": activities
+                "context": json.dumps(js_context)
             }
         )
         template = loader.render_django_template(
@@ -174,5 +177,5 @@ class IterativeAssessedActivityXBlock(XBlock):
         return [
             ("IterativeAssessedActivityXBlock",
              """<iterativeassessed/>
-             """),
+             """)
         ]

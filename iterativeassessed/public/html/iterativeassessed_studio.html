@@ -1,15 +1,17 @@
 <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
+    <meta id="context-iaa" data-context="{{context}}">
     <ul class="list-input settings-list">
+        <li id="input_block_type" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="block_type">Tipo de bloque</label>
+                <select id="block_type" class="block_type" name="block_type">
+                </select>
+            </div>
+        </li>
         <li id="input_activity_name" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="activity_name">Nombre de actividad</label>
                 <select class="activity_name" name="activity_name" id="activity_name">
-                    {% if activity_name == "" %}<option value="none" disabled selected>Seleccione una opción</option>{% endif %}
-                    {% for activity in activities %}
-                    <option value="{{activity.1}}" {% if activity.1 == activity_name %} selected {% endif %}>
-                        {{activity.1}}</option>
-                    {% endfor %}
-                    <option value="new">Crear nueva actividad</option>
                 </select>
             </div>
         </li>
@@ -20,22 +22,11 @@
                     type="text" />
             </div>
         </li>
-        <li id="input_block_type" class="field comp-setting-entry is-set" hidden>
-            <div class="wrapper-comp-setting">
-                <label class="label setting-label" for="block_type">Tipo de bloque</label>
-                <select id="block_type" class="block_type" name="block_type">
-                    <option value="full" {% if block_type == "full" %} selected {% endif %}>Completo</option>
-                    <option value="display" {% if block_type == "display" %} selected {% endif %}>Solo respuesta anterior
-                    </option>
-                    <option value="summary" {% if block_type == "summary" %} selected {% endif %}>Resumen</option>
-                </select>
-            </div>
-        </li>
         <li id="input_activity_stage" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="activity_stage">Fase de actividad</label>
-                <input disabled class="input setting-input" name="activity_stage" id="activity_stage"
-                    value="{{activity_stage}}" type="text" />
+                <input disabled class="input setting-input" name="activity_stage" id="activity_stage" value=""
+                    type="text" />
             </div>
         </li>
         <li id="input_stage_label" class="field comp-setting-entry is-set" hidden>
@@ -47,23 +38,17 @@
         <li id="input_activity_name_previous" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="activity_name_previous">Actividad de respuesta anterior</label>
-                <select class="activity_name_previous" name="activity_name_previous">
-                    <option value="none" disabled selected>Seleccione una opción</option>
-                    {% for activity in activities %}
-                    <option value="{{activity.1}}">{{activity.1}}</option>
-                    {% endfor %}
+                <select id="activity_name_previous" class="activity_name_previous" name="activity_name_previous">
                 </select>
             </div>
         </li>
         <li id="input_activity_stage_previous" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="activity_stage_previous">Fase de respuesta anterior</label>
-                <input disabled class="input setting-input" name="activity_stage_previous" id="activity_stage_previous"
-                    value="" type="text" />
+                <input class="input setting-input" name="activity_stage_previous" id="activity_stage_previous"
+                    value="" min="1" type="number" />
             </div>
         </li>
-
-
         <li id="input_question" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="question">Pregunta</label>
