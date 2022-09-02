@@ -1,8 +1,7 @@
 próximo:
 
-- incorporar valores automáticos que faltan.
-- conectar el submit y la actualización de campos en el xblock
-- testear que todo funciona bien en términos de creación y edición de bloques.
+- incorporar los cambios en la db que correspondan en studio_submit
+- testear que todo funciona bien en términos de creación y edición de bloques (al parecer algo se rompio y ahora no carga? xd)
 
 - implementar submissions y feedback
 - cambiar todos los iterativeassessed a iaaxblock

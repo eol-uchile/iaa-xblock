@@ -21,9 +21,6 @@ class IterativeAssessedActivityXBlock(XBlock):
     TO-DO: document what your XBlock does.
     """
 
-    # Fields are defined on the class.  You can access them in your code as
-    # self.<fieldname>.
-
     activity_name = String(
         default="",
         scope=Scope.settings,
@@ -32,13 +29,45 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     block_type = String(
         default="full",
-        values=["display", "full", "summary"]
+        values=["display", "full", "summary"],
+        scope=Scope.settings,
+        help="Variant of this block."
     )
 
     activity_stage = Integer(
         default=0,
         scope=Scope.settings,
-        help="Stage of this activity"
+        help="Stage of this activity."
+    )
+
+    stage_label = String(
+        default="",
+        scope=Scope.settings,
+        help="Label of this stage, shown after the title."
+    )
+
+    question = String(
+        default="",
+        scope=Scope.settings,
+        help="Question shown before the text input."
+    )
+
+    activity_name_previous = String(
+        default="",
+        scope=Scope.settings,
+        help="Activity of the shown submission."
+    )
+
+    activity_stage_previous = Integer(
+        default=0,
+        scope=Scope.settings,
+        help="Stage of the shown submission."
+    )
+
+    summary_text = String(
+        default="",
+        scope=Scope.settings,
+        help="Text shown before the summary."
     )
 
     has_author_view = True
@@ -109,6 +138,11 @@ class IterativeAssessedActivityXBlock(XBlock):
             "activity_name": self.activity_name,
             "block_type": self.block_type,
             "activity_stage": str(self.activity_stage),
+            "stage_label": self.stage_label,
+            "question": self.question,
+            "activity_name_previous": self.activity_name_previous,
+            "activity_stage_previous": str(self.activity_stage_previous),
+            "summary_text": self.summary_text,
             "activities": json.dumps(activities)
         }
         context.update(
@@ -167,6 +201,13 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         
         self.activity_name = data.get('activity_name')
+        self.block_type = data.get('block_type')
+        self.activity_stage = int(data.get('activity_stage'))
+        self.stage_label = data.get('stage_label')
+        self.question = data.get('question')
+        self.activity_name_previous = data.get('activity_name_previous')
+        self.activity_stage_previous = int(data.get('activity_stage_previous'))
+        self.summary_text = data.get('summary_text')
         return {'result': 'success'}
 
     # TO-DO: change this to create the scenarios you'd like to see in the
