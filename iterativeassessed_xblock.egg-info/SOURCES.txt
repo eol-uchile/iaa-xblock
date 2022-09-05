@@ -1,8 +1,10 @@
 README.md
 setup.py
 iterativeassessed/__init__.py
+iterativeassessed/admin.py
 iterativeassessed/db_queries.py
 iterativeassessed/iterativeassessed.py
+iterativeassessed/models.py
 iterativeassessed/public/css/iterativeassessed.css
 iterativeassessed/public/html/iterativeassessed_author.html
 iterativeassessed/public/html/iterativeassessed_student.html

@@ -25,7 +25,8 @@ def get_activities(id_course):
             result = conn.execute(text(query))
             out["result"] = []
             for row in result:
-                out["result"].append((row[0], row[1], row[2]))
+                out["result"].append({"id": row[0], "activity_name": row[1], "last_stage": row[2]})
+                #out["result"].append((row[0], row[1], row[2]))
     except:
         out["error"] = "db-error"
     return out
@@ -44,8 +45,8 @@ def get_submission(id_activity, id_student, stage):
                 out["result"] = (first[0], first[1].strftime("%m/%d/%Y %H:%M:%S"))
             else:
                 out["error"] = "submission-not-found"
-    except:
-        out["error"] = "db-error"
+    except Exception as e:
+        out["error"] = str(e)
     return out
 
 
@@ -80,9 +81,10 @@ def add_submission(id_activity, id_student, stage, submission):
         engine = create_engine(DB_URI)
         with engine.begin() as conn:
             conn.execute(text(query))
-        out["result"] = "success"
-    except:
-        out["error"] = "db-error"
+        out["msg"] = "success"
+    except Exception as e:
+        out["msg"] = "error"
+        out["error"] = str(e)
     return out
 
 # Rutina 5

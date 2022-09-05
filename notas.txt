@@ -1,13 +1,41 @@
+LO ULTIMO: haciendo el summary. la indexación está mal (error conocido xd)
+
 próximo:
 
-- incorporar los cambios en la db que correspondan en studio_submit
-- testear que todo funciona bien en términos de creación y edición de bloques (al parecer algo se rompio y ahora no carga? xd)
-
-- implementar submissions y feedback
+- desarrollar summary (student view)
+- desarrollar summary (author view)
+- actualizar comportamiento de stages
+- conseguir ids reales (course, student e instructor)
+- incorporar feedback (funcionamiento)
+- incorporar feedback (visualización)
+- desarrollar full (author view)
+- pasar todo a db real
 - cambiar todos los iterativeassessed a iaaxblock
+- errores menores
 
 
 
+
+fases automaticas
+
+pro:
+- más sencillo para el montaje
+
+contra:
+- difícil el borrado (posible?)
+
+
+
+
+fases manuales
+
+pro:
+- montaje más específico
+- al borrar y luego pedir la submission de una fase, se puede mostrar un mensaje de error nomás, culpa del montajista
+
+contra:
+- hay que llevar track (usar el summary?)
+- número máximo de fases? select con aquellas fases existentes disabled? cómo guardar en db?
 
 
 

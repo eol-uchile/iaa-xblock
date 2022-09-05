@@ -1,6 +1,13 @@
 <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
     <meta id="context-iaa" data-context="{{context}}">
     <ul class="list-input settings-list">
+        <li id="input_title" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="title">Título</label>
+                <input class="input setting-input" name="title" id="title" value=""
+                    type="text" />
+            </div>
+        </li>
         <li id="input_block_type" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="block_type">Tipo de bloque</label>
@@ -47,6 +54,13 @@
                 <label class="label setting-label" for="activity_stage_previous">Fase de respuesta anterior</label>
                 <input class="input setting-input" name="activity_stage_previous" id="activity_stage_previous"
                     value="" min="1" type="number" />
+            </div>
+        </li>
+        <li id="input_display_title" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="display_title">Título de respuesta anterior</label>
+                <input class="input setting-input" name="display_title" id="display_title"
+                    value="" type="text" />
             </div>
         </li>
         <li id="input_question" class="field comp-setting-entry is-set" hidden>

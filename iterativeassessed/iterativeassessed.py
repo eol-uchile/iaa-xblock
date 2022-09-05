@@ -11,6 +11,7 @@ from xblock.fragment import Fragment
 import datetime
 
 from .db_queries import *
+#from .models import IAAActivity, IAASubmission, IAAFeedback
 
 
 loader = ResourceLoader(__name__)
@@ -20,6 +21,12 @@ class IterativeAssessedActivityXBlock(XBlock):
     """
     TO-DO: document what your XBlock does.
     """
+
+    title = String(
+        default="Iterative Assessed Activity",
+        scope=Scope.settings,
+        help="Title of this activity."
+    )
 
     activity_name = String(
         default="",
@@ -64,6 +71,24 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Stage of the shown submission."
     )
 
+    display_title = String(
+        default="",
+        scope=Scope.settings,
+        help="Title shown before the shown submission."
+    )
+
+    submission = String(
+        default="",
+        scope=Scope.user_state,
+        help="The user submission to this block."
+    )
+
+    feedback = Dict(
+        default={},
+        scope=Scope.user_state,
+        help="Feedback given by staff to the student."
+    )
+
     summary_text = String(
         default="",
         scope=Scope.settings,
@@ -106,10 +131,56 @@ class IterativeAssessedActivityXBlock(XBlock):
         Vista estudiante
         """
 
-        context.update(
-            {
-            }
-        )
+        # provisorio
+        id_student = "ID_student1"
+        id_course = "ID_course"
+        id_activity = get_id_activity(id_course, self.activity_name)
+        
+        if self.block_type == "full":
+            context.update(
+                {
+                    "title": self.title,
+                    "block_type": self.block_type,
+                    "activity_name_previous": self.activity_name_previous,
+                    "activity_stage_previous": self.activity_stage_previous,
+                    "display_title": self.display_title,
+                    "activity_name": self.activity_name,
+                    "activity_stage": self.activity_stage,
+                    "submission": self.submission,
+                    "submission_time": self.submission_time,
+                    "stage_label": self.stage_label,
+                    "question": self.question,
+                    "submission": self.submission,
+                }
+            )
+
+        elif self.block_type == "display":
+            context.update(
+                {
+                    "title": self.title,
+                    "block_type": self.block_type,
+                    "activity_name_previous": self.activity_name_previous,
+                    "activity_stage_previous": self.activity_stage_previous,
+                    "display_title": self.display_title,
+                }
+            )
+
+        elif self.block_type == "summary":
+            summary = get_summary(id_activity, id_student)
+            context.update(
+                {
+                    "title": self.title,
+                    "block_type": self.block_type,
+                    "activity_name": self.activity_name,
+                    "summary": summary
+                }
+            )
+
+        else:
+            pass
+            # caso bloque nuevo
+            # quitar full del default
+
         template = loader.render_django_template(
             'public/html/iterativeassessed_student.html',
             context=Context(context),
@@ -132,9 +203,13 @@ class IterativeAssessedActivityXBlock(XBlock):
         Create a fragment used to display the edit view in the Studio.
         """
 
+        # provisorio
         id_course = "ID_course"
+
+        #activities = IAAActivity.objects.all().values()
         activities = get_activities(id_course)['result']
         js_context = {
+            "title": self.title,
             "activity_name": self.activity_name,
             "block_type": self.block_type,
             "activity_stage": str(self.activity_stage),
@@ -199,16 +274,42 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         Called when submitting the form in Studio.
         """
-        
-        self.activity_name = data.get('activity_name')
+
+        self.title = data.get('title')
         self.block_type = data.get('block_type')
-        self.activity_stage = int(data.get('activity_stage'))
-        self.stage_label = data.get('stage_label')
-        self.question = data.get('question')
-        self.activity_name_previous = data.get('activity_name_previous')
-        self.activity_stage_previous = int(data.get('activity_stage_previous'))
-        self.summary_text = data.get('summary_text')
+        if self.block_type == "full":
+            self.activity_name = data.get('activity_name')
+            self.activity_stage = int(data.get('activity_stage'))
+            self.stage_label = data.get('stage_label')
+            self.question = data.get('question')
+            self.activity_name_previous = data.get('activity_name_previous')
+            self.activity_stage_previous = int(data.get('activity_stage_previous'))
+        elif self.block_type == "display":
+            self.activity_name_previous = data.get('activity_name_previous')
+            self.activity_stage_previous = int(data.get('activity_stage_previous'))
+            self.display_title = data.get('display_title')
+        else:
+            self.activity_name = data.get('activity_name')
+            self.summary_text = data.get('summary_text')
         return {'result': 'success'}
+
+
+    @XBlock.json_handler
+    def student_submit(self, data, suffix=''):
+        """
+        """
+
+        id_course = "ID_course"
+        id_student = "ID_student1"
+        activities = get_activities(id_course)["result"]
+        for activity in activities:
+            if activity["activity_name"] == self.activity_name_previous:
+                activity_id = activity["id"]
+        out = add_submission(activity_id, id_student, self.activity_stage, data["submission"])
+        self.submission = data["submission"]
+        return {"result": out}
+
+    
 
     # TO-DO: change this to create the scenarios you'd like to see in the
     # workbench while developing your XBlock.
