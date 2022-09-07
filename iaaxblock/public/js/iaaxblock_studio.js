@@ -304,9 +304,17 @@ function IterativeAssessedActivityStudio(runtime, element) {
             // seleccionar todo
             if (block_type.val() === "full") {
                 input_activity_name.removeAttr("hidden");
+
+                activity_name.empty()
+                let opt = document.createElement('option');
+                opt.value = context["activity_name"]
+                opt.text = context["activity_name"]
+                opt.setAttribute("selected", true);
+                activity_name.append(opt);
                 activity_name.val(context["activity_name"]).change();
                 activity_name.attr("disabled", true);
                 input_activity_stage.removeAttr("hidden");
+
                 activity_stage.empty();
                 for (let activity of activities) {
                     if (activity["activity_name"] === activity_name.val()) {
@@ -314,15 +322,15 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         for(let i = 1; i <= MAX_STAGES; i++){
                             if (i == parseInt(context["activity_stage"])){
                                 let opt = document.createElement('option');
-                                opt.value = stage;
-                                opt.text = stage;
+                                opt.value = i.toString();
+                                opt.text = i.toString();
                                 opt.setAttribute("selected", true);
                                 activity_stage.append(opt);
                             }
                             if(!stages.includes(i.toString())){
                                 let opt = document.createElement('option');
-                                opt.value = stage;
-                                opt.text = stage;
+                                opt.value = i.toString();
+                                opt.text = i.toString();
                                 activity_stage.append(opt);
                             }
                         }

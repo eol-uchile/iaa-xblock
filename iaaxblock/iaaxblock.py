@@ -89,12 +89,6 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Datetime of this student's submission."
     )
 
-    feedback = Dict(
-        default={},
-        scope=Scope.user_state,
-        help="Feedback given by staff to the student, with respective instructors and datetimes."
-    )
-
     summary_text = String(
         default="",
         scope=Scope.settings,
@@ -156,6 +150,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             if self.block_type == "full":
                 id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
                 submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
+                #feedbacks = get_feedbacks(id_activity, id_student, stage)
                 context.update(
                     {
                         "title": self.title,
@@ -171,7 +166,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                         "submission_time": self.submission_time,
                         "stage_label": self.stage_label,
                         "question": self.question,
-                        "submission": self.submission,
+                        "submission": self.submission
                     }
                 )
 
@@ -283,8 +278,8 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         elif self.block_type == "full":
             
-            students = get_students_data(id_activity, id_course, self.activity_stage)
-            # students = nombre, time, subms, feedback
+            #students = get_students_data(id_activity, id_course, self.activity_stage)
+            students = [(1, "Pedro", "22/03", "hola :)", ""), (2, "Juan", "23/04", "holi?", "se dice hola aweonao"), (3, "Diego", "25/05", "chao", "")]
             context.update(
                 {
                     "block_type": self.block_type,
