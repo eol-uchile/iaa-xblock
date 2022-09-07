@@ -1,5 +1,7 @@
 function IterativeAssessedActivityStudio(runtime, element) {
 
+
+    let MAX_STAGES = 15;
     let context = $("#context-iaa").data()["context"];
     let activities = JSON.parse(context["activities"]);
     let input_title = $(element).find("#input_title");
@@ -24,6 +26,11 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let question = $(element).find("#question");
     let input_summary_text = $(element).find("#input_summary_text");
     let summary_text = $(element).find("#summary_text");
+
+
+    function getMinStage(stages){
+
+    }
 
 
     function validate(data) {
@@ -96,7 +103,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
     function onLoad() {
 
         // XBlock is being created for the first time
-        if (context["activity_stage"] === "0") {
+        if (context["block_type"] === "none") {
 
             input_title.removeAttr("hidden");
             title.val("Iterative Assessed Activity")
@@ -145,7 +152,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         activity_name.append(opt00);
                     }
                     let opt0 = document.createElement("option");
-                    opt0.value = "new";
+                    opt0.value = "none";
                     opt0.text = "Por favor seleccione una opción...";
                     opt0.setAttribute("disabled", true);
                     opt0.setAttribute("selected", true);
@@ -165,14 +172,36 @@ function IterativeAssessedActivityStudio(runtime, element) {
 
                         // The activity stage is set
                         input_activity_stage.removeAttr("hidden");
+                        activity_stage.empty();
                         if (activity_name.val() === "new") {
-                            activity_stage.val("1");
-                        } else {
+                            activity_stage.attr("disabled", true);
+                            let opt = document.createElement('option');
+                            opt.value = "1"
+                            opt.text = "1"
+                            opt.setAttribute("selected", true);
+                            activity_stage.append(opt);
+                        } else {  
+                            activity_stage.removeAttr("disabled");
                             for (let activity of activities) {
                                 if (activity["activity_name"] === activity_name.val()) {
-                                    activity_stage.val((parseInt(activity["last_stage"]) + 1).toString());
+                                    stages = activity["stages"].split(',');
+                                    console.log(stages);
+                                    for(let i = 1; i <= MAX_STAGES; i++){
+                                        if(!stages.includes(i.toString())){
+                                            let opt = document.createElement('option');
+                                            opt.value = i.toString();
+                                            opt.text = i.toString();
+                                            activity_stage.append(opt);
+                                        }
+                                    }
                                 }
                             }
+                            let opt0 = document.createElement("option");
+                            opt0.value = "none";
+                            opt0.text = "Por favor seleccione una opción...";
+                            opt0.setAttribute("disabled", true);
+                            opt0.setAttribute("selected", true);
+                            activity_stage.append(opt0);
                         }
                         input_stage_label.removeAttr("hidden");
                         input_question.removeAttr("hidden");
@@ -190,11 +219,23 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         opt0.setAttribute("disabled", true);
                         opt0.setAttribute("selected", true);
                         activity_name_previous.append(opt0);
+                        activity_stage_previous.empty();
                         activity_name_previous.on("change", function () {
                             for (let activity of activities) {
                                 if (activity["activity_name"] === activity_name_previous.val()) {
-                                    activity_stage_previous.attr("max", parseInt(activity["last_stage"]));
-                                    activity_stage_previous.val(parseInt(activity["last_stage"]).toString());
+                                    stages = activity["stages"].split(",")
+                                    for(let stage of stages){
+                                        let opt = document.createElement('option');
+                                        opt.value = stage;
+                                        opt.text = stage;
+                                        activity_stage_previous.append(opt)
+                                    }
+                                    let opt0 = document.createElement("option");
+                                    opt0.value = "none";
+                                    opt0.text = "Por favor seleccione una opción...";
+                                    opt0.setAttribute("disabled", true);
+                                    opt0.setAttribute("selected", true);
+                                    activity_stage_previous.append(opt0);
                                     input_activity_stage_previous.removeAttr("hidden");
                                 }
                             }
@@ -222,11 +263,23 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt0.setAttribute("disabled", true);
                     opt0.setAttribute("selected", true);
                     activity_name_previous.append(opt0);
+                    activity_stage_previous.empty();
                     activity_name_previous.on("change", function () {
                         for (let activity of activities) {
                             if (activity["activity_name"] === activity_name_previous.val()) {
-                                activity_stage_previous.attr("max", parseInt(activity["last_stage"]));
-                                activity_stage_previous.val(parseInt(activity["last_stage"]).toString());
+                                stages = activity["stages"].split(",")
+                                for(let stage of stages){
+                                    let opt = document.createElement('option');
+                                    opt.value = stage;
+                                    opt.text = stage;
+                                    activity_stage_previous.append(opt)
+                                }
+                                let opt0 = document.createElement("option");
+                                opt0.value = "none";
+                                opt0.text = "Por favor seleccione una opción...";
+                                opt0.setAttribute("disabled", true);
+                                opt0.setAttribute("selected", true);
+                                activity_stage_previous.append(opt0);
                                 input_activity_stage_previous.removeAttr("hidden");
                             }
                         }
@@ -244,7 +297,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             input_block_type.removeAttr("hidden");
             let opt = document.createElement("option");
             opt.value = context["block_type"]
-            opt.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "display" : "summary"))
+            opt.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : "Resumen"))
             opt.setAttribute("selected", true)
             block_type.append(opt);
             block_type.attr("disabled", true);
@@ -254,8 +307,27 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 activity_name.val(context["activity_name"]).change();
                 activity_name.attr("disabled", true);
                 input_activity_stage.removeAttr("hidden");
-                activity_stage.attr("disabled", true);
-                activity_stage.val(context["activity_stage"]);
+                activity_stage.empty();
+                for (let activity of activities) {
+                    if (activity["activity_name"] === activity_name.val()) {
+                        stages = activity["stages"].split(',');
+                        for(let i = 1; i <= MAX_STAGES; i++){
+                            if (i == parseInt(context["activity_stage"])){
+                                let opt = document.createElement('option');
+                                opt.value = stage;
+                                opt.text = stage;
+                                opt.setAttribute("selected", true);
+                                activity_stage.append(opt);
+                            }
+                            if(!stages.includes(i.toString())){
+                                let opt = document.createElement('option');
+                                opt.value = stage;
+                                opt.text = stage;
+                                activity_stage.append(opt);
+                            }
+                        }
+                    }
+                }
                 input_stage_label.removeAttr("hidden");
                 stage_label.val(context["stage_label"]);
                 input_question.removeAttr("hidden");
@@ -276,11 +348,25 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt.text = activity["activity_name"];
                     activity_name_previous.append(opt);
                 }
+                activity_stage_previous.empty();
                 activity_name_previous.on("change", function () {
                     for (let activity of activities) {
                         if (activity["activity_name"] === activity_name_previous.val()) {
-                            activity_stage_previous.attr("max", parseInt(activity["last_stage"]));
-                            activity_stage_previous.val(parseInt(activity["last_stage"]).toString());
+                            stages = activity["stages"].split(",")
+                            for(let stage of stages){
+                                if(activity["activity_name"] !== context["activity_name"] || stage !== context["activity_stage"]){
+                                    let opt = document.createElement('option');
+                                    opt.value = stage;
+                                    opt.text = stage;
+                                    activity_stage_previous.append(opt)
+                                }
+                            }
+                            let opt0 = document.createElement("option");
+                            opt0.value = "none";
+                            opt0.text = "Por favor seleccione una opción...";
+                            opt0.setAttribute("disabled", true);
+                            opt0.setAttribute("selected", true);
+                            activity_stage_previous.append(opt0);
                             input_activity_stage_previous.removeAttr("hidden");
                         }
                     }

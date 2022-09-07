@@ -1,4 +1,9 @@
-<div class="iterativeassessed_block">
+<div class="iaaxblock">
+    {% if block_type == "none" %}
+    <div class="iaa-not-created">
+        <p>Please set this block up from Studio.</p>
+    </div>
+    {% else %}
     <meta id="context-iaa" data-context="{{context}}">
     <div>
         <h2 class="main-title">{{title}}</h2>
@@ -7,7 +12,7 @@
         <p class="activity-name-previous-label">Actividad: {{activity_name_previous}}</p>
         <p class="activity-stage-previous-label">Fase: {{activity_stage_previous}}</p>
         <p class="submission-previous-label"></p>
-        <div class="submission-previous">{{submission}}</div>
+        <div class="submission-previous">{{submission_previous}}</div>
         {% endif %}
         {% if block_type == "full" %}
         <h3 class="stage-label">{{stage_label}}</h3>
@@ -20,8 +25,8 @@
         <h3 class="summary-text">{{summary_text}}</h3>
         <p class="activity-name-previous-label">Actividad: {{activity_name}}</p>
         {% for activity in summary %}
-            <p class="activity-stage-label">Fase: {{activity.0}}</p>
-            <p class="summary-submission">{{activity.1}}</p>
+        <p class="activity-stage-label">Fase: {{activity.0}}</p>
+        <p class="summary-submission">{{activity.1}}</p>
         {% endfor %}
         {% endif %}
     </div>
@@ -31,5 +36,5 @@
             <span>Enviar</span>
         </button>
     </div>
+    {% endif %}
 </div>
-    

@@ -35,8 +35,8 @@ class IterativeAssessedActivityXBlock(XBlock):
     )
 
     block_type = String(
-        default="full",
-        values=["display", "full", "summary"],
+        default="none",
+        values=["display", "full", "summary", "none"],
         scope=Scope.settings,
         help="Variant of this block."
     )
@@ -83,10 +83,16 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="The user submission to this block."
     )
 
+    submission_time = String(
+        default="",
+        scope=Scope.user_state,
+        help="Datetime of this student's submission."
+    )
+
     feedback = Dict(
         default={},
         scope=Scope.user_state,
-        help="Feedback given by staff to the student."
+        help="Feedback given by staff to the student, with respective instructors and datetimes."
     )
 
     summary_text = String(
@@ -131,58 +137,72 @@ class IterativeAssessedActivityXBlock(XBlock):
         Vista estudiante
         """
 
-        # provisorio
-        id_student = "ID_student1"
-        id_course = "ID_course"
-        id_activity = get_id_activity(id_course, self.activity_name)
-        
-        if self.block_type == "full":
+        if self.block_type == "none":
             context.update(
                 {
-                    "title": self.title,
-                    "block_type": self.block_type,
-                    "activity_name_previous": self.activity_name_previous,
-                    "activity_stage_previous": self.activity_stage_previous,
-                    "display_title": self.display_title,
-                    "activity_name": self.activity_name,
-                    "activity_stage": self.activity_stage,
-                    "submission": self.submission,
-                    "submission_time": self.submission_time,
-                    "stage_label": self.stage_label,
-                    "question": self.question,
-                    "submission": self.submission,
-                }
-            )
-
-        elif self.block_type == "display":
-            context.update(
-                {
-                    "title": self.title,
-                    "block_type": self.block_type,
-                    "activity_name_previous": self.activity_name_previous,
-                    "activity_stage_previous": self.activity_stage_previous,
-                    "display_title": self.display_title,
-                }
-            )
-
-        elif self.block_type == "summary":
-            summary = get_summary(id_activity, id_student)
-            context.update(
-                {
-                    "title": self.title,
-                    "block_type": self.block_type,
-                    "activity_name": self.activity_name,
-                    "summary": summary
+                    "block_type": self.block_type
                 }
             )
 
         else:
-            pass
-            # caso bloque nuevo
-            # quitar full del default
+
+            # provisorio
+            id_student = "ID_student1"
+            #id_student = self.runtime.anonymous_student_id
+            id_course = "ID_course"
+            #id_course = self.id_course
+            id_activity = get_id_activity(id_course, self.activity_name)["result"]
+
+            if self.block_type == "full":
+                id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
+                submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
+                context.update(
+                    {
+                        "title": self.title,
+                        "block_type": self.block_type,
+                        "activity_name_previous": self.activity_name_previous,
+                        "activity_stage_previous": self.activity_stage_previous,
+                        "submission_previous": submission_previous,
+                        "submission_previous_time": submission_previous_time,
+                        "display_title": self.display_title,
+                        "activity_name": self.activity_name,
+                        "activity_stage": self.activity_stage,
+                        "submission": self.submission,
+                        "submission_time": self.submission_time,
+                        "stage_label": self.stage_label,
+                        "question": self.question,
+                        "submission": self.submission,
+                    }
+                )
+
+            elif self.block_type == "display":
+                id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
+                submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
+                context.update(
+                    {
+                        "title": self.title,
+                        "block_type": self.block_type,
+                        "activity_name_previous": self.activity_name_previous,
+                        "activity_stage_previous": self.activity_stage_previous,
+                        "submission_previous": submission_previous,
+                        "submission_previous_time": submission_previous_time,
+                        "display_title": self.display_title,
+                    }
+                )
+
+            else:
+                summary = get_summary(id_activity, id_student)["result"]
+                context.update(
+                    {
+                        "title": self.title,
+                        "block_type": self.block_type,
+                        "activity_name": self.activity_name,
+                        "summary": summary
+                    }
+                )
 
         template = loader.render_django_template(
-            'public/html/iterativeassessed_student.html',
+            'public/html/iaaxblock_student.html',
             context=Context(context),
             i18n_service=self.runtime.service(self, 'i18n'),
         )
@@ -190,10 +210,10 @@ class IterativeAssessedActivityXBlock(XBlock):
             template,
             initialize_js_func='IterativeAssessedActivityStudent',
             additional_css=[
-                'public/css/iterativeassessed.css',
+                'public/css/iaaxblock.css',
             ],
             additional_js=[
-                'public/js/iterativeassessed_student.js',
+                'public/js/iaaxblock_student.js',
             ],
         )
         return frag
@@ -205,6 +225,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         # provisorio
         id_course = "ID_course"
+        #id_course = self.id_course
 
         #activities = IAAActivity.objects.all().values()
         activities = get_activities(id_course)['result']
@@ -226,7 +247,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             }
         )
         template = loader.render_django_template(
-            'public/html/iterativeassessed_studio.html',
+            'public/html/iaaxblock_studio.html',
             context=Context(context),
             i18n_service=self.runtime.service(self, 'i18n'),
         )
@@ -234,7 +255,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             template,
             initialize_js_func='IterativeAssessedActivityStudio',
             additional_js=[
-                'public/js/iterativeassessed_studio.js',
+                'public/js/iaaxblock_studio.js',
             ],
         )    
         return frag
@@ -242,16 +263,53 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     def author_view(self, context={}):
         """
-        Vista estudiante
+        Vista instructor
         """
+        
+        id_course = "ID_course"
+        id_instructor = "1"
+        #id_course = self.id_course
 
+        #activities = IAAActivity.objects.all().values()
+        activities = get_activities(id_course)['result']
+        id_activity = get_id_activity(id_course, self.activity_name)["result"]
 
-        context.update(
-            {
-            }
-        )
+        if self.block_type == "none":
+            context.update(
+                {
+                    "block_type": self.block_type
+                }
+            )
+
+        elif self.block_type == "full":
+            
+            students = get_students_data(id_activity, id_course, self.activity_stage)
+            # students = nombre, time, subms, feedback
+            context.update(
+                {
+                    "block_type": self.block_type,
+                    "activity_name": self.activity_name,
+                    "activity_stage": self.activity_stage,
+                    "students": students
+                }
+            )
+
+        elif self.block_type == "display":
+
+            context.update(
+                {
+                }
+            )
+
+        elif self.block_type == "summary":
+
+            context.update(
+                {
+                }
+            )
+        
         template = loader.render_django_template(
-            'public/html/iterativeassessed_author.html',
+            'public/html/iaaxblock_author.html',
             context=Context(context),
             i18n_service=self.runtime.service(self, 'i18n'),
         )
@@ -259,10 +317,10 @@ class IterativeAssessedActivityXBlock(XBlock):
             template,
             initialize_js_func='IterativeAssessedActivityAuthor',
             additional_css=[
-                'public/css/iterativeassessed.css',
+                'public/css/iaaxblock.css',
             ],
             additional_js=[
-                'public/js/iterativeassessed_author.js',
+                'public/js/iaaxblock_author.js',
             ],
         )
         return frag
@@ -300,7 +358,9 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
 
         id_course = "ID_course"
+        #id_course = self.id_course
         id_student = "ID_student1"
+        #id_student = self.runtime.anonymous_student_id
         activities = get_activities(id_course)["result"]
         for activity in activities:
             if activity["activity_name"] == self.activity_name_previous:
@@ -318,6 +378,6 @@ class IterativeAssessedActivityXBlock(XBlock):
         """A canned scenario for display in the workbench."""
         return [
             ("IterativeAssessedActivityXBlock",
-             """<iterativeassessed/>
+             """<iaaxblock/>
              """)
         ]

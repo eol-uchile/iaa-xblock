@@ -27,7 +27,7 @@ class IAAFeedback(models.Model):
     id_activity = models.ForeignKey(
         IAAActivity,
         on_delete=models.CASCADE,
-        related_name="iaa_submission"
+        related_name="iaa_feedback"
     )
     id_student = models.TextField()
     id_instructor = models.TextField()

@@ -1,64 +1,19 @@
-LO ULTIMO: haciendo el summary. la indexación está mal (error conocido xd)
-
 próximo:
 
-- desarrollar summary (student view)
 - desarrollar summary (author view)
-- actualizar comportamiento de stages
-- conseguir ids reales (course, student e instructor)
 - incorporar feedback (funcionamiento)
 - incorporar feedback (visualización)
 - desarrollar full (author view)
 - pasar todo a db real
-- cambiar todos los iterativeassessed a iaaxblock
 - errores menores
 
+caso borde: al borrar, ojo que activities cambia (pre-cargado en studio), lo que podría traer problemas
 
 
 
-fases automaticas
+PROXIMA VERSION:
 
-pro:
-- más sencillo para el montaje
+- displays podrían mostrar más de uno.
+- distintos instructores, distintos feedbacks
+- en student view, se pueden ver los distintos feedbacks
 
-contra:
-- difícil el borrado (posible?)
-
-
-
-
-fases manuales
-
-pro:
-- montaje más específico
-- al borrar y luego pedir la submission de una fase, se puede mostrar un mensaje de error nomás, culpa del montajista
-
-contra:
-- hay que llevar track (usar el summary?)
-- número máximo de fases? select con aquellas fases existentes disabled? cómo guardar en db?
-
-
-
-
-Activity
-id (PK)
-id_course
-activity_name
-last_stage
-
-Submission
-id (PK)
-id_activity (FK)
-id_student
-stage
-submission
-submission_time
-
-Feedback
-id (PK)
-id_activity (FK)
-id_instructor
-id_student
-stage
-feedback
-feedback_time

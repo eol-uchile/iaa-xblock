@@ -1,4 +1,4 @@
-"""Setup for iterativeassessed XBlock."""
+"""Setup for IAA XBlock."""
 
 
 import os
@@ -23,20 +23,20 @@ def package_data(pkg, roots):
 
 
 setup(
-    name='iterativeassessed-xblock',
+    name='iaaxblock',
     version='0.1',
-    description='iterativeassessed XBlock',   # TODO: write a better description.
+    description='IAA XBlock',   # TODO: write a better description.
     license='UNKNOWN',          # TODO: choose a license: 'AGPL v3' and 'Apache 2.0' are popular.
     packages=[
-        'iterativeassessed',
+        'iaaxblock',
     ],
     install_requires=[
         'XBlock',
     ],
     entry_points={
         'xblock.v1': [
-            'iterativeassessed = iterativeassessed:IterativeAssessedActivityXBlock',
+            'iaaxblock = iaaxblock:IterativeAssessedActivityXBlock',
         ]
     },
-    package_data=package_data("iterativeassessed", ["static", "public"]),
+    package_data=package_data("iaaxblock", ["static", "public"]),
 )
