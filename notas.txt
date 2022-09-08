@@ -1,4 +1,8 @@
+ver en dbeaver si se creó nueva actividad
+
+
 próximo:
+
 
 - desarrollar summary (author view)
 - incorporar feedback (funcionamiento)
@@ -7,7 +11,6 @@ próximo:
 - pasar todo a db real
 - errores menores
 
-AL PARECER HAY UN ERROR EN DB (VER LOGS STUDIO EN DEVSTACK)
 
 caso borde: al borrar, ojo que activities cambia (pre-cargado en studio), lo que podría traer problemas
 

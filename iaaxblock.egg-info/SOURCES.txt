@@ -2,6 +2,7 @@ README.md
 setup.py
 iaaxblock/__init__.py
 iaaxblock/admin.py
+iaaxblock/apps.py
 iaaxblock/db_queries.py
 iaaxblock/iaaxblock.py
 iaaxblock/models.py
@@ -13,8 +14,10 @@ iaaxblock.egg-info/requires.txt
 iaaxblock.egg-info/top_level.txt
 iaaxblock/public/css/iaaxblock.css
 iaaxblock/public/html/iaaxblock_author.html
+iaaxblock/public/html/iaaxblock_instructor.html
 iaaxblock/public/html/iaaxblock_student.html
 iaaxblock/public/html/iaaxblock_studio.html
 iaaxblock/public/js/iaaxblock_author.js
+iaaxblock/public/js/iaaxblock_instructor.js
 iaaxblock/public/js/iaaxblock_student.js
 iaaxblock/public/js/iaaxblock_studio.js

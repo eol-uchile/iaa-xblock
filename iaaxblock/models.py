@@ -14,7 +14,7 @@ class IAASubmission(models.Model):
     id_activity = models.ForeignKey(
         IAAActivity,
         on_delete=models.CASCADE,
-        related_name="iaa_submission"
+        related_name="iaa_activity"
     )
     id_student = models.TextField()
     stage = models.IntegerField()
@@ -27,7 +27,7 @@ class IAAFeedback(models.Model):
     id_activity = models.ForeignKey(
         IAAActivity,
         on_delete=models.CASCADE,
-        related_name="iaa_feedback"
+        related_name="iaa_activity"
     )
     id_student = models.TextField()
     id_instructor = models.TextField()

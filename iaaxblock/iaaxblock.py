@@ -133,7 +133,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
 
 
-        
+        # Staff
         if getattr(self.runtime, 'user_is_staff', False):
 
             id_course = "ID_course"
@@ -154,14 +154,15 @@ class IterativeAssessedActivityXBlock(XBlock):
             elif self.block_type == "full":
                 
                 #students = get_students_data(id_activity, id_course, self.activity_stage)
-                #students = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('username').values('id', 'username', 'email')
+                students2 = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('username').values('email')
                 students = [(1, "Pedro", "22/03", "hola :)", ""), (2, "Juan", "23/04", "holi?", "se dice hola aweonao"), (3, "Diego", "25/05", "chao", "")]
                 context.update(
                     {
                         "block_type": self.block_type,
                         "activity_name": self.activity_name,
                         "activity_stage": self.activity_stage,
-                        "students": students
+                        "students": students,
+                        "students2": students2
                     }
                 )
 
@@ -344,67 +345,6 @@ class IterativeAssessedActivityXBlock(XBlock):
             ],
         )
         return frag
-        
-        """
-        id_course = "ID_course"
-        id_instructor = "1"
-        #id_course = self.id_course
-
-        #activities = IAAActivity.objects.all().values()
-        activities = get_activities(id_course)['result']
-        id_activity = get_id_activity(id_course, self.activity_name)["result"]
-
-        if self.block_type == "none":
-            context.update(
-                {
-                    "block_type": self.block_type
-                }
-            )
-
-        elif self.block_type == "full":
-            
-            #students = get_students_data(id_activity, id_course, self.activity_stage)
-            students = [(1, "Pedro", "22/03", "hola :)", ""), (2, "Juan", "23/04", "holi?", "se dice hola aweonao"), (3, "Diego", "25/05", "chao", "")]
-            context.update(
-                {
-                    "block_type": self.block_type,
-                    "activity_name": self.activity_name,
-                    "activity_stage": self.activity_stage,
-                    "students": students
-                }
-            )
-
-        elif self.block_type == "display":
-
-            context.update(
-                {
-                }
-            )
-
-        elif self.block_type == "summary":
-
-            context.update(
-                {
-                }
-            )
-        
-        template = loader.render_django_template(
-            'public/html/iaaxblock_author.html',
-            context=Context(context),
-            i18n_service=self.runtime.service(self, 'i18n'),
-        )
-        frag = self.build_fragment(
-            template,
-            initialize_js_func='IterativeAssessedActivityAuthor',
-            additional_css=[
-                'public/css/iaaxblock.css',
-            ],
-            additional_js=[
-                'public/js/iaaxblock_author.js',
-            ],
-        )
-        return frag
-        """
     
 
     @XBlock.json_handler
@@ -413,6 +353,12 @@ class IterativeAssessedActivityXBlock(XBlock):
         Called when submitting the form in Studio.
         """
 
+        # provisorio
+        id_course = "ID_course"
+        #id_course = self.id_course
+        
+        previous_block_type = self.block_type
+        previous_activity_stage = self.activity_stage
         self.title = data.get('title')
         self.block_type = data.get('block_type')
         if self.block_type == "full":
@@ -422,6 +368,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.question = data.get('question')
             self.activity_name_previous = data.get('activity_name_previous')
             self.activity_stage_previous = int(data.get('activity_stage_previous'))
+            self.display_title = data.get('display_title')
         elif self.block_type == "display":
             self.activity_name_previous = data.get('activity_name_previous')
             self.activity_stage_previous = int(data.get('activity_stage_previous'))
@@ -429,6 +376,16 @@ class IterativeAssessedActivityXBlock(XBlock):
         else:
             self.activity_name = data.get('activity_name')
             self.summary_text = data.get('summary_text')
+
+
+        # se acaba de crear
+        if previous_block_type == "none" and self.block_type == "full":
+            create_or_edit_activity(id_course, self.activity_name, self.activity_stage)
+
+        # se cambia la stage
+        if previous_activity_stage != self.activity_stage:
+            create_or_edit_activity(id_course, self.activity_name, self.activity_stage)
+
         return {'result': 'success'}
 
 

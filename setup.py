@@ -38,6 +38,12 @@ setup(
     entry_points={
         'xblock.v1': [
             'iaaxblock = iaaxblock:IterativeAssessedActivityXBlock',
+        ],
+        "lms.djangoapp": [
+            "iaaxblock = iaaxblock.apps:IAAAppConfig",
+        ],
+        "cms.djangoapp": [
+            "iaaxblock = iaaxblock.apps:IAAAppConfig",
         ]
     },
     package_data=package_data("iaaxblock", ["static", "public"]),

@@ -219,8 +219,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         opt0.setAttribute("disabled", true);
                         opt0.setAttribute("selected", true);
                         activity_name_previous.append(opt0);
-                        activity_stage_previous.empty();
                         activity_name_previous.on("change", function () {
+                            activity_stage_previous.empty();
                             for (let activity of activities) {
                                 if (activity["activity_name"] === activity_name_previous.val()) {
                                     stages = activity["stages"].split(",")
@@ -263,8 +263,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt0.setAttribute("disabled", true);
                     opt0.setAttribute("selected", true);
                     activity_name_previous.append(opt0);
-                    activity_stage_previous.empty();
                     activity_name_previous.on("change", function () {
+                        activity_stage_previous.empty();
                         for (let activity of activities) {
                             if (activity["activity_name"] === activity_name_previous.val()) {
                                 stages = activity["stages"].split(",")
@@ -356,8 +356,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt.text = activity["activity_name"];
                     activity_name_previous.append(opt);
                 }
-                activity_stage_previous.empty();
                 activity_name_previous.on("change", function () {
+                    activity_stage_previous.empty();
                     for (let activity of activities) {
                         if (activity["activity_name"] === activity_name_previous.val()) {
                             stages = activity["stages"].split(",")
