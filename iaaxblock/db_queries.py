@@ -6,7 +6,7 @@ DB_URI = "postgresql://cmmiterative:cmmiterativepasswd@159.89.235.182:5432/itera
 
 def add_stage(new, old):
     stages = old.split(",")
-    stages.append(new)
+    stages.append(str(new))
     stages.sort()
     return ','.join(stages)
 
@@ -56,24 +56,23 @@ def get_submission(id_activity, id_student, stage):
 # Rutina 3
 def create_or_edit_activity(id_course, activity_name, new_stage):
     out = {}
-    try:
-        engine = create_engine(DB_URI)
-        with engine.begin() as conn:
-            query1 = "SELECT stages FROM Activity WHERE id_course = '{}' AND activity_name = '{}';".format(id_course, activity_name)
-            result1 = conn.execute(text(query1))
-            first = result1.first()
-            if first is not None:
-                stages = first[0]
-                stages = add_stage(new_stage, stages)
-                query2 = "UPDATE Activity SET stages = '{}' WHERE id_course = '{}' AND activity_name = '{}';".format(stages, id_course, activity_name)
-            else:
-                stages = str(new_stage)
-                query2 = "INSERT INTO Activity (id_course, activity_name, stages) VALUES ('{}', '{}', '{}');".format(id_course, activity_name, stages)
-            conn.execute(text(query2))
-            out["stage"] = stage
-    except Exception as e:
-        print(e)
-        out["error"] = "db-error"
+    #try:
+    engine = create_engine(DB_URI)
+    with engine.begin() as conn:
+        query1 = "SELECT stages FROM Activity WHERE id_course = '{}' AND activity_name = '{}';".format(id_course, activity_name)
+        result1 = conn.execute(text(query1))
+        first = result1.first()
+        if first is not None:
+            stages = first[0]
+            stages = add_stage(new_stage, stages)
+            query2 = "UPDATE Activity SET stages = '{}' WHERE id_course = '{}' AND activity_name = '{}';".format(stages, id_course, activity_name)
+        else:
+            stages = str(new_stage)
+            query2 = "INSERT INTO Activity (id_course, activity_name, stages) VALUES ('{}', '{}', '{}');".format(id_course, activity_name, stages)
+        conn.execute(text(query2))
+    #except Exception as e:
+    #    print(e)
+    #    out["error"] = "db-error"
     return out
 
 

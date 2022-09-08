@@ -1,24 +1,45 @@
-ver en dbeaver si se creó nueva actividad
+COSAS PENDIENTES
+
+- Incorporar tablas a base de datos.
+- Reemplazar las queries en que se insertan o editan cosas (comentadas).
+- Desarrollar funcionamiento de feedbacks (un botón por feedback, y lógicas asociadas).
+- Mostrar feedbacks en student_view, cuando corresponda.
+- Bloquear botón Save en Studio mientras se procesa una solicitud.
+- Mostrar avisos en Studio de que los cambios se realizaron correctamente.
+- Capturas de errores:
+    - Fijar requisitos mínimos para submission y feedback (en primera instancia, largo de caracteres).
+    - ¿Nueva actividad vacía?
+    - ¿Nueva actividad ya existe?
+    - ¿Todos los select fueron seleccionados?
+    - Bloquear escoger actividad con NMAX fases.
+    - ¿Título, pregunta y título anterior vacías?
+    - Si una submission está vacía, mostrar aviso de que aún no se responde.
+    - Si la respuesta anterior no está disponible, avisar en las views y forzar cambio en Studio.
+    - ¿Caracteres inválidos en algún input?
+- Manejar borrado de una instancia del bloque:
+    - Mostrar aviso que indique todo lo que ocurrirá en caso de borrar la instancia.
+    - Se borra la stage de IAAActivity, y todas las submissions y feedbacks. 
+    - Si una actividad se queda sin stages, debe borrarse.
+    - Si una actividad se quedó sin stages (y se borró), al cargar la studio_view de otra instancia del bloque que apunte a esta, deben reiniciarse los inputs de respuesta anterior (y mostrar un aviso). 
+- Desarrollar author_view.
+- Mejorar CSS.
+- Rutina de testing.
+- README y LICENSE
 
 
-próximo:
 
 
-- desarrollar summary (author view)
-- incorporar feedback (funcionamiento)
-- incorporar feedback (visualización)
-- desarrollar full (author view)
-- pasar todo a db real
-- errores menores
+PARA PRÓXIMAS VERSIONES
 
-
-caso borde: al borrar, ojo que activities cambia (pre-cargado en studio), lo que podría traer problemas
+- Bloques 'display' y 'full' podrían mostrar más de una respuesta anterior.
+- Diagrama en author_view que resuma la actividad actual (en caso de bloque 'full').
+- Reemplazar stages de enteros correlativos, con IDs.
+- Opciones de estilo/tema.
+- En summary, mostrar los IDs y permitir que se ordenen (y oculten, resalten...) desde Studio. (***)
 
 
 
-PROXIMA VERSION:
-
-- displays podrían mostrar más de uno.
-- distintos instructores, distintos feedbacks
-- en student view, se pueden ver los distintos feedbacks
+(***) ¿Qué pasa si la stage 4 está después de la stage 6 en el curso? En el summary saldría primero 6 y después 4. Si bien no es para nada grave,
+pone en duda la necesidad de stages correlativas. ¿Quizás usar IDs? La base de datos quedaría básicamente igual, con los IDs separados por comas, 
+y de tipo VARCHAR() en vez de INTEGER en IAASubmission. El summary podría construirse ordenando los IDs correspondientes a la actividad.
 

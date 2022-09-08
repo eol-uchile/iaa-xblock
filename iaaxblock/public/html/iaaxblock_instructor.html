@@ -14,9 +14,10 @@
             <tr>
                 <th hidden>ID</th>
                 <th>Estudiante</th>
-                <th>Fecha/Hora</th>
+                <th>Fecha/Hora Respuesta</th>
                 <th>Respuesta</th>
                 <th>Feedback</th>
+                <th>Fecha/Hora Feedback</th>
             </tr>
             {% for student in students %}
             <tr>
@@ -25,6 +26,7 @@
                 <td>{{student.2}}</td>
                 <td>{{student.3}}</td>
                 <td><textarea>{{student.4}}</textarea></td>
+                <td>{{student.5}}</td>
             </tr>
     
             {% endfor %}
