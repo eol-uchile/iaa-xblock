@@ -5,6 +5,7 @@ import pkg_resources
 from xblock.core import XBlock
 from django.db import IntegrityError
 from django.template.context import Context
+from django.contrib.auth.models import User
 from xblock.fields import Integer, String, Dict, Scope, Float, Boolean
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
@@ -131,87 +132,153 @@ class IterativeAssessedActivityXBlock(XBlock):
         Vista estudiante
         """
 
-        if self.block_type == "none":
-            context.update(
-                {
-                    "block_type": self.block_type
-                }
-            )
 
-        else:
+        
+        if getattr(self.runtime, 'user_is_staff', False):
 
-            # provisorio
-            id_student = "ID_student1"
-            #id_student = self.runtime.anonymous_student_id
             id_course = "ID_course"
+            id_instructor = "1"
             #id_course = self.id_course
+
+            #activities = IAAActivity.objects.all().values()
+            activities = get_activities(id_course)['result']
             id_activity = get_id_activity(id_course, self.activity_name)["result"]
 
-            if self.block_type == "full":
-                id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
-                submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
-                #feedbacks = get_feedbacks(id_activity, id_student, stage)
+            if self.block_type == "none":
                 context.update(
                     {
-                        "title": self.title,
+                        "block_type": self.block_type
+                    }
+                )
+
+            elif self.block_type == "full":
+                
+                #students = get_students_data(id_activity, id_course, self.activity_stage)
+                #students = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('username').values('id', 'username', 'email')
+                students = [(1, "Pedro", "22/03", "hola :)", ""), (2, "Juan", "23/04", "holi?", "se dice hola aweonao"), (3, "Diego", "25/05", "chao", "")]
+                context.update(
+                    {
                         "block_type": self.block_type,
-                        "activity_name_previous": self.activity_name_previous,
-                        "activity_stage_previous": self.activity_stage_previous,
-                        "submission_previous": submission_previous,
-                        "submission_previous_time": submission_previous_time,
-                        "display_title": self.display_title,
                         "activity_name": self.activity_name,
                         "activity_stage": self.activity_stage,
-                        "submission": self.submission,
-                        "submission_time": self.submission_time,
-                        "stage_label": self.stage_label,
-                        "question": self.question,
-                        "submission": self.submission
+                        "students": students
                     }
                 )
 
             elif self.block_type == "display":
-                id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
-                submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
+
                 context.update(
                     {
-                        "title": self.title,
-                        "block_type": self.block_type,
-                        "activity_name_previous": self.activity_name_previous,
-                        "activity_stage_previous": self.activity_stage_previous,
-                        "submission_previous": submission_previous,
-                        "submission_previous_time": submission_previous_time,
-                        "display_title": self.display_title,
+                    }
+                )
+
+            elif self.block_type == "summary":
+
+                context.update(
+                    {
+                    }
+                )
+            
+            template = loader.render_django_template(
+                'public/html/iaaxblock_instructor.html',
+                context=Context(context),
+                i18n_service=self.runtime.service(self, 'i18n'),
+            )
+            frag = self.build_fragment(
+                template,
+                initialize_js_func='IterativeAssessedActivityInstructor',
+                additional_css=[
+                    'public/css/iaaxblock.css',
+                ],
+                additional_js=[
+                    'public/js/iaaxblock_instructor.js',
+                ],
+            )
+            return frag
+
+        else:
+
+            if self.block_type == "none":
+                context.update(
+                    {
+                        "block_type": self.block_type
                     }
                 )
 
             else:
-                summary = get_summary(id_activity, id_student)["result"]
-                context.update(
-                    {
-                        "title": self.title,
-                        "block_type": self.block_type,
-                        "activity_name": self.activity_name,
-                        "summary": summary
-                    }
-                )
 
-        template = loader.render_django_template(
-            'public/html/iaaxblock_student.html',
-            context=Context(context),
-            i18n_service=self.runtime.service(self, 'i18n'),
-        )
-        frag = self.build_fragment(
-            template,
-            initialize_js_func='IterativeAssessedActivityStudent',
-            additional_css=[
-                'public/css/iaaxblock.css',
-            ],
-            additional_js=[
-                'public/js/iaaxblock_student.js',
-            ],
-        )
-        return frag
+                # provisorio
+                id_student = "ID_student1"
+                #id_student = self.runtime.anonymous_student_id
+                id_course = "ID_course"
+                #id_course = self.id_course
+                id_activity = get_id_activity(id_course, self.activity_name)["result"]
+
+                if self.block_type == "full":
+                    id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
+                    submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
+                    #feedbacks = get_feedbacks(id_activity, id_student, stage)
+                    context.update(
+                        {
+                            "title": self.title,
+                            "block_type": self.block_type,
+                            "activity_name_previous": self.activity_name_previous,
+                            "activity_stage_previous": self.activity_stage_previous,
+                            "submission_previous": submission_previous,
+                            "submission_previous_time": submission_previous_time,
+                            "display_title": self.display_title,
+                            "activity_name": self.activity_name,
+                            "activity_stage": self.activity_stage,
+                            "submission": self.submission,
+                            "submission_time": self.submission_time,
+                            "stage_label": self.stage_label,
+                            "question": self.question,
+                            "submission": self.submission
+                        }
+                    )
+
+                elif self.block_type == "display":
+                    id_activity_previous = get_id_activity(id_course, self.activity_name_previous)["result"]
+                    submission_previous, submission_previous_time = get_submission(id_activity_previous, id_student, self.activity_stage_previous)["result"]
+                    context.update(
+                        {
+                            "title": self.title,
+                            "block_type": self.block_type,
+                            "activity_name_previous": self.activity_name_previous,
+                            "activity_stage_previous": self.activity_stage_previous,
+                            "submission_previous": submission_previous,
+                            "submission_previous_time": submission_previous_time,
+                            "display_title": self.display_title,
+                        }
+                    )
+
+                else:
+                    summary = get_summary(id_activity, id_student)["result"]
+                    context.update(
+                        {
+                            "title": self.title,
+                            "block_type": self.block_type,
+                            "activity_name": self.activity_name,
+                            "summary": summary
+                        }
+                    )
+
+            template = loader.render_django_template(
+                'public/html/iaaxblock_student.html',
+                context=Context(context),
+                i18n_service=self.runtime.service(self, 'i18n'),
+            )
+            frag = self.build_fragment(
+                template,
+                initialize_js_func='IterativeAssessedActivityStudent',
+                additional_css=[
+                    'public/css/iaaxblock.css',
+                ],
+                additional_js=[
+                    'public/js/iaaxblock_student.js',
+                ],
+            )
+            return frag
 
     def studio_view(self, context):
         """
@@ -258,9 +325,27 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     def author_view(self, context={}):
         """
-        Vista instructor
+        Vista de autor
         """
+
+        template = loader.render_django_template(
+            'public/html/iaaxblock_author.html',
+            context=Context(context),
+            i18n_service=self.runtime.service(self, 'i18n'),
+        )
+        frag = self.build_fragment(
+            template,
+            initialize_js_func='IterativeAssessedActivityAuthor',
+            additional_css=[
+                'public/css/iaaxblock.css',
+            ],
+            additional_js=[
+                'public/js/iaaxblock_author.js',
+            ],
+        )
+        return frag
         
+        """
         id_course = "ID_course"
         id_instructor = "1"
         #id_course = self.id_course
@@ -319,7 +404,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             ],
         )
         return frag
-
+        """
     
 
     @XBlock.json_handler

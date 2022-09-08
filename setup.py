@@ -32,6 +32,8 @@ setup(
     ],
     install_requires=[
         'XBlock',
+        'sqlalchemy',
+        'psycopg2-binary',
     ],
     entry_points={
         'xblock.v1': [
