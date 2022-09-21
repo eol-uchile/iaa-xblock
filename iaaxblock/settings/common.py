@@ -2,4 +2,4 @@
 
 
 def plugin_settings(settings):
-    pass
+    settings.FEATURES['ENABLE_MY_APP'] = True
