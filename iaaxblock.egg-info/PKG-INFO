@@ -2,4 +2,5 @@ Metadata-Version: 2.1
 Name: iaaxblock
 Version: 0.1
 Summary: IAA XBlock
-License: UNKNOWN
+License: GPL 3.0
+License-File: LICENSE
