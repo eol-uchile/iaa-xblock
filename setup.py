@@ -25,15 +25,13 @@ def package_data(pkg, roots):
 setup(
     name='iaaxblock',
     version='0.1',
-    description='IAA XBlock',   # TODO: write a better description.
-    license='UNKNOWN',          # TODO: choose a license: 'AGPL v3' and 'Apache 2.0' are popular.
+    description='IAA XBlock',
+    license='GPL 3.0',
     packages=[
         'iaaxblock',
     ],
     install_requires=[
         'XBlock',
-        'sqlalchemy',
-        'psycopg2-binary',
     ],
     entry_points={
         'xblock.v1': [

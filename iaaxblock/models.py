@@ -6,32 +6,40 @@ class IAAActivity(models.Model):
 
     id_course = models.TextField()
     activity_name = models.TextField()
-    stages = models.TextField()
 
 
-class IAASubmission(models.Model):
+class IAAStage(models.Model):
 
     id_activity = models.ForeignKey(
         IAAActivity,
         on_delete=models.CASCADE,
         related_name="iaa_activity"
     )
+    stage_label = models.TextField()
+    stage_number = models.IntegerField()
+
+
+class IAASubmission(models.Model):
+
+    id_stage = models.ForeignKey(
+        IAAStage,
+        on_delete=models.CASCADE,
+        related_name="iaa_stage"
+    )
     id_student = models.TextField()
-    stage = models.IntegerField()
     submission = models.TextField()
     submission_time = models.DateField()
 
 
 class IAAFeedback(models.Model):
 
-    id_activity = models.ForeignKey(
-        IAAActivity,
+    id_stage = models.ForeignKey(
+        IAAStage,
         on_delete=models.CASCADE,
-        related_name="iaa_activity"
+        related_name="iaa_stage"
     )
     id_student = models.TextField()
     id_instructor = models.TextField()
-    stage = models.IntegerField()
     feedback = models.TextField()
     feedback_time = models.DateField()
 
