@@ -1,8 +1,6 @@
 COSAS PENDIENTES
 
 - Incorporar tablas a base de datos.
-- Reemplazar las queries en que se insertan o editan cosas (comentadas).
-- Desarrollar funcionamiento de feedbacks (un botón por feedback, y lógicas asociadas).
 - Mostrar feedbacks en student_view, cuando corresponda.
 - Bloquear botón Save en Studio mientras se procesa una solicitud.
 - Mostrar avisos en Studio de que los cambios se realizaron correctamente.

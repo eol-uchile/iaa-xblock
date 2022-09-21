@@ -150,7 +150,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 students = []
                 student_names = [x["email"] for x in enrolled]
                 student_ids = [x["id"] for x in enrolled]
-                current_stage = IAAStage.objects.get(iaa_activity=activity, stage_number=self.activity_stage)
+                current_stage = IAAStage.objects.get(iaa_activity=current_activity, stage_number=self.activity_stage)
                 for i in range(len(student_names)):
                     submission = IAASubmission.objects.filter(iaa_stage=current_stage, id_student=student_ids[i]).values('id_student', 'submission', 'submission_time')
                     feedback = IAAFeedback.objects.filter(iaa_stage=current_stage, id_student=student_ids[i], id_instructor=id_instructor).values('id_student', 'feedback', 'feedback_time')
