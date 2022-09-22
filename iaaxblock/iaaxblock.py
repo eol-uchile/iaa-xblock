@@ -2,7 +2,7 @@ import json
 import pkg_resources
 from xblock.core import XBlock
 from django.template.context import Context
-from xblock.fields import Integer, String, Scope
+from xblock.fields import Integer, String, Scope, Boolean
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
 import datetime
@@ -52,6 +52,12 @@ class IterativeAssessedActivityXBlock(XBlock):
         default="",
         scope=Scope.settings,
         help="Question shown before the text input."
+    )
+
+    activity_previous = Boolean(
+        default=False,
+        scope=Scope.settings,
+        help="Wether to show a previous student submission or not."
     )
 
     activity_name_previous = String(
@@ -402,9 +408,16 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.activity_stage = int(data.get('activity_stage'))
             self.stage_label = data.get('stage_label')
             self.question = data.get('question')
-            self.activity_name_previous = data.get('activity_name_previous')
-            self.activity_stage_previous = int(data.get('activity_stage_previous'))
-            self.display_title = data.get('display_title')
+            if self.activity_previous == "yes":
+                self.activity_previous = True
+                self.activity_name_previous = data.get('activity_name_previous')
+                self.activity_stage_previous = int(data.get('activity_stage_previous'))
+                self.display_title = data.get('display_title')
+            else:
+                self.activity_previous = False
+                self.activity_name_previous = ""
+                self.activity_stage_previous = 0
+                self.display_title = ""
         elif self.block_type == "display":
             self.activity_name_previous = data.get('activity_name_previous')
             self.activity_stage_previous = int(data.get('activity_stage_previous'))

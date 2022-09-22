@@ -42,10 +42,18 @@
                 <input class="input setting-input" name="stage_label" id="stage_label" value="" type="text" />
             </div>
         </li>
+        <li id="input_question" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="question">Pregunta</label>
+                <input class="input setting-input" name="question" id="question" value="" type="text" />
+            </div>
+        </li>
         <li id="input_activity_previous" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="activity_previous">¿Mostrar una respuesta anterior?</label>
                 <select id="activity_previous" class="activity_previous" name="activity_previous">
+                    <option value="yes">Sí</option>
+                    <option value="no" selected>No</option>
                 </select>
             </div>
         </li>
@@ -69,12 +77,6 @@
                 <label class="label setting-label" for="display_title">Título de respuesta anterior</label>
                 <input class="input setting-input" name="display_title" id="display_title"
                     value="" type="text" />
-            </div>
-        </li>
-        <li id="input_question" class="field comp-setting-entry is-set" hidden>
-            <div class="wrapper-comp-setting">
-                <label class="label setting-label" for="question">Pregunta</label>
-                <input class="input setting-input" name="question" id="question" value="" type="text" />
             </div>
         </li>
         <li id="input_summary_text" class="field comp-setting-entry is-set" hidden>

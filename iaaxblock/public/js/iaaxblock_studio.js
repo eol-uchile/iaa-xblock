@@ -16,6 +16,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let activity_stage = $(element).find("#activity_stage");
     let input_stage_label = $(element).find("#input_stage_label");
     let stage_label = $(element).find("#stage_label");
+    let input_activity_previous = $(element).find("#input_activity_previous");
+    let activity_previous = $(element).find("#activity_previous");
     let input_display_title = $(element).find("#input_display_title");
     let display_title = $(element).find("#display_title");
     let input_activity_name_previous = $(element).find("#input_activity_name_previous");
@@ -28,12 +30,10 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let summary_text = $(element).find("#summary_text");
 
     function validate(data) {
-        // revisar todos los selectores están seleccionados
-        //
         if (data["title"] === ""){
             return "Por favor indique el título del bloque."
         }
-        if (data["block_type"] === "none"){
+        if (data["block_type"] === null){
             return "Por favor indique el tipo de bloque."
         } else if (data["block_type"] === "full"){
             if (data["activity_name"] === "none" || data["activity_name"] === ""){
@@ -55,15 +55,27 @@ function IterativeAssessedActivityStudio(runtime, element) {
             if (data["question"] === ""){
                 return "Por favor proporcione un enunciado para esta fase."
             }
-            // faltan aqui la respuesta anterior
-            // agregar pregunta de si quieren o no respuesta anterior
-            // si no hay disponibles, disabled (ojo con edit y apuntarse a si mismo)
+            if (data["activity_previous"] === "yes"){
+                if (data["activity_name_previous"] === "none"){
+                    return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
+                }
+                if (data["activity_stage_previous"] != null){
+                    if (data["activity_stage_previous"] === "none"){
+                        return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior."
+                    }
+                } else {
+                    return "No se cuenta aún con otras respuestas para desplegar."
+                }
+                if (data["display_title"] === ""){
+                    return "Por favor proporcione un título a la respuesta anterior."
+                }
+            }
         } else if (data["block_type"] === "display"){
             if (data["activity_name_previous"] === "none"){
                 return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
             }
             if (data["activity_stage_previous"] === "none"){
-                return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior.."
+                return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior."
             }
             if (data["display_title"] === ""){
                 return "Por favor proporcione un título a la respuesta anterior."
@@ -83,12 +95,71 @@ function IterativeAssessedActivityStudio(runtime, element) {
         $(element).find('.iaa-studio-error-msg').html(msg);
     }
 
+    function handlePrevious(){
+        previous = activity_previous.val() === "yes";
+        if (previous){
+            input_activity_name_previous.removeAttr("hidden");
+            activity_name_previous.empty();
+            for (let activity of activities) {
+                let opt = document.createElement("option");
+                opt.value = activity["activity_name"];
+                opt.text = activity["activity_name"];
+                activity_name_previous.append(opt);
+            }
+            let opt0 = document.createElement("option");
+            opt0.value = "none";
+            opt0.text = "Por favor seleccione una opción...";
+            opt0.setAttribute("disabled", true);
+            opt0.setAttribute("selected", true);
+            activity_name_previous.append(opt0);
+            activity_name_previous.on("change", function () {
+                activity_stage_previous.empty();
+                let current_activity = (activity_name.val() === "new" ? new_activity_name : activity_name.val());
+                let current_stage = activity_stage.val();
+                for (let activity of activities) {
+                    if (activity["activity_name"] === activity_name_previous.val()) {
+                        stages = activity["stages"].split(",");
+                        for(let stage of stages){
+                            if (!(current_activity === activity["activity_name"] && current_stage === stage)){
+                                let opt = document.createElement('option');
+                                opt.value = stage;
+                                opt.text = stage;
+                                activity_stage_previous.append(opt);
+                            }
+                        }
+                        if( activity_stage_previous.has('option').length > 0 ){
+                            let opt0 = document.createElement("option");
+                            opt0.value = "none";
+                            opt0.text = "Por favor seleccione una opción...";
+                            opt0.setAttribute("disabled", true);
+                            opt0.setAttribute("selected", true);
+                            activity_stage_previous.append(opt0);
+                            input_activity_stage_previous.removeAttr("hidden");
+                        } else {
+                            activity_stage_previous.empty();
+                        }
+                    }
+                }
+            });
+            input_display_title.removeAttr("hidden");
+        } else {
+            input_activity_name_previous.attr("hidden", true);
+            input_activity_stage_previous.attr("hidden", true);
+            input_display_title.attr("hidden", true);
+        }
+    }
+
 
     $(element).find('.save-button').bind('click', function (eventObject) {
         eventObject.preventDefault();
         var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
 
-        if (block_type.val() === "full"){
+        if (block_type.val() === null){
+            var data = {
+                title: title.val(),
+                block_type: null
+            };
+        } else if (block_type.val() === "full"){
             var data = {
                 title: title.val(),
                 activity_name: (activity_name.val() === "new" ? new_activity_name.val() : (activity_name.val() === null ? "" : activity_name.val())),
@@ -96,6 +167,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 activity_stage: activity_stage.val(),
                 stage_label: stage_label.val(),
                 question: question.val(),
+                activity_previous: activity_previous.val(),
                 activity_name_previous: activity_name_previous.val(),
                 activity_stage_previous: activity_stage_previous.val(),
                 display_title: display_title.val()
@@ -248,42 +320,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         }
                         input_stage_label.removeAttr("hidden");
                         input_question.removeAttr("hidden");
-                        input_activity_name_previous.removeAttr("hidden");
-                        activity_name_previous.empty();
-                        for (let activity of activities) {
-                            let opt = document.createElement("option");
-                            opt.value = activity["activity_name"];
-                            opt.text = activity["activity_name"];
-                            activity_name_previous.append(opt);
-                        }
-                        let opt0 = document.createElement("option");
-                        opt0.value = "none";
-                        opt0.text = "Por favor seleccione una opción...";
-                        opt0.setAttribute("disabled", true);
-                        opt0.setAttribute("selected", true);
-                        activity_name_previous.append(opt0);
-                        activity_name_previous.on("change", function () {
-                            activity_stage_previous.empty();
-                            for (let activity of activities) {
-                                if (activity["activity_name"] === activity_name_previous.val()) {
-                                    stages = activity["stages"].split(",")
-                                    for(let stage of stages){
-                                        let opt = document.createElement('option');
-                                        opt.value = stage;
-                                        opt.text = stage;
-                                        activity_stage_previous.append(opt)
-                                    }
-                                    let opt0 = document.createElement("option");
-                                    opt0.value = "none";
-                                    opt0.text = "Por favor seleccione una opción...";
-                                    opt0.setAttribute("disabled", true);
-                                    opt0.setAttribute("selected", true);
-                                    activity_stage_previous.append(opt0);
-                                    input_activity_stage_previous.removeAttr("hidden");
-                                }
-                            }
+                        
+                        input_activity_previous.removeAttr("hidden");
+                        activity_previous.on("change", handlePrevious);
+                        activity_stage.on("change", function(){
+                            activity_previous.val("no");
                         });
-                        input_display_title.removeAttr("hidden");
                     }
 
                     if (block_type.val() === "summary") {
@@ -292,42 +334,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 });
 
                 if (block_type.val() === "display") {
-                    input_activity_name_previous.removeAttr("hidden");
-                    activity_name_previous.empty();
-                    for (let activity of activities) {
-                        let opt = document.createElement("option");
-                        opt.value = activity["activity_name"];
-                        opt.text = activity["activity_name"];
-                        activity_name_previous.append(opt);
-                    }
-                    let opt0 = document.createElement("option");
-                    opt0.value = "none";
-                    opt0.text = "Por favor seleccione una opción...";
-                    opt0.setAttribute("disabled", true);
-                    opt0.setAttribute("selected", true);
-                    activity_name_previous.append(opt0);
-                    activity_name_previous.on("change", function () {
-                        activity_stage_previous.empty();
-                        for (let activity of activities) {
-                            if (activity["activity_name"] === activity_name_previous.val()) {
-                                stages = activity["stages"].split(",")
-                                for(let stage of stages){
-                                    let opt = document.createElement('option');
-                                    opt.value = stage;
-                                    opt.text = stage;
-                                    activity_stage_previous.append(opt)
-                                }
-                                let opt0 = document.createElement("option");
-                                opt0.value = "none";
-                                opt0.text = "Por favor seleccione una opción...";
-                                opt0.setAttribute("disabled", true);
-                                opt0.setAttribute("selected", true);
-                                activity_stage_previous.append(opt0);
-                                input_activity_stage_previous.removeAttr("hidden");
-                            }
-                        }
-                    });
-                    input_display_title.removeAttr("hidden");
+                    handlePrevious(true);
                 }
 
             });
