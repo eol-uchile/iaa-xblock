@@ -42,6 +42,13 @@
                 <input class="input setting-input" name="stage_label" id="stage_label" value="" type="text" />
             </div>
         </li>
+        <li id="input_activity_previous" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="activity_previous">¿Mostrar una respuesta anterior?</label>
+                <select id="activity_previous" class="activity_previous" name="activity_previous">
+                </select>
+            </div>
+        </li>
         <li id="input_activity_name_previous" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
                 <label class="label setting-label" for="activity_name_previous">Actividad de respuesta anterior</label>
@@ -85,7 +92,9 @@
             <li class="action-item">
                 <a href="#" class="button cancel-button">Cancel</a>
             </li>
+            <li>
+                <p class="iaa-studio-error-msg"></p>
+            </li>
         </ul>
     </div>
-    <p class="iaa-studio-error-msg"></p>
 </div>

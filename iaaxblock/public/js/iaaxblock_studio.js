@@ -27,15 +27,55 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let input_summary_text = $(element).find("#input_summary_text");
     let summary_text = $(element).find("#summary_text");
 
-
-    function getMinStage(stages){
-
-    }
-
-
     function validate(data) {
         // revisar todos los selectores están seleccionados
-        // 
+        //
+        if (data["title"] === ""){
+            return "Por favor indique el título del bloque."
+        }
+        if (data["block_type"] === "none"){
+            return "Por favor indique el tipo de bloque."
+        } else if (data["block_type"] === "full"){
+            if (data["activity_name"] === "none" || data["activity_name"] === ""){
+                return "Por favor indique el nombre de la actividad."
+            }
+            if (activity_name.val() === "new"){
+                for (let activity of activities){
+                    if (data["activity_name"] === activity["activity_name"]){
+                        return "Ya existe en este curso una actividad con ese nombre."
+                    }
+                }
+            }
+            if (data["activity_stage"] === "none"){
+                return "Por favor selecciona la fase de la actividad."
+            }
+            if (data["stage_label"] === ""){
+                return "Por favor proporcione una etiqueta para esta fase."
+            }
+            if (data["question"] === ""){
+                return "Por favor proporcione un enunciado para esta fase."
+            }
+            // faltan aqui la respuesta anterior
+            // agregar pregunta de si quieren o no respuesta anterior
+            // si no hay disponibles, disabled (ojo con edit y apuntarse a si mismo)
+        } else if (data["block_type"] === "display"){
+            if (data["activity_name_previous"] === "none"){
+                return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
+            }
+            if (data["activity_stage_previous"] === "none"){
+                return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior.."
+            }
+            if (data["display_title"] === ""){
+                return "Por favor proporcione un título a la respuesta anterior."
+            }
+        } else {
+            if (data["activity_name"] === "none"){
+                return "Por favor indique el nombre de la actividad."
+            }
+            if (data["summary_text"] === ""){
+                return "Por favor indique el texto de resumen."
+            }
+        }
         return "";
     }
 
@@ -53,19 +93,19 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 title: title.val(),
                 activity_name: (activity_name.val() === "new" ? new_activity_name.val() : (activity_name.val() === null ? "" : activity_name.val())),
                 block_type: block_type.val(),
-                activity_stage: (activity_stage.val() === "0" ? "-1" : activity_stage.val()),
+                activity_stage: activity_stage.val(),
                 stage_label: stage_label.val(),
                 question: question.val(),
-                activity_name_previous: (activity_name_previous.val() === null ? "" : activity_name_previous.val()),
-                activity_stage_previous: (activity_stage_previous.val() === "0" ? "-1" : activity_stage_previous.val()),
+                activity_name_previous: activity_name_previous.val(),
+                activity_stage_previous: activity_stage_previous.val(),
                 display_title: display_title.val()
             };
         } else if (block_type.val() === "display"){
             var data = {
                 title: title.val(),
                 block_type: block_type.val(),
-                activity_name_previous: (activity_name_previous.val() === null ? "" : activity_name_previous.val()),
-                activity_stage_previous: (activity_stage_previous.val() === "0" ? "-1" : activity_stage_previous.val()),
+                activity_name_previous: activity_name_previous.val(),
+                activity_stage_previous: activity_stage_previous.val(),
                 display_title: display_title.val()
             };
         } else if (block_type.val() === "summary"){
@@ -117,6 +157,9 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 if (option[0] === "none") {
                     opt.setAttribute("disabled", true);
                     opt.setAttribute("selected", true);
+                }
+                if((option[0] === "display" || option[0] === "summary") && activities.length === 0){
+                    opt.setAttribute("disabled", true);
                 }
             }
 

@@ -134,7 +134,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         # Staff
         if getattr(self.runtime, 'user_is_staff', False):
 
-            id_course = self.id_course
+            id_course = self.course_id
             id_instructor = self.scope_ids.user_id
             current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
 
@@ -219,7 +219,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 )
             else:
                 id_student = self.scope_ids.user_id
-                id_course = self.id_course
+                id_course = self.course_id
                 current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
 
                 if self.block_type == "full":
@@ -320,7 +320,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         Create a fragment used to display the edit view in the Studio.
         """
         from .models import IAAActivity, IAAStage
-        id_course = self.id_course
+        id_course = self.course_id
         activities_no_stage = [x for x in IAAActivity.objects.filter(id_course=id_course).values("id", "activity_name")]
         activities = []
         for i in range(len(activities_no_stage)):
@@ -391,7 +391,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
 
-        id_course = self.id_course
+        id_course = self.course_id
         previous_block_type = self.block_type
         previous_activity_stage = self.activity_stage
         previous_stage_label = self.stage_label
@@ -450,7 +450,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         from .models import IAAActivity, IAAStage, IAASubmission
 
-        id_course = self.id_course
+        id_course = self.course_id
         id_student = self.scope_ids.user_id
         current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
         current_stage = IAAStage.objects.get(iaa_activity=current_activity)
@@ -467,7 +467,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         """
         from .models import IAAActivity, IAAStage, IAAFeedback
-        id_course = self.id_course
+        id_course = self.course_id
         id_instructor = self.scope_ids.user_id
         current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
         current_stage = IAAStage.objects.get(iaa_activity=current_activity)
