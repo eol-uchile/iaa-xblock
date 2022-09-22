@@ -1,15 +1,11 @@
 import json
 import pkg_resources
 from xblock.core import XBlock
-from django.db import IntegrityError
 from django.template.context import Context
-from django.contrib.auth.models import User
-from xblock.fields import Integer, String, Dict, Scope, Float, Boolean
+from xblock.fields import Integer, String, Scope
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
 import datetime
-
-from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
 
 
 loader = ResourceLoader(__name__)
@@ -96,10 +92,12 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     has_author_view = True
 
+
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
+
 
     def build_fragment(
         self,
@@ -125,11 +123,13 @@ class IterativeAssessedActivityXBlock(XBlock):
         fragment.initialize_js(initialize_js_func, json_args=settings)
         return fragment
 
+
     def student_view(self, context={}):
         """
         Vista estudiante
         """
-
+        from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
+        from django.contrib.auth.models import User
 
         # Staff
         if getattr(self.runtime, 'user_is_staff', False):
@@ -152,8 +152,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                 student_ids = [x["id"] for x in enrolled]
                 current_stage = IAAStage.objects.get(iaa_activity=current_activity, stage_number=self.activity_stage)
                 for i in range(len(student_names)):
-                    submission = IAASubmission.objects.filter(iaa_stage=current_stage, id_student=student_ids[i]).values('id_student', 'submission', 'submission_time')
-                    feedback = IAAFeedback.objects.filter(iaa_stage=current_stage, id_student=student_ids[i], id_instructor=id_instructor).values('id_student', 'feedback', 'feedback_time')
+                    submission = IAASubmission.objects.filter(iaa_stage_submission=current_stage, id_student=student_ids[i]).values('id_student', 'submission', 'submission_time')
+                    feedback = IAAFeedback.objects.filter(iaa_stage_feedback=current_stage, id_student=student_ids[i], id_instructor=id_instructor).values('id_student', 'feedback', 'feedback_time')
                     if len(submission) == 0:
                         this_submission = ""
                         this_submission_time = ""
@@ -166,7 +166,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     else:
                         this_feedback = feedback[0]["feedback"]
                         this_feedback_time = str(feedback[0]["feedback_time"])
-                    students.append((student_ids[i], student_names[i], submission[i]["submission"], submission[i]["submission_time"], feedback[i]["feedback"], feedback[i]["feedback_time"]))
+                    students.append((student_ids[i], student_names[i], this_submission, this_submission_time, this_feedback, this_feedback_time))
                 context.update(
                     {
                         "block_type": self.block_type,
@@ -225,7 +225,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 if self.block_type == "full":
                     current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
                     current_stage_previous = IAAStage.objects.get(iaa_activity=current_activity_previous, stage_number=self.activity_stage_previous)
-                    current_submission_previous = IAASubmission.objects.filter(iaa_stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
+                    current_submission_previous = IAASubmission.objects.filter(iaa_stage_submission=current_stage_previous, id_student=id_student).values("submission", "submission_time")
                     if len(current_submission_previous) == 0:
                         this_submission_previous = ""
                         this_submission_time_previous = ""
@@ -233,7 +233,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                         this_submission_previous = current_submission_previous[0]["submission"]
                         this_submission_time_previous = current_submission_previous[0]["submission_time"]
                     current_stage = IAAStage.objects.get(iaa_activity=current_activity, stage_number=self.activity_stage)
-                    feedbacks = [(x["id_instructor"], x["feedback"], x["feedback_time"]) for x in IAAFeedback.objects.filter(iaa_stage=current_stage, id_student=id_student).values('id_instructor', 'feedback', 'feedback_time')]
+                    feedbacks = [(x["id_instructor"], x["feedback"], x["feedback_time"]) for x in IAAFeedback.objects.filter(iaa_stage_feedback=current_stage, id_student=id_student).values('id_instructor', 'feedback', 'feedback_time')]
                     context.update(
                         {
                             "title": self.title,
@@ -256,7 +256,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 elif self.block_type == "display":
                     current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
                     current_stage_previous = IAAStage.objects.get(iaa_activity=current_activity_previous, stage_number=self.activity_stage_previous)
-                    current_submission_previous = IAASubmission.objects.filter(iaa_stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
+                    current_submission_previous = IAASubmission.objects.filter(iaa_stage_submission=current_stage_previous, id_student=id_student).values("submission", "submission_time")
                     if len(current_submission_previous) == 0:
                         this_submission_previous = ""
                         this_submission_time_previous = ""
@@ -280,7 +280,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     stages_list = IAAStage.objects.filter(iaa_activity=current_activity).order_by("stage_number").all()
 
                     for stage in stages_list:
-                        submission = IAASubmission.objects.filter(iaa_stage=stage, id_student=id_student).values("submission", "submission_time")
+                        submission = IAASubmission.objects.filter(iaa_stage_submission=stage, id_student=id_student).values("submission", "submission_time")
                         if len(submission) == 0:
                             this_summary_submission = ""
                             this_summary_submission_time = ""
@@ -319,7 +319,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         Create a fragment used to display the edit view in the Studio.
         """
-
+        from .models import IAAActivity, IAAStage
         id_course = self.id_course
         activities_no_stage = [x for x in IAAActivity.objects.filter(id_course=id_course).values("id", "activity_name")]
         activities = []
@@ -389,6 +389,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         Called when submitting the form in Studio.
         """
+        from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
 
         id_course = self.id_course
         previous_block_type = self.block_type
@@ -447,13 +448,14 @@ class IterativeAssessedActivityXBlock(XBlock):
     def student_submit(self, data, suffix=''):
         """
         """
+        from .models import IAAActivity, IAAStage, IAASubmission
 
         id_course = self.id_course
         id_student = self.scope_ids.user_id
         current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
         current_stage = IAAStage.objects.get(iaa_activity=current_activity)
         new_submission_time = datetime.datetime.now()
-        new_submission = IAASubmission(iaa_stage=current_stage, id_student=id_student, submission=data["submission"], submission_time=new_submission_time)
+        new_submission = IAASubmission(iaa_stage_submission=current_stage, id_student=id_student, submission=data["submission"], submission_time=new_submission_time)
         new_submission.save()
         self.submission = data["submission"]
         self.submission_time = str(new_submission_time)
@@ -464,16 +466,17 @@ class IterativeAssessedActivityXBlock(XBlock):
     def instructor_submit(self, data, suffix=''):
         """
         """
+        from .models import IAAActivity, IAAStage, IAAFeedback
         id_course = self.id_course
         id_instructor = self.scope_ids.user_id
         current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
         current_stage = IAAStage.objects.get(iaa_activity=current_activity)
         for student in data["feedbacks"]:
             if student["feedback"] != "":
-                existing_feedback = IAAFeedback.objects.filter(iaa_stage=current_stage, id_instructor=id_instructor, id_student=student["id_stundent"]).all()
+                existing_feedback = IAAFeedback.objects.filter(iaa_stage_feedback=current_stage, id_instructor=id_instructor, id_student=student["id_stundent"]).all()
                 new_feedback_time = datetime.datetime.now()
                 if len(existing_feedback) == 0:
-                    new_feedback = IAAFeedback(iaa_stage=current_stage, id_instructor=id_instructor, id_student=student["id_student"], feedback=student["feedback"], feedback_time=new_feedback_time)
+                    new_feedback = IAAFeedback(iaa_stage_feedback=current_stage, id_instructor=id_instructor, id_student=student["id_student"], feedback=student["feedback"], feedback_time=new_feedback_time)
                     new_feedback.save()
                 else:
                     existing_feedback.feedback = student["feedback"]

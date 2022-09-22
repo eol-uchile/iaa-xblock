@@ -22,7 +22,7 @@ COSAS PENDIENTES
 - Desarrollar author_view.
 - Mejorar CSS.
 - Rutina de testing.
-- README y LICENSE
+- README
 
 
 

@@ -34,9 +34,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
 
 
     function validate(data) {
-        if (data.block_type !== "display" && data.activity_name === "none") {
-            return "Invalid activity name."
-        }
+        // revisar todos los selectores están seleccionados
+        // 
         return "";
     }
 
@@ -185,6 +184,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             for (let activity of activities) {
                                 if (activity["activity_name"] === activity_name.val()) {
                                     stages = activity["stages"].split(',');
+                                    //if (stages === allStages)
                                     console.log(stages);
                                     for(let i = 1; i <= MAX_STAGES; i++){
                                         if(!stages.includes(i.toString())){
