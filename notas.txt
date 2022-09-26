@@ -2,15 +2,11 @@ PENDIENTE
 
 
 A la edición incorporar:
-- input nuevo de usar o no respuesta anterior
-- caso en que no hay activities, o cuando se está apuntando a sí mismo
-- caso en que la activity/stage que tenía seleccionado, desapareció
+- si no hay activities, dejar fijo en no el input de respuesta anterior
+- caso en que la activity/stage que tenía seleccionado, desapareció (YA QUEDÓ CUBIERTO?)
 
-Lo último:
-- probar crear un bloque full. hay un error en la db (y probablemente en todas las queries con one-to-many)
 
 Cosas pendientes:
-- Mostrar avisos en Studio de que los cambios se realizaron correctamente.
 - Capturas de errores:
     - Fijar requisitos mínimos para submission y feedback (en primera instancia, largo de caracteres).
     - Bloquear escoger actividad con NMAX fases.
@@ -32,6 +28,5 @@ Bloque adicional para armar documentos a partir de las actividades iterativas, y
 
 PARA PRÓXIMAS VERSIONES
 
-- Bloques 'display' y 'full' podrían mostrar más de una respuesta anterior.
 - Diagrama en author_view que resuma la actividad actual (en caso de bloque 'full').
 - Opciones de estilo/tema.
