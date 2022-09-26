@@ -9,7 +9,6 @@
         <h2 class="header-label-author">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h2>
         <h4>Actividad: {{activity_name}}</h4>
         <h4>Fase: {{activity_stage}}</h4>
-        <p>{{var}}</p>
         <table>
             <tr>
                 <th hidden>ID</th>
@@ -18,6 +17,7 @@
                 <th>Fecha/Hora Respuesta</th>
                 <th>Feedback</th>
                 <th>Fecha/Hora Feedback</th>
+                <th>Enviar feedback</th>
             </tr>
             {% for student in students %}
             <tr>
@@ -25,15 +25,15 @@
                 <td>{{student.1}}</td>
                 <td>{{student.2}}</td>
                 <td>{{student.3}}</td>
-                <td><textarea>{{student.4}}</textarea></td>
+                <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
                 <td>{{student.5}}</td>
+                <td><span id="feedback-button-{{student.0}}" class="feedback-button">Enviar</span></td>
             </tr>
     
             {% endfor %}
 
 
         </table>
-        {{students2}}
 
 
         {% endif %}

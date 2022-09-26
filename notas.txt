@@ -1,32 +1,18 @@
-PENDIENTE 
+PENDIENTE:
 
-
-A la edición incorporar:
-- si no hay activities, dejar fijo en no el input de respuesta anterior
-- caso en que la activity/stage que tenía seleccionado, desapareció (YA QUEDÓ CUBIERTO?)
-
-
-Cosas pendientes:
-- Capturas de errores:
-    - Fijar requisitos mínimos para submission y feedback (en primera instancia, largo de caracteres).
-    - Bloquear escoger actividad con NMAX fases.
-    - ¿Caracteres inválidos en algún input?
+- Si no hay activities, dejar fijo en no el input de respuesta anterior.
+- Caso en que la activity/stage que tenía seleccionado, desapareció (YA QUEDÓ CUBIERTO, DEJANDO EL INPUT VACÍO? PROBAR BIEN)
+- Fijar requisitos mínimos para submission y feedback (en primera instancia, largo de caracteres).
+- Bloquear escoger actividad con NMAX fases.
+- ¿Caracteres inválidos en algún input?
 - Manejar borrado de una instancia del bloque:
     - Mostrar aviso que indique todo lo que ocurrirá en caso de borrar la instancia.
     - Se borra la stage de IAAActivity, y todas las submissions y feedbacks. 
     - Si una actividad se queda sin stages, debe borrarse.
     - Si una actividad se quedó sin stages (y se borró), al cargar la studio_view de otra instancia del bloque que apunte a esta, deben reiniciarse los inputs de respuesta anterior (y mostrar un aviso). 
 - Desarrollar author_view.
+- Botones individuales para feedbacks.
 - Estilos.
 - Rutina de testing.
-- Completar README
-
-Bloque adicional para armar documentos a partir de las actividades iterativas, y descargarlos en formato Word. (!!!)
-
-
-
-
-PARA PRÓXIMAS VERSIONES
-
-- Diagrama en author_view que resuma la actividad actual (en caso de bloque 'full').
-- Opciones de estilo/tema.
+- Completar README.
+- Bloque adicional para armar y descargar informes en formato Word.

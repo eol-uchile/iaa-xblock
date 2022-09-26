@@ -1,2 +1,10 @@
 /* CSS for IterativeAssessedActivityXBlock */
 
+a.LinkButton {
+    border-style: solid;
+    border-width : 1px 1px 1px 1px;
+    text-decoration : none;
+    padding : 4px;
+    border-color : #000000;
+    border-radius: 5px;
+  }
