@@ -1,30 +1,54 @@
 function IterativeAssessedActivityInstructor(runtime, element, settings) {
 
+    function showMessage(msg){
+        $(element).find('#iaa-instructor-msg').html(msg);
+    }
+
+    function lockButtons(lock){
+        let buttons = $(element).find('.iaa-feedback-button');
+        for (let button of buttons){
+            if (lock){
+                button.setAttribute("disabled", true);
+            } else {
+                button.removeAttr("disabled");
+            }     
+        }
+    }
+
     function validate(data){
+        if (data.feedback.length < 10){
+            return "El feedback debe tener como mínimo un largo de 10 caracteres."
+        }
         return "";
     }
 
+    function afterSubmission(result){
+        if (result["msg"] !== "error"){
+            showMessage("Feedback enviado.");
+        } else {
+            showMessage("Algo salió mal.");
+        }
+        lockButtons(false);
+    }
 
-    $(element).find('.feedback-button').on('click', function (eventObject) {
-        eventObject.preventDefault();
+    $(element).find('.iaa-feedback-button').on('click', function (eventObject) {
+        lockButtons(true);
         var handlerUrl = runtime.handlerUrl(element, 'instructor_submit');
-        let student_id = parseInt(eventObject.target.parentNode.parentNode.querySelector('th').innerHTML);
+        let student_id = eventObject.target.parentNode.parentNode.querySelector('th').innerHTML;
         let feedback = eventObject.target.parentNode.parentNode.querySelectorAll('td')[3].querySelector("textarea").value;
         let previous_datetime = eventObject.target.parentNode.parentNode.querySelectorAll('td')[4].innerHTML;
+        var data = {
+            "id_student": student_id,
+            "feedback": feedback,
+            "new": previous_datetime !== "—"
+        }
         var error_msg = validate(data);
         if (error_msg !== "") {
             showMessage(error_msg);
         } else {
-            var data = {
-                "id_student": student_id,
-                "feedback": feedback,
-                "new": previous_datetime != "—"
-            }
             console.log(data);
-            // bloquear botones
             $.post(handlerUrl, JSON.stringify(data)).done(function (response) {
-                // liberar botones
-                // mensaje de exito
+                afterSubmission(response)
             });
         }
     });

@@ -24,6 +24,10 @@ a.LinkButton {
   cursor: pointer;
 }
 
+.iaa-feedback-button:disabled {
+  background: gray;
+}
+
 .iaa-feedback-table {
   text-align: center;
   border-collapse: collapse;

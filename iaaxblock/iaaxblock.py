@@ -522,17 +522,18 @@ class IterativeAssessedActivityXBlock(XBlock):
         id_instructor = self.scope_ids.user_id
         current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
         current_stage = IAAStage.objects.get(activity=current_activity)
-        for student in data["feedbacks"]:
-            if student["feedback"] != "":
-                existing_feedback = IAAFeedback.objects.filter(stage=current_stage, id_instructor=id_instructor, id_student=student["id_stundent"]).all()
-                new_feedback_time = datetime.datetime.now()
-                if len(existing_feedback) == 0:
-                    new_feedback = IAAFeedback(stage=current_stage, id_instructor=id_instructor, id_student=student["id_student"], feedback=student["feedback"], feedback_time=new_feedback_time)
-                    new_feedback.save()
-                else:
-                    existing_feedback.feedback = student["feedback"]
-                    existing_feedback.feedback_time = str(new_feedback_time)
-                    existing_feedback.save()
+        id_student = data.get("id_student")
+        feedback = data.get("feedback")
+        new = data.get("new")
+        new_feedback_time = datetime.datetime.now()
+        if new:
+            new_feedback = IAAFeedback(stage=current_stage, id_instructor=id_instructor, id_student=id_student, feedback=feedback, feedback_time=new_feedback_time)
+            new_feedback.save()
+        else:
+            existing_feedback = IAAFeedback.objects.filter(stage=current_stage, id_instructor=id_instructor, id_student=id_student).all()
+            existing_feedback.feedback = feedback
+            existing_feedback.feedback_time = new_feedback_time
+            existing_feedback.save()
         return {"result": "success"}
 
 

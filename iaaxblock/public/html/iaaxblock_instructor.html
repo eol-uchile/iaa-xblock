@@ -46,7 +46,11 @@
                     {{student.5}}
                     {% endif %}
                 </td>
-                <td><span id="feedback-button-{{student.0}}" class="iaa-feedback-button">Enviar</span></td>
+                <td>
+                {% if student.2 != "" %}
+                <span id="feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
+                {% endif %}
+                </td>
             </tr>
     
             {% endfor %}
@@ -60,7 +64,9 @@
         {% endif %}
         {% if block_type == "summary" %}
         {% endif %}
-
+        <div>
+            <p id="iaa-instructor-msg"></p>
+        </div>
         <div class="action">
         </div>
     {% endif %}
