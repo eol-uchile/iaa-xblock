@@ -4,6 +4,17 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     let submission = $(element).find(".submission")
     var handlerUrl = runtime.handlerUrl(element, 'student_submit');
 
+    function showMessage(msg){
+        $(element).find('#iaa-student-msg').html(msg);
+    }
+
+    function validate(data){
+        if (data.submission.length < 10){
+            return "La respuesta debe tener como mínimo un largo de 10 caracteres."
+        }
+        return "";
+    }
+
     function afterSubmission(result){
         console.log(result)
         if (result["msg"] !== "error"){
@@ -22,16 +33,22 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                 state: 'start'
             });
         }
-        $.ajax({
-            type: "POST",
-            url: handlerUrl,
-            data: JSON.stringify({"submission": submission.val()}),
-            success: afterSubmission
-        });
-        if ($.isFunction(runtime.notify)) {
-            runtime.notify('submit', {
-                state: 'end'
+        var data = {"submission": submission.val()}
+        let error_msg = validate(data)
+        if (error_msg !== ""){
+            showMessage(error_msg);
+        } else {
+            $.ajax({
+                type: "POST",
+                url: handlerUrl,
+                data: JSON.stringify(data),
+                success: afterSubmission
             });
+            if ($.isFunction(runtime.notify)) {
+                runtime.notify('submit', {
+                    state: 'end'
+                });
+            }
         }
     });
 

@@ -1,7 +1,8 @@
 function IterativeAssessedActivityStudio(runtime, element) {
 
 
-    let MAX_STAGES = 15;
+    let MAX_STAGES = 15;    
+    let ALL_STAGES = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
     let context = $("#context-iaa").data()["context"];
     let activities = JSON.parse(context["activities"]);
     let input_title = $(element).find("#input_title");
@@ -327,10 +328,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     input_activity_name.removeAttr("hidden");
                     activity_name.removeAttr("disabled");
                     for (let activity of activities) {
-                        let opt = document.createElement("option");
-                        opt.value = activity[1];
-                        opt.text = activity[1];
-                        activity_name.append(opt);
+                        if (!activity[2] === ALL_STAGES){
+                            let opt = document.createElement("option");
+                            opt.value = activity[1];
+                            opt.text = activity[1];
+                            activity_name.append(opt);
+                        }
                     }
                     if (block_type.val() === "full") {
                         let opt00 = document.createElement("option");
