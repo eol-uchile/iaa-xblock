@@ -178,6 +178,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                         "block_type": self.block_type,
                         "activity_name": self.activity_name,
                         "activity_stage": self.activity_stage,
+                        "stage_label": self.stage_label,
                         "students": students,
                         "var": str(enrolled)
                     }
@@ -377,9 +378,41 @@ class IterativeAssessedActivityXBlock(XBlock):
         Vista de autor
         """
 
+        if self.block_type == "none":
+            js_context = {
+                "block_type": self.block_type
+            }
+        elif self.block_type == "full":
+            from .models import IAAActivity, IAAStage
+            id_course = self.course_id
+            activity = IAAActivity.objects.filter(id_course=id_course, activity_name=self.activity_name).first()
+            stages_list = [[str(x["stage_number"]), x["stage_label"]] for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number", "stage_label")]
+            js_context = {
+                "activity_name": self.activity_name,
+                "block_type": self.block_type,
+                "activity_stage": str(self.activity_stage),
+                "stage_label": self.stage_label,
+                "question": self.question,
+                "stages": stages_list,
+                "activity_previous": self.activity_previous
+            }
+            if self.activity_previous:
+                js_context["activity_name_previous"] = self.activity_name_previous
+                js_context["activity_stage_previous"] = str(self.activity_stage_previous)
+        elif self.block_type == "display":
+            js_context = {
+                "block_type": self.block_type,
+                "activity_name_previous": self.activity_name_previous,
+                "activity_stage_previous": str(self.activity_stage_previous)
+            }
+        else:
+            js_context = {
+                "activity_name": self.activity_name,
+                "summary_text": self.summary_text
+            }
         template = loader.render_django_template(
             'public/html/iaaxblock_author.html',
-            context=Context(context),
+            context=Context(js_context),
             i18n_service=self.runtime.service(self, 'i18n'),
         )
         frag = self.build_fragment(

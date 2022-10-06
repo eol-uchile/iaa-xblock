@@ -10,9 +10,13 @@ PENDIENTE:
     - Se borra la stage de IAAActivity, y todas las submissions y feedbacks. 
     - Si una actividad se queda sin stages, debe borrarse.
     - Si una actividad se quedó sin stages (y se borró), al cargar la studio_view de otra instancia del bloque que apunte a esta, deben reiniciarse los inputs de respuesta anterior (y mostrar un aviso). 
-- Desarrollar author_view.
 - Botones individuales para feedbacks.
 - Estilos.
 - Rutina de testing.
 - Completar README.
 - Bloque adicional para armar y descargar informes en formato Word.
+
+
+
+
+- conseguir ids
