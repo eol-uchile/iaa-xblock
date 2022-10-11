@@ -48,3 +48,42 @@ a.LinkButton {
 .iaa-padded-subtitle {
   padding-bottom: 10px;
 }
+
+/* Container */
+
+.iaa-container_block {
+  min-height: 1px;
+  margin-bottom: 70px;
+}
+
+.iaa-container .exptop { 
+  position: absolute;
+  width: calc(var(--max-width) - 16px);
+  background-repeat: no-repeat;
+  height: 70px;
+  background-image: url(https://static.sumaysigue.uchile.cl/cmmeduformacion/produccion/assets/img/redfid_situacion.png);
+  background-size: cover;
+  left: 16px;
+}
+
+.iaa-container_block .expmid {
+  position: relative;
+  top: 0px;
+  height: 100%;
+  width: calc( var(--max-width) - 16px);
+  box-sizing: border-box;
+  border: 2px solid;
+
+  border-color: #20a83d;
+  overflow: hidden;
+  text-align: justify;
+
+  padding-top: 112px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 30px;
+
+  line-height: 24px;
+  border-radius: 16px;
+  left: 16px;
+}
