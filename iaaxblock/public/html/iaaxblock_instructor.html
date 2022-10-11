@@ -1,74 +1,85 @@
 <div class="iaaxblock">
-    {% if block_type == "none" %}
-    <div class="iaa-not-created">
-        <p>Please set this block up from Studio.</p>
-    </div>
-    {% else %}
-        {% if block_type == "full" %}
 
-        <h2 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h2>
-        <h4 class="iaa-padded-subtitle">Actividad: {{activity_name}}</h4>
-        <h4 class="iaa-padded-subtitle">Fase: {{activity_stage}}</h4>
-        <h4 class="iaa-padded-subtitle">Etiqueta: {{stage_label}}</h4>
-        <table class="iaa-feedback-table">
-            <tr>
-                <th hidden>ID</th>
-                <th>Estudiante</th>
-                <th>Respuesta</th>
-                <th>Fecha/Hora Respuesta</th>
-                <th>Feedback</th>
-                <th>Fecha/Hora Feedback</th>
-                <th>Enviar feedback</th>
-            </tr>
-            {% for student in students %}
-            <tr>
-                <th hidden>{{student.0}}</th>
-                <td>{{student.1}}</td>
-                <td>
-                    {% if student.2 == "" %}
-                    —
-                    {% else %}
-                    {{student.2}}
+    <div class="eolcontainer_block ">
+
+            <div class="exptop"></div>
+            <div class="expmid">
+
+                {% if block_type == "none" %}
+                <div class="iaa-not-created">
+                    <p>Please set this block up from Studio.</p>
+                </div>
+                {% else %}
+                    {% if block_type == "full" %}
+            
+                    <h2 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h2>
+                    <h4 class="iaa-padded-subtitle">Actividad: {{activity_name}}</h4>
+                    <h4 class="iaa-padded-subtitle">Fase: {{activity_stage}}</h4>
+                    <h4 class="iaa-padded-subtitle">Etiqueta: {{stage_label}}</h4>
+                    <table class="iaa-feedback-table">
+                        <tr>
+                            <th hidden>ID</th>
+                            <th>Estudiante</th>
+                            <th>Respuesta</th>
+                            <th>Fecha/Hora Respuesta</th>
+                            <th>Feedback</th>
+                            <th>Fecha/Hora Feedback</th>
+                            <th>Enviar feedback</th>
+                        </tr>
+                        {% for student in students %}
+                        <tr>
+                            <th hidden>{{student.0}}</th>
+                            <td>{{student.1}}</td>
+                            <td>
+                                {% if student.2 == "" %}
+                                —
+                                {% else %}
+                                {{student.2}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if student.3 == "" %}
+                                —
+                                {% else %}
+                                {{student.3}}
+                                {% endif %}
+                            </td>
+                            <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
+                            <td>
+                                {% if student.5 == "" %}
+                                —
+                                {% else %}
+                                {{student.5}}
+                                {% endif %}
+                            </td>
+                            <td>
+                            {% if student.2 != "" %}
+                            <span id="feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
+                            {% endif %}
+                            </td>
+                        </tr>
+                
+                        {% endfor %}
+            
+            
+                    </table>
+            
+            
                     {% endif %}
-                </td>
-                <td>
-                    {% if student.3 == "" %}
-                    —
-                    {% else %}
-                    {{student.3}}
+                    {% if block_type == "display" %}
                     {% endif %}
-                </td>
-                <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
-                <td>
-                    {% if student.5 == "" %}
-                    —
-                    {% else %}
-                    {{student.5}}
+                    {% if block_type == "summary" %}
                     {% endif %}
-                </td>
-                <td>
-                {% if student.2 != "" %}
-                <span id="feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
+                    <div>
+                        <p id="iaa-instructor-msg"></p>
+                    </div>
+                    <div class="action">
+                    </div>
                 {% endif %}
-                </td>
-            </tr>
-    
-            {% endfor %}
 
+            </div>
 
-        </table>
+    </div>
 
-
-        {% endif %}
-        {% if block_type == "display" %}
-        {% endif %}
-        {% if block_type == "summary" %}
-        {% endif %}
-        <div>
-            <p id="iaa-instructor-msg"></p>
-        </div>
-        <div class="action">
-        </div>
-    {% endif %}
 </div>
     
