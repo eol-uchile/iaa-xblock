@@ -130,6 +130,55 @@ class IterativeAssessedActivityXBlock(XBlock):
         return fragment
 
 
+    def studio_post_duplicate(self, store, source_item):
+        from .models import IAAActivity, IAAStage
+
+
+        if source_item.block_type == "full":
+            activities = IAAActivity.objects.filter(id_course=self.course_id).values("activity_name")
+            i = 1
+            new_name = ""
+            repeated = False
+            while True:
+                new_name = source_item.activity_name + "_copy{}".format(str(i))
+                for activity in activities:
+                    if new_name == activity["activity_name"]:
+                        repeated = True
+                        break
+                if repeated:
+                    i = i + 1
+                    continue
+                break
+            self.activity_name = new_name
+            self.activity_stage = 1
+            new_activity = IAAActivity(id_course=self.course_id, activity_name=self.activity_name)
+            new_activity.save()
+            new_stage = IAAStage(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
+            new_stage.save()
+        return True
+
+        # bien logica de db, mal atributos
+
+    def studio_post_delete(self):
+        from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
+
+        if self.block_type == "full":
+            id_course = self.course_id
+            id_student = self.scope_ids.user_id
+            activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
+            stage = IAAStage.objects.get(activity=activity, stage_number=self.activity_stage)
+            current_submissions = IAASubmission.objects.filter(stage=stage, id_student=id_student).all()
+            for submission in current_submissions:
+                submission.delete()
+            current_feedbacks = IAAFeedback.objects.filter(stage=stage, id_student=id_student).all()
+            for feedback in current_feedbacks:
+                feedback.delete()
+            stage.delete()
+            all_stages = IAAStage.objects.filter(activity=activity).all()
+            if len(all_stages) == 0:
+                activity.delete()
+
+
     def student_view(self, context={}):
         """
         Vista estudiante
@@ -348,6 +397,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             "activity_stage": str(self.activity_stage),
             "stage_label": self.stage_label,
             "question": self.question,
+            "display_title": self.display_title,
             "activity_name_previous": self.activity_name_previous,
             "activity_stage_previous": str(self.activity_stage_previous),
             "summary_text": self.summary_text,
@@ -436,7 +486,9 @@ class IterativeAssessedActivityXBlock(XBlock):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
 
         id_course = self.course_id
+        id_student = self.scope_ids.user_id
         previous_block_type = self.block_type
+        previous_activity_name = self.activity_name
         previous_activity_stage = self.activity_stage
         previous_stage_label = self.stage_label
         self.title = data.get('title')
@@ -464,30 +516,50 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.activity_name = data.get('activity_name')
             self.summary_text = data.get('summary_text')
 
-        if previous_block_type == "none" and self.block_type == "full":
-            new_activity = IAAActivity(id_course=id_course, activity_name=self.activity_name)
-            new_activity.save()
-            new_stage = IAAStage(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
-            new_stage.save()
-        
-        else:
-            if previous_activity_stage != self.activity_stage:
-                new_stage = IAAStage(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
+        if self.block_type == "full":
+            if previous_block_type == "none":
+                try:
+                    activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
+                except:
+                    activity = IAAActivity(id_course=id_course, activity_name=self.activity_name)
+                    activity.save()
+                new_stage = IAAStage(activity=activity, stage_label=self.stage_label, stage_number=self.activity_stage)
                 new_stage.save()
-                current_submissions = IAASubmission.objects.filter().all()
-                for submission in current_submissions:
-                    submission.stage = new_stage
-                    submission.save()
-                current_feedbacks = IAAFeedback.objects.filter().all()
-                for feedback in current_feedbacks:
-                    feedback.stage = new_stage
-                    feedback.save()
-                current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
-                IAAStage.objects.get(activity=current_activity, stage_number=previous_activity_stage).delete()
             
             else:
-                if previous_stage_label != self.stage_label:
+
+                previous_activity = IAAActivity.objects.get(id_course=id_course, activity_name=previous_activity_name)
+                try:
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
+                except:
+                    current_activity = IAAActivity(id_course=id_course, activity_name=self.activity_name)
+                    current_activity.save()
+
+                # cambio la stage
+                if previous_activity_stage != self.activity_stage or previous_activity_name != data.get('activity_name'):
+                    previous_stage = IAAStage.objects.get(activity=previous_activity, stage_number=previous_activity_stage)
+                    new_stage = IAAStage(activity=current_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
+                    new_stage.save()
+                    current_submissions = IAASubmission.objects.filter(stage=previous_stage, id_student=id_student).all()
+                    for submission in current_submissions:
+                        submission.stage = new_stage
+                        submission.save()
+                    current_feedbacks = IAAFeedback.objects.filter(stage=previous_stage, id_student=id_student).all()
+                    for feedback in current_feedbacks:
+                        feedback.stage = new_stage
+                        feedback.save()
+                    previous_stage.delete()
+
+                    ## HAY UN CASO EN QUE NO SE CREA LA IAASTAGE
+
+                # cambio tambien la actividad
+                if previous_activity_name != data.get('activity_name'):
+                    previous_activity_all_stages = IAAStage.objects.filter(activity=previous_activity).values("stage_number")
+                    if len(previous_activity_all_stages) == 0:
+                        previous_activity.delete()
+            
+                #
+                if previous_stage_label != self.stage_label:
                     current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                     current_stage.stage_label = self.stage_label
                     current_stage.save()
