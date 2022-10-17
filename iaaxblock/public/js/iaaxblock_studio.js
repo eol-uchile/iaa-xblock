@@ -68,17 +68,17 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior."
                     }
                 } else {
-                    return "No se cuenta aún con otras respuestas para desplegar."
+                    return "Respuesta anterior inválida."
                 }
                 if (data["display_title"] === ""){
                     return "Por favor proporcione un título a la respuesta anterior."
                 }
             }
         } else if (data["block_type"] === "display"){
-            if (data["activity_name_previous"] === "none"){
+            if (data["activity_name_previous"] === "none" || data["activity_name_previous"] == null){
                 return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
             }
-            if (data["activity_stage_previous"] === "none"){
+            if (data["activity_stage_previous"] === "none" || data["activity_stage_previous"] == null){
                 return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior."
             }
             if (data["display_title"] === ""){
@@ -97,78 +97,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
 
     function showMessage(msg) {
         $(element).find('.iaa-studio-error-msg').html(msg);
-    }
-
-    function handlePrevious(previous_values){
-
-        // Bloque full
-        if (previous_values["show"]){
-            previous = activity_previous.val() === "yes";
-
-            // Bloque full con respuesta anterior
-            if (previous){
-                var selected = false;
-                input_activity_name_previous.removeAttr("hidden");
-                activity_name_previous.empty();
-                for (let activity of activities) {
-                    let opt = document.createElement("option");
-                    opt.value = activity[1];
-                    opt.text = activity[1];
-                    if (previous_values["previous_activity_name"] == activity[1]){
-                        opt.setAttribute("selected", true);
-                        selected = true;
-                    }
-                    activity_name_previous.append(opt);
-                }
-                let opt0 = document.createElement("option");
-                opt0.value = "none";
-                opt0.text = "Por favor seleccione una opción...";
-                opt0.setAttribute("disabled", true);
-                if (!selected){
-                    opt0.setAttribute("selected", true);
-                }
-                activity_name_previous.append(opt0);
-                activity_name_previous.on("change", function () {
-                    activity_stage_previous.empty();
-                    let current_activity = (activity_name.val() === "new" ? new_activity_name : activity_name.val());
-                    let current_stage = activity_stage.val();
-                    for (let activity of activities) {
-                        if (activity[1] === activity_name_previous.val()) {
-                            stages = activity[2].split(",");
-                            for(let stage of stages){
-                                if (!(current_activity === activity[1] && current_stage === stage)){
-                                    let opt = document.createElement('option');
-                                    opt.value = stage;
-                                    opt.text = stage;
-                                    activity_stage_previous.append(opt);
-                                }
-                            }
-                            if( activity_stage_previous.has('option').length > 0 ){
-                                let opt0 = document.createElement("option");
-                                opt0.value = "none";
-                                opt0.text = "Por favor seleccione una opción...";
-                                opt0.setAttribute("disabled", true);
-                                opt0.setAttribute("selected", true);
-                                activity_stage_previous.append(opt0);
-                                input_activity_stage_previous.removeAttr("hidden");
-                            } else {
-                                activity_stage_previous.empty();
-                            }
-                        }
-                    }
-                });
-                if (previous_values["previous_activity_stage"] !== 0){
-                    activity_stage_previous.val(previous_values["previous_activity_stage"]);
-                }
-                input_display_title.removeAttr("hidden");
-
-            // Bloque full sin respuesta anterior
-            } else {
-                input_activity_name_previous.attr("hidden", true);
-                input_activity_stage_previous.attr("hidden", true);
-                input_display_title.attr("hidden", true);
-            }
-        }
     }
 
 
@@ -215,7 +143,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
         if (error_msg !== "") {
             showMessage(error_msg);
         } else {
-            console.log(data);
             if ($.isFunction(runtime.notify)) {
                 runtime.notify('save', { state: 'start' });
             }
@@ -270,6 +197,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_display_title.attr("hidden", true);
                 input_question.attr("hidden", true);
                 input_summary_text.attr("hidden", true);
+                activity_previous.val("no").change();
+                input_activity_previous.attr("hidden", true);
 
                 // Load activity_name input
                 if (block_type.val() !== "display") {
@@ -345,6 +274,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         input_activity_previous.removeAttr("hidden");
                     
                         activity_previous.on("change", function (){
+                            activity_name_previous.empty();
                             if (activity_previous.val() === "yes"){
                                 input_activity_name_previous.removeAttr("hidden");
                                 input_activity_stage_previous.removeAttr("hidden");
@@ -354,39 +284,57 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                     opt.value = activity[1];
                                     opt.text = activity[1];
                                     if (context["activity_name_previous"] == activity[1]){
-                                        opt.setAttribute("selected", true);
                                         activity_exists = true;
                                     }
                                     activity_name_previous.append(opt);
-                                    let opt0 = document.createElement("option");
-                                    opt0.value = "none";
-                                    opt0.text = "Por favor seleccione una opción...";
-                                    opt0.setAttribute("disabled", true);
-                                    activity_name_previous.append(opt0);
-
-                                    activity_name_previous.on("change", function() {
-                                        activity_stage_previous.empty();
-                                        for (let activity of activities) {
-                                            if (activity[1] === activity_name_previous.val()) {
-                                                stages = activity[2].split(",");
-                                                for(let stage of stages){
-                                                    if (activity_name.val() !== activity_name_previous.val() && activity_stage.val() !== stage){
-                                                        let opt = document.createElement('option');
-                                                        opt.value = stage;
-                                                        opt.text = stage;
-                                                        activity_stage_previous.append(opt);
-                                                    }
-                                                }
-                                                let opt0 = document.createElement("option");
-                                                opt0.value = "none";
-                                                opt0.text = "Por favor seleccione una opción...";
-                                                opt0.setAttribute("disabled", true);
-                                                activity_stage_previous.append(opt0);
-                                                input_activity_stage_previous.removeAttr("hidden");
-                                            }
-                                        }
-                                    });
                                 }
+                                let opt0 = document.createElement("option");
+                                opt0.value = "none";
+                                opt0.text = "Por favor seleccione una opción...";
+                                opt0.setAttribute("disabled", true);
+                                activity_name_previous.append(opt0);
+
+                                activity_name_previous.on("change", function() {
+                                    activity_stage_previous.empty();
+                                    for (let activity of activities) {
+                                        if (activity[1] === activity_name_previous.val()) {
+                                            stages = activity[2].split(",");
+                                            for(let stage of stages){
+                                                if (activity_name.val() !== activity_name_previous.val() || activity_stage.val() !== stage){
+                                                    let opt = document.createElement('option');
+                                                    opt.value = stage;
+                                                    opt.text = stage;
+                                                    activity_stage_previous.append(opt);
+                                                }
+                                            }
+                                            let opt0 = document.createElement("option");
+                                            opt0.value = "none";
+                                            opt0.text = "Por favor seleccione una opción...";
+                                            opt0.setAttribute("disabled", true);
+                                            activity_stage_previous.append(opt0);
+                                            input_activity_stage_previous.removeAttr("hidden");
+                                        }
+                                    }
+                                });
+
+                                if (context["activity_name_previous"] !== ""){
+                                    activity_name_previous.val(context["activity_name_previous"]).change();
+                                    let opts = document.getElementById('yourselect').options;
+                                    var option_exists = false;
+                                    for (let opt of opts){
+                                        if (opt.value === context["activity_name_previous"]){
+                                            activity_stage_previous.val(context["activity_name_previous"]).change();
+                                            option_exists = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!option_exists) {
+                                        activity_stage_previous.val("none").change();
+                                    }
+                                } else {
+                                    activity_name_previous.val("none").change();
+                                }
+
                             } else {
                                 input_activity_name_previous.attr("hidden", true);
                                 input_activity_stage_previous.attr("hidden", true);
@@ -457,12 +405,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
             input_title.removeAttr("hidden");
             title.val(context["title"])
             input_block_type.removeAttr("hidden");
-            let opt = document.createElement("option");
-            opt.value = context["block_type"]
-            opt.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : "Resumen"))
-            opt.setAttribute("selected", true)
-            block_type.append(opt);
-            block_type.attr("disabled", true);
+            block_type.empty();
+            let opt000 = document.createElement("option");
+            opt000.value = context["block_type"]
+            opt000.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : "Resumen"))
+            block_type.append(opt000);
+            block_type.val(context["block_type"]).change();
             // seleccionar todo
             if (block_type.val() === "full") {
                 input_activity_name.removeAttr("hidden");
@@ -544,6 +492,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         }
                     }
                     activity_previous.on("change", function (){
+                        activity_name_previous.empty();
                         if (activity_previous.val() === "yes"){
                             input_activity_name_previous.removeAttr("hidden");
                             input_activity_stage_previous.removeAttr("hidden");
@@ -553,39 +502,57 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                 opt.value = activity[1];
                                 opt.text = activity[1];
                                 if (context["activity_name_previous"] == activity[1]){
-                                    opt.setAttribute("selected", true);
                                     activity_exists = true;
                                 }
                                 activity_name_previous.append(opt);
-                                let opt0 = document.createElement("option");
-                                opt0.value = "none";
-                                opt0.text = "Por favor seleccione una opción...";
-                                opt0.setAttribute("disabled", true);
-                                activity_name_previous.append(opt0);
-
-                                activity_name_previous.on("change", function() {
-                                    activity_stage_previous.empty();
-                                    for (let activity of activities) {
-                                        if (activity[1] === activity_name_previous.val()) {
-                                            stages = activity[2].split(",");
-                                            for(let stage of stages){
-                                                if (activity_name.val() !== activity_name_previous.val() && activity_stage.val() !== stage){
-                                                    let opt = document.createElement('option');
-                                                    opt.value = stage;
-                                                    opt.text = stage;
-                                                    activity_stage_previous.append(opt);
-                                                }
-                                            }
-                                            let opt0 = document.createElement("option");
-                                            opt0.value = "none";
-                                            opt0.text = "Por favor seleccione una opción...";
-                                            opt0.setAttribute("disabled", true);
-                                            activity_stage_previous.append(opt0);
-                                            input_activity_stage_previous.removeAttr("hidden");
-                                        }
-                                    }
-                                });
                             }
+                            let opt0 = document.createElement("option");
+                            opt0.value = "none";
+                            opt0.text = "Por favor seleccione una opción...";
+                            opt0.setAttribute("disabled", true);
+                            activity_name_previous.append(opt0);
+                        
+                            activity_name_previous.on("change", function() {
+                                activity_stage_previous.empty();
+                                for (let activity of activities) {
+                                    if (activity[1] === activity_name_previous.val()) {
+                                        stages = activity[2].split(",");
+                                        for(let stage of stages){
+                                            if (activity_name.val() !== activity_name_previous.val() || activity_stage.val() !== stage){
+                                                let opt = document.createElement('option');
+                                                opt.value = stage;
+                                                opt.text = stage;
+                                                activity_stage_previous.append(opt);
+                                            }
+                                        }
+                                        let opt0 = document.createElement("option");
+                                        opt0.value = "none";
+                                        opt0.text = "Por favor seleccione una opción...";
+                                        opt0.setAttribute("disabled", true);
+                                        activity_stage_previous.append(opt0);
+                                        input_activity_stage_previous.removeAttr("hidden");
+                                    }
+                                }
+                            });
+
+                            if (context["activity_name_previous"] !== ""){
+                                activity_name_previous.val(context["activity_name_previous"]).change();
+                                let opts = document.getElementById('activity_stage_previous').options;
+                                var option_exists = false;
+                                for (let opt of opts){
+                                    if (opt.value === context["activity_stage_previous"]){
+                                        activity_stage_previous.val(context["activity_stage_previous"]).change();
+                                        option_exists = true;
+                                        break;
+                                    }
+                                }
+                                if (!option_exists) {
+                                    activity_stage_previous.val("none").change();
+                                }
+                            } else {
+                                activity_name_previous.val("none").change();
+                            }
+
                         } else {
                             input_activity_name_previous.attr("hidden", true);
                             input_activity_stage_previous.attr("hidden", true);
@@ -594,21 +561,16 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     });
                     activity_previous.val(context["activity_name_previous"] !== "" ? "yes" : "no").change();
                     if (activity_previous.val() === "yes"){
+                        display_title.val(context["display_title"])
                         if(!activity_exists){
                             activity_name_previous.val("none").change();
                         } else {
                             activity_name_previous.val(context["activity_name_previous"]).change();
-    
-                            var stage_exists = false;
-                            for (let stage_option of document.getElementById("activity_name_previous")){
-                                if (stage_option.value === context["activity_stage_previous"]){
-                                    stage_exists = true;
-                                    activity_stage_previous.val(stage_option.value).change();
-                                    break;
-                                }
-                            }
+
                             if (!stage_exists){
                                 activity_stage_previous.val("none").change();
+                            } else {
+                                activity_stage_previous.val(context["activity_stage_previous"]).change();
                             }
                         }
                     }
@@ -636,8 +598,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             opt.setAttribute("selected", true);
                             activity_exists = true;
                         }
+                        activity_name_previous.append(opt);
                     }
-                    activity_name_previous.append(opt);
                     let opt0 = document.createElement("option");
                     opt0.value = "none";
                     opt0.text = "Por favor seleccione una opción...";
@@ -664,14 +626,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             }
                         }
                     });
-
                     if(!activity_exists){
                         // reset por borrado externo
                         // y si no hay ninguna? forzar a borrar xblock... como?
                         activity_name_previous.val("none").change();
                     } else {
                         activity_name_previous.val(context["activity_name_previous"]).change();
-
                         var stage_exists = false;
                         for (let stage_option of document.getElementById("activity_stage_previous").options){
                             if (stage_option.value === context["activity_stage_previous"]){

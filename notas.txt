@@ -1,12 +1,5 @@
-
-
-
 PENDIENTE:
 
-- display puede quedar sin nada que mostrar, ahi forzar none
-- activity_previous se muestra/oculta mal al cambiar el tipo de bloque (en modo creación)
 - atributos no se marcan bien al duplicar. logica de db funciona bien
-- Si no hay activities, dejar fijo en no el input de respuesta anterior.
-- Si un full con display se quedó sin opciones, dejarlo como full sin display. 
 - testing
 - readme

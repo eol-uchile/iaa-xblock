@@ -13,7 +13,7 @@
                 <meta id="context-iaa" data-context="{{context}}">
                 <div>
                     <h2 class="main-title">{{title}}</h2>
-                    {% if block_type == "display" or block_type == "full" %}
+                    {% if block_type == "display" or activity_name_previous != "" %}
                     <h3 class="display-title">{{display_title}}</h3>
                     <p class="activity-name-previous-label">Actividad: {{activity_name_previous}}</p>
                     <p class="activity-stage-previous-label">Fase: {{activity_stage_previous}}</p>
@@ -38,11 +38,13 @@
                     {% endif %}
                 </div>
             
+                {% if block_type == "full" %}
                 <div class="action">
                     <button class="iaa-submit" data-checking="Enviando..." data-value="Enviar">
                         <span>Enviar</span>
                     </button>
                 </div>
+                {% endif %}
                 <div>
                     <p id="iaa-student-msg"></p>
                 </div>
