@@ -11,6 +11,10 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import DictFieldData
 
 from .iaaxblock import IterativeAssessedActivityXBlock
+from .models import IAAActivity, IAAStage, IAAFeedback, IAASubmission
+
+COURSE_ID = SlashSeparatedCourseKey('foo', 'bar', 'baz')
+
 
 class TestRequest(object):
     # pylint: disable=too-few-public-methods
@@ -21,6 +25,7 @@ class TestRequest(object):
     body = None
     success = None
 
+
 class IAATestCase(unittest.TestCase):
     # pylint: disable=too-many-instance-attributes, too-many-public-methods
     """
@@ -30,11 +35,10 @@ class IAATestCase(unittest.TestCase):
     @classmethod
     def make_an_xblock(cls, **kw):
         """
-        Helper method that creates a VoF XBlock
+        Helper method that creates an IAA XBlock
         """
-        course_id = SlashSeparatedCourseKey('foo', 'bar', 'baz')
         runtime = Mock(
-            course_id=course_id,
+            course_id=COURSE_ID,
             service=Mock(
                 return_value=Mock(_catalog={}),
             ),
@@ -43,123 +47,208 @@ class IAATestCase(unittest.TestCase):
         field_data = DictFieldData(kw)
         xblock = IterativeAssessedActivityXBlock(runtime, field_data, scope_ids)
         xblock.xmodule_runtime = runtime
-        return xblock
-        
+        return 
+
 
     def setUp(self):
         """
-        Creates an xblock
+        Creates some XBlocks
         """
-        self.xblock = IAATestCase.make_an_xblock()
+        self.xblock1 = IAATestCase.make_an_xblock()
+        self.xblock2 = IAATestCase.make_an_xblock()
+        self.xblock3 = IAATestCase.make_an_xblock()
+
+
+    def tearDown(self):
+        self.xblock1.studio_post_delete()
+        self.xblock2.studio_post_delete()
+        self.xblock3.studio_post_delete()
 
 
     def test_validate_field_data(self):
         """
-        Reviso si se creo bien el xblock por defecto, sin intentos y sin respuestas.
+        Check if XBlock was created successfully.
         """
-        self.assertEqual(self.xblock.title, "Iterative Assessed Activity")
-        self.assertEqual(self.xblock.activity_name, "")
-        self.assertEqual(self.xblock.block_type, "none")
-        self.assertEqual(self.xblock.activity_stage, 0)
-        self.assertEqual(self.xblock.stage_label, "")
-        self.assertEqual(self.xblock.activity_previous, False)
-        self.assertEqual(self.xblock.activity_name_previous, "")
-        self.assertEqual(self.xblock.activity_stage_previous, 0)
-        self.assertEqual(self.xblock.display_title, "")
-        self.assertEqual(self.xblock.question, "")
-        self.assertEqual(self.xblock.submission, "")
-        self.assertEqual(self.xblock.submission_time, "")
-        self.assertEqual(self.xblock.summary_text, "")
+        self.assertEqual(self.xblock1.title, "Iterative Assessed Activity")
+        self.assertEqual(self.xblock1.block_type, "none")
+        self.assertEqual(self.xblock1.activity_name, "")
+        self.assertEqual(self.xblock1.activity_stage, 0)
+        self.assertEqual(self.xblock1.stage_label, "")
+        self.assertEqual(self.xblock1.activity_previous, False)
+        self.assertEqual(self.xblock1.activity_name_previous, "")
+        self.assertEqual(self.xblock1.activity_stage_previous, 0)
+        self.assertEqual(self.xblock1.display_title, "")
+        self.assertEqual(self.xblock1.question, "")
+        self.assertEqual(self.xblock1.submission, "")
+        self.assertEqual(self.xblock1.submission_time, "")
+        self.assertEqual(self.xblock1.summary_text, "")
 
 
-    def test_basic_answer(self):
-        #pruebo respuestas buenas y malas con el problema default
+
+    def test_create_full(self):
+        """
+        Check if a 'full' type XBlock was created successfully.
+        """
         request = TestRequest()
         request.method = 'POST'
-
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'verdadero'}]})
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
         request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'incorrect')
-        self.assertEqual(response.json_body['intentos'], 1)
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        self.assertEqual(self.xblock1.block_type, "full")
+        self.assertEqual(self.xblock1.activity_name, "TestActivity")
+        self.assertEqual(self.xblock1.activity_stage, 1)
+        self.assertEqual(self.xblock1.stage_label, "TestStageLabel1")
+        self.assertEqual(self.xblock1.question, "TestQuestion1")
+        self.assertEqual(self.xblock1.activity_previous, False)
+        activity = IAAActivity.objects.filter(id_course=COURSE_ID, activity_name=self.xblock1.activity_name).values("activity_name", "id_course")
+        self.assertEqual(len(activity), 1)
+        self.assertEqual(activity[0]["activity_name"], "TestActivity")
+        self.assertEqual(activity[0]["id_course"], COURSE_ID)
+        stage = IAAStage.objects.filter(activity=activity[0], stage_number=self.xblock1.activity_stage).values("stage_number", "stage_label")
+        self.assertEqual(len(stage), 1)
+        self.assertEqual(stage[0]["stage_number"], 1)
+        self.assertEqual(stage[0]["stage_label"], "TestStageLabel1")
 
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'falso'}, {'name': '2', 'value': 'falso'}]})
-        request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'incorrect')
-        self.assertEqual(response.json_body['intentos'], 2)
 
-    def test_basic_answer2(self):
-        #pruebo respuestas buenas y malas con el problema default
+
+    def test_create_display(self):
         request = TestRequest()
         request.method = 'POST'
-
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'falso'}, {'name': '2', 'value': 'verdadero'}]})
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
         request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'incorrect')
-        self.assertEqual(response.json_body['intentos'], 1)
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "block_type": "display",
+            "activity_name_previous": "TestActivity",
+            "activity_stage_previous": "1",
+            "display_title": "TestDisplayTitle"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock2.studio_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        self.assertEqual(self.xblock2.block_type, "display")
+        self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
+        self.assertEqual(self.xblock2.activity_stage_previous, 1)
+        self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'verdadero'}, {'name': '2', 'value': 'falso'}]})
-        request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'correct')
-        self.assertEqual(response.json_body['intentos'], 2)
 
-    def test_add_questions(self):
-        #pruebo agregar preguntas
+    def test_create_summary(self):
         request = TestRequest()
         request.method = 'POST'
-
-        data = json.dumps({'preguntas': [
-                                        {'id': '1', 'enunciado':'pregunta verdadera', 'valor': 'V'},
-                                        {'id': '2', 'enunciado':'pregunta verdadera 2', 'valor': 'V'},
-                                        {'id': '3', 'enunciado':'pregunta falsa', 'valor': 'F'}
-                                        ]})
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
         request.body = data.encode('utf-8')
-        response = self.xblock.studio_submit(request)
-        self.assertEqual(response.json_body['result'], 'success')
-        preguntas = {'1': {'valor': True, 'enunciado': 'pregunta verdadera'}, '2': {'valor': True, 'enunciado': 'pregunta verdadera 2'}, '3': {'valor': False, 'enunciado': 'pregunta falsa'}}
-        self.assertEqual(self.xblock.preguntas, preguntas)
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "block_type": "summary",
+            "activity_name_previous": "TestActivity",
+            "summary_text": "TestSummaryText"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock2.studio_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        self.assertEqual(self.xblock2.block_type, "summary")
+        self.assertEqual(self.xblock2.activity_name, "TestActivity")
+        self.assertEqual(self.xblock2.summary_text, "TestSummaryText")
 
-    def test_answers_with_more_questions(self):
-        #agrego preguntas
+
+    def test_create_full_with_display(self):
+        """
+        Check if a 'full' type XBlock, with a previous displayed answer, was created successfully.
+        """
         request = TestRequest()
         request.method = 'POST'
-
-        data = json.dumps({'preguntas': [
-                                        {'id': '1', 'enunciado':'pregunta verdadera', 'valor': 'V'},
-                                        {'id': '2', 'enunciado':'pregunta verdadera 2', 'valor': 'V'},
-                                        {'id': '3', 'enunciado':'pregunta falsa', 'valor': 'F'}
-                                        ],
-                            'nro_de_intentos':4})
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
         request.body = data.encode('utf-8')
-        response = self.xblock.studio_submit(request)
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "2",
+            "stage_label": "TestStageLabel2",
+            "question": "TestQuestion2",
+            "activity_previous": "yes",
+            "activity_name_previous": "TestActivity",
+            "activity_stage_previous": "1",
+            "display_title": "TestDisplayTitle"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock2.studio_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        self.assertEqual(self.xblock2.block_type, "full")
+        self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
+        self.assertEqual(self.xblock2.activity_stage_previous, 1)
+        self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
-        #pruebo respuestas buenas y malas con el problema con nuevas preguntas
+
+    def test_make_submission(self):
         request = TestRequest()
         request.method = 'POST'
-
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'verdadero'}]})
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
         request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'incorrect')
-        self.assertEqual(response.json_body['intentos'], 1)
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "submission": "TestSubmission"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock1.student_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        activity = IAAActivity.objects.filter(id_course=COURSE_ID, activity_name=self.xblock1.activity_name).values("activity_name", "id_course")
+        stage = IAAStage.objects.filter(activity=activity[0], stage_number=self.xblock1.activity_stage).values("stage_number", "stage_label")
+        submissions = IAASubmission.objects.filter(stage=stage[0]).values("submission")
+        self.assertEqual(len(submissions), 1)
+        self.assertEqual(submissions[0]["submission"], "TestSubmission")
 
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'falso'}, {'name': '2', 'value': 'falso'}]})
-        request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'incorrect')
-        self.assertEqual(response.json_body['intentos'], 2)
 
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'falso'}, {'name': '2', 'value': 'verdadero'}, {'name': '3', 'value': 'verdadero'}]})
-        request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'incorrect')
-        self.assertEqual(response.json_body['intentos'], 3)
 
-        data = json.dumps({'respuestas': [{'name': '1', 'value': 'verdadero'}, {'name': '2', 'value': 'verdadero'}, {'name': '3', 'value': 'falso'}]})
-        request.body = data.encode('utf-8')
-        response = self.xblock.responder(request)
-        self.assertEqual(response.json_body['indicator_class'], 'correct')
-        self.assertEqual(response.json_body['intentos'], 4)
+
+
+
+

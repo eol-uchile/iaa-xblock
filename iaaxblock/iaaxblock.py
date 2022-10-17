@@ -504,8 +504,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.activity_stage = int(data.get('activity_stage'))
             self.stage_label = data.get('stage_label')
             self.question = data.get('question')
-            self.activity_previous = data.get('activity_previous')
-            if self.activity_previous == "yes":
+            if data.get('activity_previous') == "yes":
                 self.activity_previous = True
                 self.activity_name_previous = data.get('activity_name_previous')
                 self.activity_stage_previous = int(data.get('activity_stage_previous'))
@@ -532,17 +531,13 @@ class IterativeAssessedActivityXBlock(XBlock):
                     activity.save()
                 new_stage = IAAStage(activity=activity, stage_label=self.stage_label, stage_number=self.activity_stage)
                 new_stage.save()
-            
             else:
-
                 previous_activity = IAAActivity.objects.get(id_course=id_course, activity_name=previous_activity_name)
                 try:
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                 except:
                     current_activity = IAAActivity(id_course=id_course, activity_name=self.activity_name)
                     current_activity.save()
-
-                # cambio la stage
                 if previous_activity_stage != self.activity_stage or previous_activity_name != data.get('activity_name'):
                     previous_stage = IAAStage.objects.get(activity=previous_activity, stage_number=previous_activity_stage)
                     new_stage = IAAStage(activity=current_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
@@ -556,21 +551,14 @@ class IterativeAssessedActivityXBlock(XBlock):
                         feedback.stage = new_stage
                         feedback.save()
                     previous_stage.delete()
-
-                    ## HAY UN CASO EN QUE NO SE CREA LA IAASTAGE
-
-                # cambio tambien la actividad
                 if previous_activity_name != data.get('activity_name'):
                     previous_activity_all_stages = IAAStage.objects.filter(activity=previous_activity).values("stage_number")
                     if len(previous_activity_all_stages) == 0:
                         previous_activity.delete()
-            
-                #
                 if previous_stage_label != self.stage_label:
                     current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                     current_stage.stage_label = self.stage_label
                     current_stage.save()
-
         return {'result': 'success'}
 
 

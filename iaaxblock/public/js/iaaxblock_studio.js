@@ -49,6 +49,9 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         return "Ya existe en este curso una actividad con ese nombre."
                     }
                 }
+                if (data["activity_name"] === "new" || data["activity_name"] === "TestActivity"){
+                    return "Los nombres de actividad 'new' y 'TestActivity' son inválidos."
+                }
             }
             if (data["activity_stage"] === "none"){
                 return "Por favor selecciona la fase de la actividad."
