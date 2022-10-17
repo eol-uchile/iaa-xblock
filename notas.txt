@@ -1,5 +1,0 @@
-PENDIENTE:
-
-- atributos no se marcan bien al duplicar. logica de db funciona bien
-- testing
-- readme
