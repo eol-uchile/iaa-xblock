@@ -55,9 +55,10 @@ a.LinkButton {
 
 /* Container */
 
-.eolcontainer_block{
+.iaa-container_block {
   margin: 30px auto;
-  position:relative;width:var(--max-width);
+  position:relative;
+  width:var(--max-width);
 }
 
 
