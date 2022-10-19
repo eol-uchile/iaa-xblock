@@ -1,5 +1,9 @@
 /* CSS for IterativeAssessedActivityXBlock */
 
+:root {
+  --max-width: 800px;
+  }
+
 a.LinkButton {
   border-style: solid;
   border-width: 1px 1px 1px 1px;
@@ -51,22 +55,28 @@ a.LinkButton {
 
 /* Container */
 
-.iaa-container_block {
+.eolcontainer_block{
+  margin: 30px auto;
+  position:relative;width:var(--max-width);
+}
+
+
+.iaa-container_block .Reconociendo-RedFid{
   min-height: 1px;
   margin-bottom: 70px;
 }
 
-.iaa-container .exptop { 
+.iaa-container_block .Reconociendo-RedFid .exptop { 
   position: absolute;
   width: calc(var(--max-width) - 16px);
   background-repeat: no-repeat;
-  height: 70px;
-  background-image: url(https://static.sumaysigue.uchile.cl/cmmeduformacion/produccion/assets/img/redfid_situacion.png);
+  height: 52px;
+  background-image: url(https://static.sumaysigue.uchile.cl/redfid/Assets/img/redfid_reconociendo.png);
   background-size: cover;
   left: 16px;
 }
 
-.iaa-container_block .expmid {
+.iaa-container_block .Reconociendo-RedFid .expmid {
   position: relative;
   top: 0px;
   height: 100%;
@@ -74,11 +84,11 @@ a.LinkButton {
   box-sizing: border-box;
   border: 2px solid;
 
-  border-color: #20a83d;
+  border-color: #df595a;
   overflow: hidden;
   text-align: justify;
 
-  padding-top: 112px;
+  padding-top: 100px;
   padding-left: 24px;
   padding-right: 24px;
   padding-bottom: 30px;

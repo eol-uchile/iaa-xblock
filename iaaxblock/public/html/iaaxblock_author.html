@@ -1,36 +1,34 @@
-<div class="iaaxblock">
-    <div class="iaa-container_block ">
+<div class="iaa-container_block xmodule_display xmodule_HtmlModule">
+    <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
+        <div class="exptop"></div>
+        <div class="expmid">
+            
+            <p>IAA XBlock</p>
+            <p>Este XBlock solo es visible desde el LMS.</p>
+            {% if block_type == "full" %}
+            <p>Actividad: {{activity_name}}</p>
+            <p>Fase: {{activity_stage}}</p>
+            <p>Etiqueta: {{stage_label}}</p>
+            <p>Fases de esta actividad:</p>
+            <table>
+                <tr>
+                    <th>Fase</th>
+                    <th>Etiqueta</th>
+                </tr>
+                {% for stage in stages %}
+                <tr>
+                    <td>{{stage.0}}</td>
+                    <td>{{stage.1}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+            {% if block_type == "display" %}
+            <p>Respuesta a mostrar</p>
+            {% endif %}
+            {% if block_type == "summary" %}
+            {% endif %}
 
-            <div class="exptop"></div>
-            <div class="expmid">
-
-                <p>IAA XBlock</p>
-                <p>Este XBlock solo es visible desde el LMS.</p>
-                {% if block_type == "full" %}
-                <p>Actividad: {{activity_name}}</p>
-                <p>Fase: {{activity_stage}}</p>
-                <p>Etiqueta: {{stage_label}}</p>
-                <p>Fases de esta actividad:</p>
-                <table>
-                    <tr>
-                        <th>Fase</th>
-                        <th>Etiqueta</th>
-                    </tr>
-                    {% for stage in stages %}
-                    <tr>
-                        <td>{{stage.0}}</td>
-                        <td>{{stage.1}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
-                {% if block_type == "display" %}
-                <p>Respuesta a mostrar</p>
-                {% endif %}
-                {% if block_type == "summary" %}
-                {% endif %}
-
-            </div>
-
+        </div>
     </div>
 </div>

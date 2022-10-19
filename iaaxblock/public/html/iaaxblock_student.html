@@ -1,57 +1,53 @@
-<div class="iaaxblock">
+<div class="iaa-container_block xmodule_display xmodule_HtmlModule">
+    <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
+        <div class="exptop"></div>
+        <div class="expmid">
 
-    <div class="eolcontainer_block ">
-
-            <div class="exptop"></div>
-            <div class="expmid">
-
-                {% if block_type == "none" %}
-                <div class="iaa-not-created">
-                    <p>Please set this block up from Studio.</p>
-                </div>
-                {% else %}
-                <meta id="context-iaa" data-context="{{context}}">
-                <div>
-                    <h2 class="main-title">{{title}}</h2>
-                    {% if block_type == "display" or activity_name_previous != "" %}
-                    <h3 class="display-title">{{display_title}}</h3>
-                    <p class="activity-name-previous-label">Actividad: {{activity_name_previous}}</p>
-                    <p class="activity-stage-previous-label">Fase: {{activity_stage_previous}}</p>
-                    <p class="submission-previous-label"></p>
-                    <div class="submission-previous">{{submission_previous}}</div>
-                    {% endif %}
-                    {% if block_type == "full" %}
-                    <h3 class="stage-label">{{stage_label}}</h3>
-                    <p class="activity-name-label">Actividad: {{activity_name}}</p>
-                    <p class="activity-stage-label">Fase: {{activity_stage}}</p>
-                    <p class="question">{{question}}</p>
-                    <textarea class="submission">{{submission}}</textarea>
-                    {% endif %}
-                    {% if block_type == "summary" %}
-                    <h3 class="summary-text">{{summary_text}}</h3>
-                    <p class="activity-name-previous-label">Actividad: {{activity_name}}</p>
-                    {% for activity in summary %}
-                    <p class="activity-stage-label">Fase: {{activity.0}}</p>
-                    <p class="summary-submission">{{activity.1}}</p>
-                    <p class="summary-submission-time">{{activity.2}}</p>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-            
-                {% if block_type == "full" %}
-                <div class="action">
-                    <button class="iaa-submit" data-checking="Enviando..." data-value="Enviar">
-                        <span>Enviar</span>
-                    </button>
-                </div>
-                {% endif %}
-                <div>
-                    <p id="iaa-student-msg"></p>
-                </div>
-                {% endif %}
-
+            {% if block_type == "none" %}
+            <div class="iaa-not-created">
+                <p>Please set this block up from Studio.</p>
             </div>
+            {% else %}
+            <meta id="context-iaa" data-context="{{context}}">
+            <div>
+                <h2 class="main-title">{{title}}</h2>
+                {% if block_type == "display" or activity_name_previous != "" %}
+                <h3 class="display-title">{{display_title}}</h3>
+                <p class="activity-name-previous-label">Actividad: {{activity_name_previous}}</p>
+                <p class="activity-stage-previous-label">Fase: {{activity_stage_previous}}</p>
+                <p class="submission-previous-label"></p>
+                <div class="submission-previous">{{submission_previous}}</div>
+                {% endif %}
+                {% if block_type == "full" %}
+                <h3 class="stage-label">{{stage_label}}</h3>
+                <p class="activity-name-label">Actividad: {{activity_name}}</p>
+                <p class="activity-stage-label">Fase: {{activity_stage}}</p>
+                <p class="question">{{question}}</p>
+                <textarea class="submission">{{submission}}</textarea>
+                {% endif %}
+                {% if block_type == "summary" %}
+                <h3 class="summary-text">{{summary_text}}</h3>
+                <p class="activity-name-previous-label">Actividad: {{activity_name}}</p>
+                {% for activity in summary %}
+                <p class="activity-stage-label">Fase: {{activity.0}}</p>
+                <p class="summary-submission">{{activity.1}}</p>
+                <p class="summary-submission-time">{{activity.2}}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
+        
+            {% if block_type == "full" %}
+            <div class="action">
+                <button class="iaa-submit" data-checking="Enviando..." data-value="Enviar">
+                    <span>Enviar</span>
+                </button>
+            </div>
+            {% endif %}
+            <div>
+                <p id="iaa-student-msg"></p>
+            </div>
+            {% endif %}
 
+        </div>
     </div>
-
 </div>
