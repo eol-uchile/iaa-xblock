@@ -11,50 +11,52 @@
                 <h4 class="iaa-padded-subtitle">Actividad: {{activity_name}}</h4>
                 <h4 class="iaa-padded-subtitle">Fase: {{activity_stage}}</h4>
                 <h4 class="iaa-padded-subtitle">Etiqueta: {{stage_label}}</h4>
-                <table class="iaa-table">
-                    <tr>
-                        <th hidden>ID</th>
-                        <th>Estudiante</th>
-                        <th>Respuesta</th>
-                        <th>Fecha/Hora Respuesta</th>
-                        <th>Feedback</th>
-                        <th>Fecha/Hora Feedback</th>
-                        <th>Enviar feedback</th>
-                    </tr>
-                    {% for student in students %}
-                    <tr>
-                        <th hidden>{{student.0}}</th>
-                        <td>{{student.1}}</td>
-                        <td>
-                            {% if student.2 == "" %}
-                            —
-                            {% else %}
-                            {{student.2}}
+                <div style="overflow-x:auto;">
+                    <table class="iaa-table">
+                        <tr>
+                            <th hidden>ID</th>
+                            <th>Estudiante</th>
+                            <th>Respuesta</th>
+                            <th>Fecha/Hora Respuesta</th>
+                            <th>Feedback</th>
+                            <th>Fecha/Hora Feedback</th>
+                            <th>Enviar feedback</th>
+                        </tr>
+                        {% for student in students %}
+                        <tr>
+                            <th hidden>{{student.0}}</th>
+                            <td>{{student.1}}</td>
+                            <td>
+                                {% if student.2 == "" %}
+                                —
+                                {% else %}
+                                {{student.2}}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if student.3 == "" %}
+                                —
+                                {% else %}
+                                {{student.3}}
+                                {% endif %}
+                            </td>
+                            <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
+                            <td>
+                                {% if student.5 == "" %}
+                                —
+                                {% else %}
+                                {{student.5}}
+                                {% endif %}
+                            </td>
+                            <td>
+                            {% if student.2 != "" %}
+                            <span id="feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
                             {% endif %}
-                        </td>
-                        <td>
-                            {% if student.3 == "" %}
-                            —
-                            {% else %}
-                            {{student.3}}
-                            {% endif %}
-                        </td>
-                        <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
-                        <td>
-                            {% if student.5 == "" %}
-                            —
-                            {% else %}
-                            {{student.5}}
-                            {% endif %}
-                        </td>
-                        <td>
-                        {% if student.2 != "" %}
-                        <span id="feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
-                        {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
             {% elif block_type == "display" %}
                 <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
             {% elif block_type == "summary" %}
