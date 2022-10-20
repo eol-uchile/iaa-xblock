@@ -2,31 +2,111 @@
     <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
         <div class="exptop"></div>
         <div class="expmid">
-            
-            <p>IAA XBlock</p>
-            <p>Este XBlock solo es visible desde el LMS.</p>
-            {% if block_type == "full" %}
-            <p>Actividad: {{activity_name}}</p>
-            <p>Fase: {{activity_stage}}</p>
-            <p>Etiqueta: {{stage_label}}</p>
-            <p>Fases de esta actividad:</p>
-            <table>
-                <tr>
-                    <th>Fase</th>
-                    <th>Etiqueta</th>
-                </tr>
-                {% for stage in stages %}
-                <tr>
-                    <td>{{stage.0}}</td>
-                    <td>{{stage.1}}</td>
-                </tr>
-                {% endfor %}
-            </table>
+            {% if block_type == "none" %}
+                <p class="centered">Este XBlock aún no se ha configurado. No se verá en el LMS.</p>
             {% endif %}
+
+
+            {% if block_type == "full" %}
+                {% if activity_previous %}
+                    <p>Este XBlock mostrará al estudiante, la respuesta correspondiente a la siguiente instancia de problema iterativo:</p>
+                    {% if activity_name_previous == "ERROR" %}
+                    <p class="author-error">ERROR: La instancia referenciada por este XBlock no está disponible. Por favor, actualice desde Studio.</p>
+                    {% else %}
+                    <div>
+                        <table class="iaa-table">
+                            <tr>
+                                <th><b>Actividad</b></th>
+                                <td>{{activity_name_previous}}</td>
+                            </tr>
+                            <tr>
+                                <th><b>Fase</b></th>
+                                <td>{{activity_stage_previous}}</td>
+                            </tr>
+                            <tr>
+                                <th><b>Etiqueta</b></th>
+                                <td>{{stage_label_previous}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                <p>Este XBlock consiste en una instancia de actividad iterativa:</p>
+                <div>
+                    <table class="iaa-table">
+                        <tr>
+                            <th><b>Actividad</b></th>
+                            <td>{{activity_name}}</td>
+                        </tr>
+                        <tr>
+                            <th><b>Fase</b></th>
+                            <td>{{activity_stage}}</td>
+                        </tr>
+                        <tr>
+                            <th><b>Etiqueta</b></th>
+                            <td>{{stage_label}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <p>Esta actividad cuenta actualmente con las siguientes fases:</p>
+                <div>
+                    <table class="iaa-table">
+                        <tr>
+                            <th><b>Fase</b></th>
+                            <th><b>Etiqueta</b></th>
+                        </tr>
+                        {% for stage in stages %}
+                        <tr>
+                            <td>{{stage.0}}</td>
+                            <td>{{stage.1}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <p>Los efectos de este XBlock se verán en el LMS.</p>
+            {% endif %}
+
             {% if block_type == "display" %}
-            <p>Respuesta a mostrar</p>
+                <p>Este XBlock mostrará al estudiante, la respuesta correspondiente a la siguiente instancia de problema iterativo:</p>
+                {% if activity_name_previous == "ERROR" %}
+                    <p class="author-error">ERROR: La instancia referenciada por este XBlock no está disponible. Por favor, actualice desde Studio.</p>
+                {% else %}
+                    <div>
+                        <table class="iaa-table">
+                            <tr>
+                                <th><b>Actividad</b></th>
+                                <td>{{activity_name_previous}}</td>
+                            </tr>
+                            <tr>
+                                <th><b>Fase</b></th>
+                                <td>{{activity_stage_previous}}</td>
+                            </tr>
+                            <tr>
+                                <th><b>Etiqueta</b></th>
+                                <td>{{stage_label_previous}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                {% endif %}
             {% endif %}
             {% if block_type == "summary" %}
+            <p>Este XBlock mostrará al estudiante todas las respuestas proporcionadas a la siguiente actividad de problema iterativo:</p>
+            <div>
+                <table class="iaa-table">
+                    <tr>
+                        <th><b>Actividad</b></th>
+                        <td>{{activity_name}}</td>
+                    </tr>
+                    <tr>
+                        <th><b>Fase</b></th>
+                        <td>{{activity_stage}}</td>
+                    </tr>
+                    <tr>
+                        <th><b>Etiqueta</b></th>
+                        <td>{{stage_label}}</td>
+                    </tr>
+                </table>
+            </div>
             {% endif %}
 
         </div>

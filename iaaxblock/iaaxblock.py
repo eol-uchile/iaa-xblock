@@ -186,6 +186,8 @@ class IterativeAssessedActivityXBlock(XBlock):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
         from django.contrib.auth.models import User
 
+        indicator_class = self.get_indicator_class()
+
         # Staff
         if getattr(self.runtime, 'user_is_staff', False):
 
@@ -195,7 +197,9 @@ class IterativeAssessedActivityXBlock(XBlock):
             if self.block_type == "none":
                 context.update(
                     {
-                        "block_type": self.block_type
+                        "block_type": self.block_type,
+                        'location': str(self.location).split('@')[-1],
+                        'indicator_class': indicator_class,
                     }
                 )
 
@@ -229,7 +233,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                         "activity_stage": self.activity_stage,
                         "stage_label": self.stage_label,
                         "students": students,
-                        "var": str(enrolled)
+                        'location': str(self.location).split('@')[-1],
+                        'indicator_class': indicator_class,
                     }
                 )
 
@@ -237,6 +242,9 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 context.update(
                     {
+                        "block_type": self.block_type,
+                        'location': str(self.location).split('@')[-1],
+                        'indicator_class': indicator_class,
                     }
                 )
 
@@ -244,6 +252,9 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 context.update(
                     {
+                        "block_type": self.block_type,
+                        'location': str(self.location).split('@')[-1],
+                        'indicator_class': indicator_class,
                     }
                 )
             
@@ -283,20 +294,23 @@ class IterativeAssessedActivityXBlock(XBlock):
                     if not self.activity_previous:
                         this_submission_previous = ""
                         this_submission_time_previous = ""
+                        stage_label_previous = ""
                     else:
                         try:
                             current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
                             current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
+                            stage_label_previous = current_stage_previous.stage_label
+                            current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
+                            if len(current_submission_previous) == 0:
+                                this_submission_previous = "EMPTY"
+                                this_submission_time_previous = "EMPTY"
+                            else:
+                                this_submission_previous = current_submission_previous[0]["submission"]
+                                this_submission_time_previous = current_submission_previous[0]["submission_time"]
                         except:
-                            this_submission_previous = "La respuesta a la que apunta este bloque no existe. Por favor editar desde Studio."
-                            this_submission_time_previous = ""
-                        current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
-                        if len(current_submission_previous) == 0:
-                            this_submission_previous = ""
-                            this_submission_time_previous = ""
-                        else:
-                            this_submission_previous = current_submission_previous[0]["submission"]
-                            this_submission_time_previous = current_submission_previous[0]["submission_time"]
+                            this_submission_previous = "ERROR"
+                            this_submission_time_previous = "ERROR"
+                            stage_label_previous = "ERROR"
                     current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                     feedbacks = [(x["id_instructor"], x["feedback"], x["feedback_time"]) for x in IAAFeedback.objects.filter(stage=current_stage, id_student=id_student).values('id_instructor', 'feedback', 'feedback_time')]
                     context.update(
@@ -305,6 +319,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "block_type": self.block_type,
                             "activity_name_previous": self.activity_name_previous,
                             "activity_stage_previous": self.activity_stage_previous,
+                            "stage_label_previous": stage_label_previous,
                             "submission_previous": this_submission_previous,
                             "submission_previous_time": this_submission_time_previous,
                             "activity_previous": self.activity_previous,
@@ -315,17 +330,25 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "submission_time": self.submission_time,
                             "stage_label": self.stage_label,
                             "question": self.question,
-                            "feedbacks": feedbacks
+                            "feedbacks": feedbacks,
+                            'location': str(self.location).split('@')[-1],
+                            'indicator_class': indicator_class,
                         }
                     )
 
                 elif self.block_type == "display":
-                    current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
-                    current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
+                    try:
+                        current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
+                        current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
+                        stage_label_previous = current_stage_previous.stage_label
+                    except:
+                        this_submission_previous = "ERROR"
+                        this_submission_time_previous = "ERROR"
+                        stage_label_previous = "ERROR"
                     current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
                     if len(current_submission_previous) == 0:
-                        this_submission_previous = ""
-                        this_submission_time_previous = ""
+                        this_submission_previous = "EMPTY"
+                        this_submission_time_previous = "EMPTY"
                     else:
                         this_submission_previous = current_submission_previous[0]["submission"]
                         this_submission_time_previous = current_submission_previous[0]["submission_time"]
@@ -335,9 +358,12 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "block_type": self.block_type,
                             "activity_name_previous": self.activity_name_previous,
                             "activity_stage_previous": self.activity_stage_previous,
+                            "stage_label_previous": stage_label_previous,
                             "submission_previous": this_submission_previous,
                             "submission_previous_time": this_submission_time_previous,
                             "display_title": self.display_title,
+                            'location': str(self.location).split('@')[-1],
+                            'indicator_class': indicator_class,
                         }
                     )
 
@@ -361,7 +387,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "title": self.title,
                             "block_type": self.block_type,
                             "activity_name": self.activity_name,
-                            "summary": summary
+                            "summary": summary,
+                            'indicator_class': indicator_class,
                         }
                     )
 
@@ -381,6 +408,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 ],
             )
             return frag
+
 
     def studio_view(self, context):
         """
@@ -434,6 +462,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         Vista de autor
         """
 
+        indicator_class = self.get_indicator_class()
         if self.block_type == "none":
             js_context = {
                 "block_type": self.block_type
@@ -450,21 +479,46 @@ class IterativeAssessedActivityXBlock(XBlock):
                 "stage_label": self.stage_label,
                 "question": self.question,
                 "stages": stages_list,
-                "activity_previous": self.activity_previous
+                "activity_previous": self.activity_previous,
+                'location': str(self.location).split('@')[-1],
+                'indicator_class': indicator_class,
             }
             if self.activity_previous:
-                js_context["activity_name_previous"] = self.activity_name_previous
-                js_context["activity_stage_previous"] = str(self.activity_stage_previous)
+                try:
+                    previous_activity = IAAActivity.objects.filter(id_course=id_course, activity_name=self.activity_name_previous).first()
+                    previous_stage = IAAStage.objects.get(activity=previous_activity, stage_number=self.activity_stage_previous)
+                    stage_label_previous = previous_stage.stage_label
+                    js_context["activity_name_previous"] = self.activity_name_previous
+                    js_context["activity_stage_previous"] = str(self.activity_stage_previous)
+                    js_context["stage_label_previous"] = stage_label_previous
+                except:
+                    js_context["activity_name_previous"] = "ERROR"
+                    js_context["activity_stage_previous"] = "ERROR"
+                    js_context["stage_label_previous"] = "ERROR"
         elif self.block_type == "display":
+            from .models import IAAActivity, IAAStage
+            id_course = self.course_id
             js_context = {
                 "block_type": self.block_type,
-                "activity_name_previous": self.activity_name_previous,
-                "activity_stage_previous": str(self.activity_stage_previous)
+                'location': str(self.location).split('@')[-1],
+                'indicator_class': indicator_class,
             }
+            try:
+                previous_activity = IAAActivity.objects.filter(id_course=id_course, activity_name=self.activity_name_previous).first()
+                previous_stage = IAAStage.objects.get(activity=previous_activity, stage_number=self.activity_stage_previous)
+                stage_label_previous = previous_stage.stage_label
+                js_context["activity_name_previous"] = self.activity_name_previous
+                js_context["activity_stage_previous"] = str(self.activity_stage_previous)
+                js_context["stage_label_previous"] = stage_label_previous
+            except:
+                js_context["activity_name_previous"] = "ERROR"
+                js_context["activity_stage_previous"] = "ERROR"
+                js_context["stage_label_previous"] = "ERROR"
         else:
             js_context = {
                 "activity_name": self.activity_name,
-                "summary_text": self.summary_text
+                "summary_text": self.summary_text,
+                'location': str(self.location).split('@')[-1],
             }
         template = loader.render_django_template(
             'public/html/iaaxblock_author.html',
@@ -575,7 +629,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         new_submission_time = datetime.datetime.now()
         new_submission = IAASubmission(stage=current_stage, id_student=id_student, submission=data["submission"], submission_time=new_submission_time)
         new_submission.save()
-        self.submission = data["submission"]
+        self.submission = data.get("submission")
         self.submission_time = str(new_submission_time)
         return {"result": 'success'}
 
@@ -602,6 +656,13 @@ class IterativeAssessedActivityXBlock(XBlock):
             existing_feedback.feedback_time = new_feedback_time
             existing_feedback.save()
         return {"result": "success"}
+
+
+    def get_indicator_class(self):
+        indicator_class = 'unanswered'
+        if self.submission != "":
+            indicator_class = 'correct'
+        return indicator_class
 
 
     @staticmethod

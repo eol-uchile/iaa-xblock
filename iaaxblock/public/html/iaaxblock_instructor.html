@@ -2,19 +2,16 @@
     <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
         <div class="exptop"></div>
         <div class="expmid">
-
             {% if block_type == "none" %}
-            <div class="iaa-not-created">
-                <p>Please set this block up from Studio.</p>
-            </div>
-            {% else %}
-                {% if block_type == "full" %}
-        
+                <div class="iaa-not-created">
+                    <p class="centered">Este XBlock aún no se ha configurado.</p>
+                </div>
+            {% elif block_type == "full" %}
                 <h2 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h2>
                 <h4 class="iaa-padded-subtitle">Actividad: {{activity_name}}</h4>
                 <h4 class="iaa-padded-subtitle">Fase: {{activity_stage}}</h4>
                 <h4 class="iaa-padded-subtitle">Etiqueta: {{stage_label}}</h4>
-                <table class="iaa-feedback-table">
+                <table class="iaa-table">
                     <tr>
                         <th hidden>ID</th>
                         <th>Estudiante</th>
@@ -56,25 +53,18 @@
                         {% endif %}
                         </td>
                     </tr>
-            
                     {% endfor %}
-        
-        
                 </table>
-        
-        
-                {% endif %}
-                {% if block_type == "display" %}
-                {% endif %}
-                {% if block_type == "summary" %}
-                {% endif %}
-                <div>
-                    <p id="iaa-instructor-msg"></p>
-                </div>
-                <div class="action">
-                </div>
+            {% elif block_type == "display" %}
+                <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
+            {% elif block_type == "summary" %}
+                <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
             {% endif %}
-
+            <div>
+                <p id="iaa-instructor-msg"></p>
+            </div>
+            <div class="action">
+            </div>
         </div>
     </div>
 </div>

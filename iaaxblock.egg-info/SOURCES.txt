@@ -1,11 +1,13 @@
 LICENSE
 README.md
+setup.cfg
 setup.py
 iaaxblock/__init__.py
 iaaxblock/admin.py
 iaaxblock/apps.py
 iaaxblock/iaaxblock.py
 iaaxblock/models.py
+iaaxblock/tests.py
 iaaxblock.egg-info/PKG-INFO
 iaaxblock.egg-info/SOURCES.txt
 iaaxblock.egg-info/dependency_links.txt

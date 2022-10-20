@@ -1,7 +1,7 @@
 function IterativeAssessedActivityStudent(runtime, element, settings) {
 
     let buttonSubmit = $(element).find(".iaa-submit");
-    let submission = $(element).find(".submission")
+    let submission = $(element).find(".iaa-submission")
     var handlerUrl = runtime.handlerUrl(element, 'student_submit');
 
     function showMessage(msg){
@@ -16,7 +16,6 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     function afterSubmission(result){
-        console.log(result)
         if (result["msg"] !== "error"){
             submission.attr("disabled", true);
         } else {
@@ -34,7 +33,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             });
         }
         var data = {"submission": submission.val()}
-        let error_msg = validate(data)
+        console.log(data);
+        let error_msg = validate(data);
         if (error_msg !== ""){
             showMessage(error_msg);
         } else {
