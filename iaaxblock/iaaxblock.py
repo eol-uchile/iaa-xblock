@@ -133,23 +133,19 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     def clear_student_state(self, user_id, course_id, item_id, requesting_user_id):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
-        self.submission = ""
-        self.submission_time = ""
-        id_student = self.scope_ids.user_id
         activity = IAAActivity.objects.get(id_course=self.course_id, activity_name=self.activity_name)
         stage = IAAStage.objects.get(activity=activity, stage_number=self.activity_stage)
-        try:
-            current_submission = IAASubmission.objects.get(stage=stage, id_student=id_student)
-            current_feedbacks = IAAFeedback.objects.filter(stage=stage, id_student=id_student).all()
-            for feedback in current_feedbacks:
-                feedback.delete()
-            current_submission.delete()
-        except ObjectDoesNotExist:
-            pass
+        submissions = IAASubmission.objects.filter(stage=stage)
+        feedbacks = IAAFeedback.objects.filter(stage=stage)
+        for submission in submissions:
+            submission.delete()
+        for feedback in feedbacks:
+            feedback.delete()
+        self.submission = ""
+        self.submission_time = ""
 
 
-
-    def studio_post_duplicate(self, store, source_item):
+    def iaa_duplicate(self, source_item):
         from .models import IAAActivity, IAAStage
         if source_item.block_type == "full":
             activities = IAAActivity.objects.filter(id_course=self.course_id).values("activity_name")
@@ -172,11 +168,10 @@ class IterativeAssessedActivityXBlock(XBlock):
             new_activity.save()
             new_stage = IAAStage(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
             new_stage.save()
-        return True
 
         # bien logica de db, mal atributos
 
-    def studio_post_delete(self):
+    def iaa_delete(self):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
         if self.block_type == "full":
             id_course = self.course_id
@@ -213,6 +208,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             if self.block_type == "none":
                 context.update(
                     {
+                        "title": self.title,
                         "block_type": self.block_type,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
@@ -244,6 +240,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     students.append((student_ids[i], student_names[i], this_submission, this_submission_time, this_feedback, this_feedback_time))
                 context.update(
                     {
+                        "title": self.title,
                         "block_type": self.block_type,
                         "activity_name": self.activity_name,
                         "activity_stage": self.activity_stage,
@@ -258,6 +255,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 context.update(
                     {
+                        "title": self.title,
                         "block_type": self.block_type,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
@@ -268,6 +266,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 context.update(
                     {
+                        "title": self.title,
                         "block_type": self.block_type,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
@@ -489,6 +488,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             activity = IAAActivity.objects.filter(id_course=id_course, activity_name=self.activity_name).first()
             stages_list = [[str(x["stage_number"]), x["stage_label"]] for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number", "stage_label")]
             js_context = {
+                "title": self.title,
                 "activity_name": self.activity_name,
                 "block_type": self.block_type,
                 "activity_stage": str(self.activity_stage),

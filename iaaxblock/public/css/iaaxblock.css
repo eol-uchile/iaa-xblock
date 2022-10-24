@@ -82,6 +82,8 @@ a.LinkButton {
   left: 16px;
 }
 
+
+
 .iaa-container_block .Reconociendo-RedFid .expmid {
   position: relative;
   top: 0px;
@@ -135,4 +137,16 @@ a.LinkButton {
 .author-warning {
   text-align: center;
   color: darkgoldenrod;
+}
+
+.author-success {
+  text-align: center;
+  color:seagreen;
+}
+
+.iaa-container_block .Reconociendo-RedFid .exptop .recono-title {
+  padding-left: 54px;
+  padding-top: 12px;
+  font-size: 20px !important;
+  color: white !important;
 }

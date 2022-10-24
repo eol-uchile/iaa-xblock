@@ -1,16 +1,29 @@
 <div class="iaa-container_block xmodule_display xmodule_HtmlModule">
     <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
-        <div class="exptop"></div>
+        <div class="exptop"><p class="recono-title">{{title}}</p></div>
         <div class="expmid">
             {% if block_type == "none" %}
                 <div class="iaa-not-created">
                     <p class="centered">Este XBlock aún no se ha configurado.</p>
                 </div>
             {% elif block_type == "full" %}
-                <h2 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h2>
-                <h4 class="iaa-padded-subtitle">Actividad: {{activity_name}}</h4>
-                <h4 class="iaa-padded-subtitle">Fase: {{activity_stage}}</h4>
-                <h4 class="iaa-padded-subtitle">Etiqueta: {{stage_label}}</h4>
+                <h3 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h3>
+                <div>
+                    <table class="iaa-table">
+                        <tr>
+                            <th><b>Actividad</b></th>
+                            <td>{{activity_name}}</td>
+                        </tr>
+                        <tr>
+                            <th><b>Fase</b></th>
+                            <td>{{activity_stage}}</td>
+                        </tr>
+                        <tr>
+                            <th><b>Etiqueta</b></th>
+                            <td>{{stage_label}}</td>
+                        </tr>
+                    </table>
+                </div>
                 <div style="overflow-x:auto;">
                     <table class="iaa-table">
                         <tr>
@@ -63,7 +76,7 @@
                 <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
             {% endif %}
             <div>
-                <p id="iaa-instructor-msg"></p>
+                <p id="iaa-instructor-msg" class="author-success"></p>
             </div>
             <div class="action">
             </div>

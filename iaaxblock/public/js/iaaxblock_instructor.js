@@ -10,7 +10,7 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
             if (lock){
                 button.setAttribute("disabled", true);
             } else {
-                button.removeAttr("disabled");
+                button.removeAttribute("disabled");
             }     
         }
     }

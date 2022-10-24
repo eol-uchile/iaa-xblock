@@ -1,111 +1,102 @@
-<div class="iaa-container_block xmodule_display xmodule_HtmlModule">
-    <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
-        <div class="exptop"></div>
-        <div class="expmid">
+<div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
+    <meta id="context-iaa" data-context="{{context}}">
+    <ul class="list-input settings-list">
+        <li id="input_title" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="title">Título</label>
+                <input class="input setting-input" name="title" id="title" value=""
+                    type="text" />
+            </div>
+        </li>
+        <li id="input_block_type" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="block_type">Tipo de bloque</label>
+                <select id="block_type" class="block_type" name="block_type">
+                </select>
+            </div>
+        </li>
+        <li id="input_activity_name" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="activity_name">Nombre de actividad</label>
+                <select class="activity_name" name="activity_name" id="activity_name">
+                </select>
+            </div>
+        </li>
+        <li id="input_new_activity_name" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="new_activity_name">Nombre de nueva actividad</label>
+                <input class="input setting-input" name="new_activity_name" id="new_activity_name" value=""
+                    type="text" />
+            </div>
+        </li>
+        <li id="input_activity_stage" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="activity_stage">ID de fase de actividad</label>
+                <select class="input setting-input" name="activity_stage" id="activity_stage">
+                </select>
+            </div>
+        </li>
+        <li id="input_stage_label" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="stage_label">Etiqueta de fase</label>
+                <input class="input setting-input" name="stage_label" id="stage_label" value="" type="text" />
+            </div>
+        </li>
+        <li id="input_question" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="question">Pregunta</label>
+                <input class="input setting-input" name="question" id="question" value="" type="text" />
+            </div>
+        </li>
+        <li id="input_activity_previous" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="activity_previous">¿Mostrar una respuesta anterior?</label>
+                <select id="activity_previous" class="activity_previous" name="activity_previous">
+                    <option value="yes">Sí</option>
+                    <option value="no" selected>No</option>
+                </select>
+            </div>
+        </li>
+        <li id="input_activity_name_previous" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="activity_name_previous">Actividad de respuesta anterior</label>
+                <select id="activity_name_previous" class="activity_name_previous" name="activity_name_previous">
+                </select>
+            </div>
+        </li>
+        <li id="input_activity_stage_previous" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="activity_stage_previous">ID de fase de respuesta anterior</label>
+                <select class="input setting-input" name="activity_stage_previous" id="activity_stage_previous">
 
-            <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
-                <meta id="context-iaa" data-context="{{context}}">
-                <ul class="list-input settings-list">
-                    <li id="input_title" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="title">Título</label>
-                            <input class="input setting-input" name="title" id="title" value=""
-                                type="text" />
-                        </div>
-                    </li>
-                    <li id="input_block_type" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="block_type">Tipo de bloque</label>
-                            <select id="block_type" class="block_type" name="block_type">
-                            </select>
-                        </div>
-                    </li>
-                    <li id="input_activity_name" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="activity_name">Nombre de actividad</label>
-                            <select class="activity_name" name="activity_name" id="activity_name">
-                            </select>
-                        </div>
-                    </li>
-                    <li id="input_new_activity_name" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="new_activity_name">Nombre de nueva actividad</label>
-                            <input class="input setting-input" name="new_activity_name" id="new_activity_name" value=""
-                                type="text" />
-                        </div>
-                    </li>
-                    <li id="input_activity_stage" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="activity_stage">ID de fase de actividad</label>
-                            <select class="input setting-input" name="activity_stage" id="activity_stage">
-                            </select>
-                        </div>
-                    </li>
-                    <li id="input_stage_label" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="stage_label">Etiqueta de fase</label>
-                            <input class="input setting-input" name="stage_label" id="stage_label" value="" type="text" />
-                        </div>
-                    </li>
-                    <li id="input_question" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="question">Pregunta</label>
-                            <input class="input setting-input" name="question" id="question" value="" type="text" />
-                        </div>
-                    </li>
-                    <li id="input_activity_previous" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="activity_previous">¿Mostrar una respuesta anterior?</label>
-                            <select id="activity_previous" class="activity_previous" name="activity_previous">
-                                <option value="yes">Sí</option>
-                                <option value="no" selected>No</option>
-                            </select>
-                        </div>
-                    </li>
-                    <li id="input_activity_name_previous" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="activity_name_previous">Actividad de respuesta anterior</label>
-                            <select id="activity_name_previous" class="activity_name_previous" name="activity_name_previous">
-                            </select>
-                        </div>
-                    </li>
-                    <li id="input_activity_stage_previous" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="activity_stage_previous">ID de fase de respuesta anterior</label>
-                            <select class="input setting-input" name="activity_stage_previous" id="activity_stage_previous">
-                                
-                            </select>
-                        </div>
-                    </li>
-                    <li id="input_display_title" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="display_title">Título de respuesta anterior</label>
-                            <input class="input setting-input" name="display_title" id="display_title"
-                                value="" type="text" />
-                        </div>
-                    </li>
-                    <li id="input_summary_text" class="field comp-setting-entry is-set" hidden>
-                        <div class="wrapper-comp-setting">
-                            <label class="label setting-label" for="summary_text">Texto de resumen</label>
-                            <input class="input setting-input" name="summary_text" id="summary_text" value="" type="textarea" />
-                        </div>
-                    </li>
-                </ul>
-                <div class="xblock-actions">
-                    <ul>
-                        <li class="action-item">
-                            <a href="#" class="button action-primary save-button">Save</a>
-                        </li>
-                        <li class="action-item">
-                            <a href="#" class="button cancel-button">Cancel</a>
-                        </li>
-                        <li>
-                            <p class="iaa-studio-error-msg"></p>
-                        </li>
-                    </ul>
-                </div>
-            </div> 
-
-        </div>
+                </select>
+            </div>
+        </li>
+        <li id="input_display_title" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="display_title">Título de respuesta anterior</label>
+                <input class="input setting-input" name="display_title" id="display_title"
+                    value="" type="text" />
+            </div>
+        </li>
+        <li id="input_summary_text" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="summary_text">Texto de resumen</label>
+                <input class="input setting-input" name="summary_text" id="summary_text" value="" type="textarea" />
+            </div>
+        </li>
+    </ul>
+    <div class="xblock-actions">
+        <ul>
+            <li class="action-item">
+                <a href="#" class="button action-primary save-button">Save</a>
+            </li>
+            <li class="action-item">
+                <a href="#" class="button cancel-button">Cancel</a>
+            </li>
+            <li>
+                <p class="iaa-studio-error-msg"></p>
+            </li>
+        </ul>
     </div>
 </div>
