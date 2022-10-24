@@ -2,6 +2,7 @@ import json
 import pkg_resources
 from xblock.core import XBlock
 from django.template.context import Context
+from django.core.exceptions import ObjectDoesNotExist
 from xblock.fields import Integer, String, Scope, Boolean
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
@@ -128,12 +129,28 @@ class IterativeAssessedActivityXBlock(XBlock):
         }
         fragment.initialize_js(initialize_js_func, json_args=settings)
         return fragment
+    
+
+    def clear_student_state(self, user_id, course_id, item_id, requesting_user_id):
+        from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
+        self.submission = ""
+        self.submission_time = ""
+        id_student = self.scope_ids.user_id
+        activity = IAAActivity.objects.get(id_course=self.course_id, activity_name=self.activity_name)
+        stage = IAAStage.objects.get(activity=activity, stage_number=self.activity_stage)
+        try:
+            current_submission = IAASubmission.objects.get(stage=stage, id_student=id_student)
+            current_feedbacks = IAAFeedback.objects.filter(stage=stage, id_student=id_student).all()
+            for feedback in current_feedbacks:
+                feedback.delete()
+            current_submission.delete()
+        except ObjectDoesNotExist:
+            pass
+
 
 
     def studio_post_duplicate(self, store, source_item):
         from .models import IAAActivity, IAAStage
-
-
         if source_item.block_type == "full":
             activities = IAAActivity.objects.filter(id_course=self.course_id).values("activity_name")
             i = 1
@@ -161,7 +178,6 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     def studio_post_delete(self):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
-
         if self.block_type == "full":
             id_course = self.course_id
             id_student = self.scope_ids.user_id
