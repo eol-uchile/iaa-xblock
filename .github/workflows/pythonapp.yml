@@ -13,4 +13,4 @@ jobs:
     - name: Run Tests
       run: |
         cd .github/
-        docker-compose run lms /openedx/requirements/iaaxblock/.github/test.sh
+        docker-compose run lms /openedx/requirements/iaa-xblock/.github/test.sh

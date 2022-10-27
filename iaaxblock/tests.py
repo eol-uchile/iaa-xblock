@@ -62,9 +62,9 @@ class IAATestCase(TransactionTestCase):
         """
         Cleans the database.
         """
-        self.xblock1.studio_post_delete()
-        self.xblock2.studio_post_delete()
-        self.xblock3.studio_post_delete()
+        self.xblock1.iaa_delete()
+        self.xblock2.iaa_delete()
+        self.xblock3.iaa_delete()
 
 
     def test_validate_field_data(self):
