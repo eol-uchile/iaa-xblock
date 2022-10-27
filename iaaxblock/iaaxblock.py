@@ -1,8 +1,9 @@
 import json
+from uuid import uuid4
 import pkg_resources
 from xblock.core import XBlock
 from django.template.context import Context
-from xblock.fields import Integer, String, Scope, Boolean
+from xblock.fields import Integer, String, Scope, Boolean, Float
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
 import datetime
@@ -78,6 +79,11 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Title shown before the shown submission."
     )
 
+    score = Float(
+        default=0.0,
+        scope=Scope.user_state,
+    )
+
     submission = String(
         default="",
         scope=Scope.user_state,
@@ -146,31 +152,22 @@ class IterativeAssessedActivityXBlock(XBlock):
         self.submission_time = ""
 
 
-    def iaa_duplicate(self, source_item):
+    def studio_post_duplicate(self, store, source_item):
         from .models import IAAActivity, IAAStage
         if source_item.block_type == "full":
-            activities = IAAActivity.objects.filter(id_course=self.course_id).values("activity_name")
+            item = IAAActivity.objects.last()
+            random = item.id + 1
             i = 1
             new_name = ""
-            repeated = False
-            while True:
-                new_name = source_item.activity_name + "_copy{}".format(str(i))
-                for activity in activities:
-                    if new_name == activity["activity_name"]:
-                        repeated = True
-                        break
-                if repeated:
-                    i = i + 1
-                    continue
-                break
+            new_name = source_item.activity_name + "_copy{}".format(str(random + 1))
             self.activity_name = new_name
             self.activity_stage = 1
             new_activity = IAAActivity(id_course=self.course_id, activity_name=self.activity_name)
             new_activity.save()
             new_stage = IAAStage(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
             new_stage.save()
+        return True
 
-        # bien logica de db, mal atributos
 
     def iaa_delete(self):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
@@ -682,6 +679,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         id_course = self.course_id
         id_student = self.scope_ids.user_id
+        self.score = 1
         self.runtime.publish(
             self,
             'grade',
