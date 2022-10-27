@@ -2,7 +2,7 @@ import json
 import pkg_resources
 from xblock.core import XBlock
 from django.template.context import Context
-from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 from xblock.fields import Integer, String, Scope, Boolean
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
@@ -98,6 +98,8 @@ class IterativeAssessedActivityXBlock(XBlock):
     )
 
     has_author_view = True
+
+    has_score = True
 
 
     def resource_string(self, path):
@@ -480,7 +482,8 @@ class IterativeAssessedActivityXBlock(XBlock):
         indicator_class = self.get_indicator_class()
         if self.block_type == "none":
             js_context = {
-                "block_type": self.block_type
+                "block_type": self.block_type,
+                "title": self.title
             }
         elif self.block_type == "full":
             from .models import IAAActivity, IAAStage
@@ -640,6 +643,14 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         id_course = self.course_id
         id_student = self.scope_ids.user_id
+        self.runtime.publish(
+            self,
+            'grade',
+            {
+                'value': 1,
+                'max_value': 1
+            }
+        )
         current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
         current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
         new_submission_time = datetime.datetime.now()
@@ -661,13 +672,13 @@ class IterativeAssessedActivityXBlock(XBlock):
         current_stage = IAAStage.objects.get(activity=current_activity)
         id_student = data.get("id_student")
         feedback = data.get("feedback")
-        new = data.get("new")
         new_feedback_time = datetime.datetime.now()
-        if new:
+        existing_feedback = IAAFeedback.objects.filter(stage=current_stage, id_instructor=id_instructor, id_student=id_student).all()
+        if len(existing_feedback) == 0:
             new_feedback = IAAFeedback(stage=current_stage, id_instructor=id_instructor, id_student=id_student, feedback=feedback, feedback_time=new_feedback_time)
             new_feedback.save()
         else:
-            existing_feedback = IAAFeedback.objects.filter(stage=current_stage, id_instructor=id_instructor, id_student=id_student).all()
+            existing_feedback = IAAFeedback.objects.get(stage=current_stage, id_instructor=id_instructor, id_student=id_student)
             existing_feedback.feedback = feedback
             existing_feedback.feedback_time = new_feedback_time
             existing_feedback.save()

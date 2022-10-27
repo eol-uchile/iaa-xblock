@@ -22,6 +22,11 @@ $ python manage.py lms migrate iaaxblock
 
 3. Agregar a los cursos mediante el nombre 'iaaxblock'.
 
+## TODO
+
+- Agregar selección de estilos.
+- Mejoras visuales dentro del contenedor.
+
 ## Licencia
 
 Desarrollado para el CMMEdu.

@@ -61,6 +61,23 @@
                         <span>Enviar</span>
                     </button>
                 </div>
+                {% if feedbacks %}
+                        <div>
+                            <p>¡Cuentas con feedback!</p>
+                            <table class="iaa-table">
+                                <tr>
+                                    <th>Feedback</th>
+                                    <th>Fecha/Hora</th>
+                                </tr>
+                                {% for feedback in feedbacks %}
+                                    <tr>
+                                        <td>{{feedback.1}}</td>
+                                        <td>{{feedback.2}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% endif %}
             {% endif %}
             {% if block_type == "summary" %}
                 <meta id="context-iaa" data-context="{{context}}">
@@ -75,7 +92,9 @@
                 </div>
             {% endif %}
             <div>
-                <p id="iaa-student-msg"></p>
+                <p id="iaa-student-error-msg" class="iaa-error-msg"></p>
+                <p id="iaa-student-warning-msg" class="iaa-warning-msg"></p>
+                <p id="iaa-student-success-msg" class="iaa-success-msg"></p>
             </div>
         </div>
     </div>

@@ -1,7 +1,15 @@
 function IterativeAssessedActivityInstructor(runtime, element, settings) {
 
-    function showMessage(msg){
-        $(element).find('#iaa-instructor-msg').html(msg);
+    function showErrorMessage(msg){
+        $(element).find('.iaa-istructor-error-msg').html(msg);
+    }
+
+    function showWarningMessage(msg){
+        $(element).find('#iaa-instructor-warning-msg').html(msg);
+    }
+
+    function showSuccessMessage(msg){
+        $(element).find('#iaa-instructor-success-msg').html(msg);
     }
 
     function lockButtons(lock){
@@ -24,9 +32,9 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
 
     function afterSubmission(result){
         if (result["msg"] !== "error"){
-            showMessage("Feedback enviado.");
+            showSuccessMessage("Feedback enviado.");
         } else {
-            showMessage("Algo salió mal.");
+            showErrorMessage("Algo salió mal.");
         }
         lockButtons(false);
     }
@@ -36,17 +44,16 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
         var handlerUrl = runtime.handlerUrl(element, 'instructor_submit');
         let student_id = eventObject.target.parentNode.parentNode.querySelector('th').innerHTML;
         let feedback = eventObject.target.parentNode.parentNode.querySelectorAll('td')[3].querySelector("textarea").value;
-        let previous_datetime = eventObject.target.parentNode.parentNode.querySelectorAll('td')[4].innerHTML;
+        let previous_datetime = eventObject.target.parentNode.parentNode.querySelectorAll('td')[4].innerText;
+        console.log(previous_datetime);
         var data = {
             "id_student": student_id,
-            "feedback": feedback,
-            "new": previous_datetime !== "—"
+            "feedback": feedback
         }
         var error_msg = validate(data);
         if (error_msg !== "") {
-            showMessage(error_msg);
+            showErrorMessage(error_msg);
         } else {
-            console.log(data);
             $.post(handlerUrl, JSON.stringify(data)).done(function (response) {
                 afterSubmission(response)
             });

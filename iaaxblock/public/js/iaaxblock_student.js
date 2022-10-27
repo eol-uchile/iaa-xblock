@@ -4,8 +4,16 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     let submission = $(element).find(".iaa-submission")
     var handlerUrl = runtime.handlerUrl(element, 'student_submit');
 
-    function showMessage(msg){
-        $(element).find('#iaa-student-msg').html(msg);
+    function showErrorMessage(msg){
+        $(element).find('#iaa-student-error-msg').html(msg);
+    }
+
+    function showWarningMessage(msg){
+        $(element).find('#iaa-student-warning-msg').html(msg);
+    }
+
+    function showSuccessMessage(msg){
+        $(element).find('#iaa-student-success-msg').html(msg);
     }
 
     function validate(data){
@@ -17,8 +25,10 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
 
     function afterSubmission(result){
         if (result["msg"] !== "error"){
+            showSuccessMessage("¡Respuesta enviada exitosamente!");
             submission.attr("disabled", true);
         } else {
+            showErrorMessage("Algo salió mal.");
             buttonSubmit.removeAttr("disabled");
         }
     }
@@ -36,7 +46,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         console.log(data);
         let error_msg = validate(data);
         if (error_msg !== ""){
-            showMessage(error_msg);
+            showErrorMessage(error_msg);
         } else {
             $.ajax({
                 type: "POST",
