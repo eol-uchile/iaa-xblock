@@ -1,5 +1,7 @@
 function IterativeAssessedActivityInstructor(runtime, element, settings) {
 
+    let buttonReport = $(element).find(".iaa-report-button");
+
     function showErrorMessage(msg){
         $(element).find('.iaa-istructor-error-msg').html(msg);
     }
@@ -29,6 +31,40 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
         }
         return "";
     }
+
+    function generateDocument() {
+        const doc = new docx.Document({
+            sections: [{
+                properties: {},
+                children: [
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun("Hello World"),
+                            new docx.TextRun({
+                                text: "Foo Bar",
+                                bold: true,
+                            }),
+                            new docx.TextRun({
+                                text: "\tGithub is the best",
+                                bold: true,
+                            }),
+                        ],
+                    }),
+                ],
+            }]
+        });
+
+        docx.Packer.toBlob(doc).then(blob => {
+            saveAs(blob, "example.docx");
+        });
+    }
+
+    buttonReport.on("click", function (e) {
+        e.preventDefault()
+        buttonReport.attr("disabled", true);
+        generateDocument();
+        buttonReport.removeAttr("disabled");
+    })
 
     function afterSubmission(result){
         if (result["msg"] !== "error"){

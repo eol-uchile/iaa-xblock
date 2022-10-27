@@ -17,9 +17,9 @@
                 <meta id="context-iaa" data-context="{{context}}">
                 <div>
                     {% if submission_previous_time == "ERROR" %}
-                        <p class="author-error">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
+                        <p class="iaa-student-error-msg">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
                     {% elif submission_previous_time == "EMPTY" %}
-                        <p class="author-warning">Aún no proporcionas una respuesta.</p>
+                        <p class="iaa-student-warning-msg">Aún no proporcionas una respuesta.</p>
                     {% else %}
                         <h3 class="display-title">{{display_title}}</h3>
                         <figure class="submission-previous">
@@ -38,9 +38,9 @@
                 <div>
                     {% if activity_previous %}
                         {% if submission_previous_time == "ERROR" %}
-                            <p class="author-error">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
+                            <p class="iaa-student-error-msg">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
                         {% elif submission_previous_time == "EMPTY" %}
-                            <p class="author-warning">Aún no proporcionas una respuesta.</p>
+                            <p class="iaa-student-warning-msg">Aún no proporcionas una respuesta.</p>
                         {% else %}
                             <h3 class="display-title">{{display_title}}</h3>
                             <figure class="submission-previous">
@@ -90,6 +90,9 @@
                     <p class="summary-submission-time">{{activity.2}}</p>
                     {% endfor %}
                 </div>
+            {% endif %}
+            {% if block_type == "report" %}
+                <span id="report-button" class="iaa-report-button" >Descargar reporte</span>
             {% endif %}
             <div>
                 <p id="iaa-student-error-msg" class="iaa-error-msg"></p>

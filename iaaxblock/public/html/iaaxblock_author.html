@@ -11,7 +11,7 @@
                 {% if activity_previous %}
                     <p>Este XBlock mostrará al estudiante, la respuesta correspondiente a la siguiente instancia de problema iterativo:</p>
                     {% if activity_name_previous == "ERROR" %}
-                    <p class="author-error">ERROR: La instancia referenciada por este XBlock no está disponible. Por favor, actualice desde Studio.</p>
+                    <p class="iaa-student-error-msg">ERROR: La instancia referenciada por este XBlock no está disponible. Por favor, actualice desde Studio.</p>
                     {% else %}
                     <div>
                         <table class="iaa-table">
@@ -69,7 +69,7 @@
             {% if block_type == "display" %}
                 <p>Este XBlock mostrará al estudiante, la respuesta correspondiente a la siguiente instancia de problema iterativo:</p>
                 {% if activity_name_previous == "ERROR" %}
-                    <p class="author-error">ERROR: La instancia referenciada por este XBlock no está disponible. Por favor, actualice desde Studio.</p>
+                    <p class="iaa-student-error-msg">ERROR: La instancia referenciada por este XBlock no está disponible. Por favor, actualice desde Studio.</p>
                 {% else %}
                     <div>
                         <table class="iaa-table">
@@ -108,7 +108,11 @@
                 </table>
             </div>
             {% endif %}
-
+            {% if block_type == "report" %}
+            <div>
+                <p class="centered">En desarrollo.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -140,6 +140,11 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 block_type: block_type.val(),
                 summary_text: summary_text.val()
             };
+        } else if (block_type.val() === "report"){
+            var data = {
+                title: title.val(),
+                block_type: block_type.val()
+            };
         }
 
         var error_msg = validate(data);
@@ -172,7 +177,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             title.val("Iterative Assessed Activity")
             input_block_type.removeAttr("hidden");
             input_block_type.removeAttr("disabled");
-            let block_type_options = [["full", "Completo"], ["display", "Sólo respuesta anterior"], ["summary", "Resumen"], ["none", "Por favor seleccione una opción..."]];
+            let block_type_options = [["full", "Completo"], ["display", "Sólo respuesta anterior"], ["summary", "Resumen"], ["report", "Reporte"], ["none", "Por favor seleccione una opción..."]];
             for (let option of block_type_options) {
                 let opt = document.createElement("option");
                 opt.value = option[0];
@@ -182,7 +187,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt.setAttribute("disabled", true);
                     opt.setAttribute("selected", true);
                 }
-                if((option[0] === "display" || option[0] === "summary") && activities.length === 0){
+                if((option[0] === "display" || option[0] === "summary" || option[0] === "report") && activities.length === 0){
                     opt.setAttribute("disabled", true);
                 }
             }
@@ -204,7 +209,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_activity_previous.attr("hidden", true);
 
                 // Load activity_name input
-                if (block_type.val() !== "display") {
+                if (block_type.val() !== "display" && block_type.val() !== "report") {
                     input_activity_name.removeAttr("hidden");
                     activity_name.removeAttr("disabled");
                     for (let activity of activities) {
@@ -400,6 +405,10 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     activity_name_previous.val("none").change();
                 }
 
+                if (block_type === "report"){
+
+                }
+
             });
 
 
@@ -411,7 +420,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             block_type.empty();
             let opt000 = document.createElement("option");
             opt000.value = context["block_type"]
-            opt000.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : "Resumen"))
+            opt000.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : (context["block_type"] === "summary" ? "Resumen" : "Reporte")))
             block_type.append(opt000);
             block_type.val(context["block_type"]).change();
             // seleccionar todo
@@ -477,7 +486,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_summary_text.removeAttr("hidden");
                 summary_text.val(context["summary_text"])
             }
-            if (block_type.val() !== "summary") {
+            if (block_type.val() !== "summary" && block_type.val() !== "report") {
                 if (block_type.val() === "full"){
                     input_activity_previous.removeAttr("hidden");
                     var activity_exists;
@@ -648,6 +657,9 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         }
                     }
                 }
+            }
+            if (block_type === "report"){
+                    
             }
         }
     }

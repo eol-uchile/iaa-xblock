@@ -2,7 +2,6 @@ import json
 import pkg_resources
 from xblock.core import XBlock
 from django.template.context import Context
-from django.db import IntegrityError
 from xblock.fields import Integer, String, Scope, Boolean
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
@@ -275,6 +274,18 @@ class IterativeAssessedActivityXBlock(XBlock):
                     }
                 )
             
+            else:
+
+                context.update(
+                    {
+                        "title": self.title,
+                        "block_type": self.block_type,
+                        'location': str(self.location).split('@')[-1],
+                        'indicator_class': indicator_class,
+                    }
+                )
+
+            
             template = loader.render_django_template(
                 'public/html/iaaxblock_instructor.html',
                 context=Context(context),
@@ -290,6 +301,9 @@ class IterativeAssessedActivityXBlock(XBlock):
                     'public/js/iaaxblock_instructor.js',
                 ],
             )
+            if self.block_type == "report":
+                frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
+                frag.add_javascript_url("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js")
             return frag
 
         
@@ -384,7 +398,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                         }
                     )
 
-                else:
+                elif self.block_type == "summary":
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                     summary = []
                     stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
@@ -404,7 +418,18 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "title": self.title,
                             "block_type": self.block_type,
                             "activity_name": self.activity_name,
+                            "summary_text": self.summary_text,
                             "summary": summary,
+                            'indicator_class': indicator_class,
+                        }
+                    )
+                
+                else:
+
+                    context.update(
+                        {
+                            "title": self.title,
+                            "block_type": self.block_type,
                             'indicator_class': indicator_class,
                         }
                     )
@@ -424,6 +449,9 @@ class IterativeAssessedActivityXBlock(XBlock):
                     'public/js/iaaxblock_student.js',
                 ],
             )
+            if self.block_type == "report":
+                frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
+                frag.add_javascript_url("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js")
             return frag
 
 
@@ -518,6 +546,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             from .models import IAAActivity, IAAStage
             id_course = self.course_id
             js_context = {
+                "title": self.title,
                 "block_type": self.block_type,
                 'location': str(self.location).split('@')[-1],
                 'indicator_class': indicator_class,
@@ -533,11 +562,19 @@ class IterativeAssessedActivityXBlock(XBlock):
                 js_context["activity_name_previous"] = "ERROR"
                 js_context["activity_stage_previous"] = "ERROR"
                 js_context["stage_label_previous"] = "ERROR"
-        else:
+        elif self.block_type == "summary":
             js_context = {
+                "title": self.title,
                 "activity_name": self.activity_name,
+                "block_type": self.block_type,
                 "summary_text": self.summary_text,
                 'location': str(self.location).split('@')[-1],
+            }
+        else:
+            js_context = {
+                "title": self.title,
+                "block_type": self.block_type,
+                'location': str(self.location).split('@')[-1]
             }
         template = loader.render_django_template(
             'public/html/iaaxblock_author.html',
@@ -591,9 +628,11 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.activity_name_previous = data.get('activity_name_previous')
             self.activity_stage_previous = int(data.get('activity_stage_previous'))
             self.display_title = data.get('display_title')
-        else:
+        elif self.block_type == "summary":
             self.activity_name = data.get('activity_name')
             self.summary_text = data.get('summary_text')
+        else:
+            pass
 
         if self.block_type == "full":
             if previous_block_type == "none":
