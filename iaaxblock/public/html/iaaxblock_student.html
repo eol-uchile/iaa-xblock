@@ -2,6 +2,7 @@
     <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
         <div class="exptop"><p class="recono-title">{{title}}</p></div>
         <div class="expmid">
+            <meta id="context-iaa" data-context="{{context}}">
             {% if indicator_class == 'unanswered' %}
                 <div class="status {{ indicator_class }}" id="status_{{ location }}">
             {% else %}
@@ -83,16 +84,24 @@
                 <meta id="context-iaa" data-context="{{context}}">
                 <div>
                     <h3 class="summary-text">{{summary_text}}</h3>
-                    <p class="activity-name-previous-label">Actividad: {{activity_name}}</p>
+                    <div>
+                        <table class="iaa-table">
+                            <tr>
+                                <th><b>Actividad</b></th>
+                                <td>{{activity_name}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="centered">
+                        <span id="report-button" class="iaa-report-button" >Descargar reporte (.docx)</span>
+                    </div>
                     {% for activity in summary %}
-                    <p class="activity-stage-label">Fase: {{activity.0}}</p>
-                    <p class="summary-submission">{{activity.1}}</p>
-                    <p class="summary-submission-time">{{activity.2}}</p>
+                    <hr>
+                    <p class="summary-element-header activity-stage-label">Fase: {{activity.0}} ({{activity.1}})</p>
+                    <p class="summary-element-header summary-submission">{{activity.3}}</p>
+                    <p class="summary-element summary-submission-time">{{activity.2}}</p>
                     {% endfor %}
                 </div>
-            {% endif %}
-            {% if block_type == "report" %}
-                <span id="report-button" class="iaa-report-button" >Descargar reporte</span>
             {% endif %}
             <div>
                 <p id="iaa-student-error-msg" class="iaa-error-msg"></p>

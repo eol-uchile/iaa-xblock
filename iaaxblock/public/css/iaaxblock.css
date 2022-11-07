@@ -166,3 +166,10 @@ a.LinkButton {
   color: white !important;
 }
 
+.summary-element-header {
+  margin-bottom: 0;
+}
+
+.summary-element {
+  text-align: center;
+}

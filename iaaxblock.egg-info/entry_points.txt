@@ -6,4 +6,3 @@ iaaxblock = iaaxblock.apps:IAAAppConfig
 
 [xblock.v1]
 iaaxblock = iaaxblock:IterativeAssessedActivityXBlock
-

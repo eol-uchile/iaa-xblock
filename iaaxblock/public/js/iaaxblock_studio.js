@@ -1,7 +1,7 @@
 function IterativeAssessedActivityStudio(runtime, element) {
 
 
-    let MAX_STAGES = 15;    
+    let MAX_STAGES = 15;
     let ALL_STAGES = "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
     let context = $("#context-iaa").data()["context"];
     let activities = JSON.parse(context["activities"]);
@@ -31,67 +31,67 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let summary_text = $(element).find("#summary_text");
 
     function validate(data) {
-        if (data["title"] === ""){
+        if (data["title"] === "") {
             return "Por favor indique el título del bloque."
         }
-        if (data["block_type"] === null){
+        if (data["block_type"] === null) {
             return "Por favor indique el tipo de bloque."
-        } else if (data["block_type"] === "full"){
-            if (data["activity_name"] === "none" || data["activity_name"] === ""){
+        } else if (data["block_type"] === "full") {
+            if (data["activity_name"] === "none" || data["activity_name"] === "") {
                 return "Por favor indique el nombre de la actividad."
             }
-            if (activity_name.val() === "new"){
-                if (data["activity_name"] === context["activity_name"]){
+            if (activity_name.val() === "new") {
+                if (data["activity_name"] === context["activity_name"]) {
                     return "El nombre es igual a la actividad actual."
                 }
-                for (let activity of activities){
-                    if (data["activity_name"] === activity["activity_name"]){
+                for (let activity of activities) {
+                    if (data["activity_name"] === activity["activity_name"]) {
                         return "Ya existe en este curso una actividad con ese nombre."
                     }
                 }
-                if (data["activity_name"] === "new" || data["activity_name"] === "TestActivity"){
+                if (data["activity_name"] === "new" || data["activity_name"] === "TestActivity") {
                     return "Los nombres de actividad 'new' y 'TestActivity' son inválidos."
                 }
             }
-            if (data["activity_stage"] === "none"){
+            if (data["activity_stage"] === "none") {
                 return "Por favor selecciona la fase de la actividad."
             }
-            if (data["stage_label"] === ""){
+            if (data["stage_label"] === "") {
                 return "Por favor proporcione una etiqueta para esta fase."
             }
-            if (data["question"] === ""){
+            if (data["question"] === "") {
                 return "Por favor proporcione un enunciado para esta fase."
             }
-            if (data["activity_previous"] === "yes"){
-                if (data["activity_name_previous"] === "none"){
+            if (data["activity_previous"] === "yes") {
+                if (data["activity_name_previous"] === "none") {
                     return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
                 }
-                if (data["activity_stage_previous"] != null){
-                    if (data["activity_stage_previous"] === "none"){
+                if (data["activity_stage_previous"] != null) {
+                    if (data["activity_stage_previous"] === "none") {
                         return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior."
                     }
                 } else {
                     return "Respuesta anterior inválida."
                 }
-                if (data["display_title"] === ""){
+                if (data["display_title"] === "") {
                     return "Por favor proporcione un título a la respuesta anterior."
                 }
             }
-        } else if (data["block_type"] === "display"){
-            if (data["activity_name_previous"] === "none" || data["activity_name_previous"] == null){
+        } else if (data["block_type"] === "display") {
+            if (data["activity_name_previous"] === "none" || data["activity_name_previous"] == null) {
                 return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
             }
-            if (data["activity_stage_previous"] === "none" || data["activity_stage_previous"] == null){
+            if (data["activity_stage_previous"] === "none" || data["activity_stage_previous"] == null) {
                 return "Por favor selecciona la fase de la actividad de la cual se mostrará una respuesta anterior."
             }
-            if (data["display_title"] === ""){
+            if (data["display_title"] === "") {
                 return "Por favor proporcione un título a la respuesta anterior."
             }
         } else {
-            if (data["activity_name"] === "none"){
+            if (data["activity_name"] === "none") {
                 return "Por favor indique el nombre de la actividad."
             }
-            if (data["summary_text"] === ""){
+            if (data["summary_text"] === "") {
                 return "Por favor indique el texto de resumen."
             }
         }
@@ -107,12 +107,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
         eventObject.preventDefault();
         var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
 
-        if (block_type.val() === null){
+        if (block_type.val() === null) {
             var data = {
                 title: title.val(),
                 block_type: null
             };
-        } else if (block_type.val() === "full"){
+        } else if (block_type.val() === "full") {
             var data = {
                 title: title.val(),
                 activity_name: (activity_name.val() === "new" ? new_activity_name.val() : (activity_name.val() === null ? "" : activity_name.val())),
@@ -125,7 +125,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 activity_stage_previous: activity_stage_previous.val(),
                 display_title: display_title.val()
             };
-        } else if (block_type.val() === "display"){
+        } else if (block_type.val() === "display") {
             var data = {
                 title: title.val(),
                 block_type: block_type.val(),
@@ -133,17 +133,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 activity_stage_previous: activity_stage_previous.val(),
                 display_title: display_title.val()
             };
-        } else if (block_type.val() === "summary"){
+        } else if (block_type.val() === "summary") {
             var data = {
                 title: title.val(),
                 activity_name: activity_name.val(),
                 block_type: block_type.val(),
                 summary_text: summary_text.val()
-            };
-        } else if (block_type.val() === "report"){
-            var data = {
-                title: title.val(),
-                block_type: block_type.val()
             };
         }
 
@@ -177,7 +172,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             title.val("Iterative Assessed Activity")
             input_block_type.removeAttr("hidden");
             input_block_type.removeAttr("disabled");
-            let block_type_options = [["full", "Completo"], ["display", "Sólo respuesta anterior"], ["summary", "Resumen"], ["report", "Reporte"], ["none", "Por favor seleccione una opción..."]];
+            let block_type_options = [["full", "Completo"], ["display", "Sólo respuesta anterior"], ["summary", "Resumen"], ["none", "Por favor seleccione una opción..."]];
             for (let option of block_type_options) {
                 let opt = document.createElement("option");
                 opt.value = option[0];
@@ -187,7 +182,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt.setAttribute("disabled", true);
                     opt.setAttribute("selected", true);
                 }
-                if((option[0] === "display" || option[0] === "summary" || option[0] === "report") && activities.length === 0){
+                if ((option[0] === "display" || option[0] === "summary") && activities.length === 0) {
                     opt.setAttribute("disabled", true);
                 }
             }
@@ -209,11 +204,11 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_activity_previous.attr("hidden", true);
 
                 // Load activity_name input
-                if (block_type.val() !== "display" && block_type.val() !== "report") {
+                if (block_type.val() !== "display") {
                     input_activity_name.removeAttr("hidden");
                     activity_name.removeAttr("disabled");
                     for (let activity of activities) {
-                        if (activity[2] !== ALL_STAGES){
+                        if (activity[2] !== ALL_STAGES) {
                             let opt = document.createElement("option");
                             opt.value = activity[1];
                             opt.text = activity[1];
@@ -255,13 +250,13 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             opt.text = "1";
                             opt.setAttribute("selected", true);
                             activity_stage.append(opt);
-                        } else {  
+                        } else {
                             activity_stage.removeAttr("disabled");
                             for (let activity of activities) {
                                 if (activity[1] === activity_name.val()) {
                                     stages = activity[2].split(',');
-                                    for(let i = 1; i <= MAX_STAGES; i++){
-                                        if(!stages.includes(i.toString())){
+                                    for (let i = 1; i <= MAX_STAGES; i++) {
+                                        if (!stages.includes(i.toString())) {
                                             let opt = document.createElement('option');
                                             opt.value = i.toString();
                                             opt.text = i.toString();
@@ -280,10 +275,10 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         input_stage_label.removeAttr("hidden");
                         input_question.removeAttr("hidden");
                         input_activity_previous.removeAttr("hidden");
-                    
-                        activity_previous.on("change", function (){
+
+                        activity_previous.on("change", function () {
                             activity_name_previous.empty();
-                            if (activity_previous.val() === "yes"){
+                            if (activity_previous.val() === "yes") {
                                 input_activity_name_previous.removeAttr("hidden");
                                 input_activity_stage_previous.removeAttr("hidden");
                                 input_display_title.removeAttr("hidden");
@@ -291,7 +286,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                     let opt = document.createElement("option");
                                     opt.value = activity[1];
                                     opt.text = activity[1];
-                                    if (context["activity_name_previous"] == activity[1]){
+                                    if (context["activity_name_previous"] == activity[1]) {
                                         activity_exists = true;
                                     }
                                     activity_name_previous.append(opt);
@@ -302,13 +297,13 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                 opt0.setAttribute("disabled", true);
                                 activity_name_previous.append(opt0);
 
-                                activity_name_previous.on("change", function() {
+                                activity_name_previous.on("change", function () {
                                     activity_stage_previous.empty();
                                     for (let activity of activities) {
                                         if (activity[1] === activity_name_previous.val()) {
                                             stages = activity[2].split(",");
-                                            for(let stage of stages){
-                                                if (activity_name.val() !== activity_name_previous.val() || activity_stage.val() !== stage){
+                                            for (let stage of stages) {
+                                                if (activity_name.val() !== activity_name_previous.val() || activity_stage.val() !== stage) {
                                                     let opt = document.createElement('option');
                                                     opt.value = stage;
                                                     opt.text = stage;
@@ -325,12 +320,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                     }
                                 });
 
-                                if (context["activity_name_previous"] !== ""){
+                                if (context["activity_name_previous"] !== "") {
                                     activity_name_previous.val(context["activity_name_previous"]).change();
                                     let opts = document.getElementById('yourselect').options;
                                     var option_exists = false;
-                                    for (let opt of opts){
-                                        if (opt.value === context["activity_name_previous"]){
+                                    for (let opt of opts) {
+                                        if (opt.value === context["activity_name_previous"]) {
                                             activity_stage_previous.val(context["activity_name_previous"]).change();
                                             option_exists = true;
                                             break;
@@ -350,16 +345,16 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             }
                         });
                         activity_previous.val("no").change();
-                        activity_stage.on("change", function() {
-                            if (activity_previous.val() === "yes"){
+                        activity_stage.on("change", function () {
+                            if (activity_previous.val() === "yes") {
                                 activity_name_previous.val("none").change();
                             }
                         });
-                        activity_name.on("change", function() {
-                            if (activity_previous.val() === "yes"){
+                        activity_name.on("change", function () {
+                            if (activity_previous.val() === "yes") {
                                 activity_name_previous.val("none").change();
                             }
-                        }); 
+                        });
                     }
                     if (block_type.val() === "summary") {
                         input_summary_text.removeAttr("hidden");
@@ -381,12 +376,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt0.text = "Por favor seleccione una opción...";
                     opt0.setAttribute("disabled", true);
                     activity_name_previous.append(opt0);
-                    activity_name_previous.on("change", function() {
+                    activity_name_previous.on("change", function () {
                         activity_stage_previous.empty();
                         for (let activity of activities) {
                             if (activity[1] === activity_name_previous.val()) {
                                 stages = activity[2].split(",");
-                                for(let stage of stages){
+                                for (let stage of stages) {
                                     let opt = document.createElement('option');
                                     opt.value = stage;
                                     opt.text = stage;
@@ -405,14 +400,10 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     activity_name_previous.val("none").change();
                 }
 
-                if (block_type === "report"){
-
-                }
-
             });
 
 
-        // XBlock is being edited
+            // XBlock is being edited
         } else {
             input_title.removeAttr("hidden");
             title.val(context["title"])
@@ -420,7 +411,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             block_type.empty();
             let opt000 = document.createElement("option");
             opt000.value = context["block_type"]
-            opt000.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : (context["block_type"] === "summary" ? "Resumen" : "Reporte")))
+            opt000.text = (context["block_type"] === "full" ? "Completo" : (context["block_type"] === "display" ? "Solo respuesta anterior" : "Resumen"));
             block_type.append(opt000);
             block_type.val(context["block_type"]).change();
             // seleccionar todo
@@ -431,9 +422,9 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 activity_name.empty();
                 activity_stage.empty();
 
-                activity_name.on("change", function() {
+                activity_name.on("change", function () {
                     activity_stage.empty();
-                    
+
                     if (activity_name.val() == "new") {
                         input_new_activity_name.removeAttr("hidden");
                         let opt = document.createElement('option');
@@ -444,18 +435,18 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     } else {
                         input_new_activity_name.attr("hidden", true);
                         var current_activity;
-                        for (let activity of activities){
-                            if (activity[1] === activity_name.val()){
+                        for (let activity of activities) {
+                            if (activity[1] === activity_name.val()) {
                                 current_activity = activity;
                             }
                         }
                         stages = current_activity[2].split(',');
                         var selected_stage = false;
-                        for(let i = 1; i <= MAX_STAGES; i++){
+                        for (let i = 1; i <= MAX_STAGES; i++) {
                             let opt = document.createElement('option');
                             opt.value = i.toString();
                             opt.text = i.toString();
-                            if (!selected_stage){
+                            if (!selected_stage) {
                                 opt.setAttribute("selected", true);
                             }
                             selected_stage = true;
@@ -486,16 +477,16 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_summary_text.removeAttr("hidden");
                 summary_text.val(context["summary_text"])
             }
-            if (block_type.val() !== "summary" && block_type.val() !== "report") {
-                if (block_type.val() === "full"){
+            if (block_type.val() !== "summary") {
+                if (block_type.val() === "full") {
                     input_activity_previous.removeAttr("hidden");
                     var activity_exists;
                     var stage_exists;
-                    for (let activity of activities){
-                        if (activity[1] === context["activity_name_previous"]){
+                    for (let activity of activities) {
+                        if (activity[1] === context["activity_name_previous"]) {
                             activity_exists = true;
-                            for (let stage of activity[2].split(",")){
-                                if (stage === context["activity_stage_previous"]){
+                            for (let stage of activity[2].split(",")) {
+                                if (stage === context["activity_stage_previous"]) {
                                     stage_exists = true;
                                     break;
                                 }
@@ -503,9 +494,9 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             break;
                         }
                     }
-                    activity_previous.on("change", function (){
+                    activity_previous.on("change", function () {
                         activity_name_previous.empty();
-                        if (activity_previous.val() === "yes"){
+                        if (activity_previous.val() === "yes") {
                             input_activity_name_previous.removeAttr("hidden");
                             input_activity_stage_previous.removeAttr("hidden");
                             input_display_title.removeAttr("hidden");
@@ -513,7 +504,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                 let opt = document.createElement("option");
                                 opt.value = activity[1];
                                 opt.text = activity[1];
-                                if (context["activity_name_previous"] == activity[1]){
+                                if (context["activity_name_previous"] == activity[1]) {
                                     activity_exists = true;
                                 }
                                 activity_name_previous.append(opt);
@@ -523,14 +514,14 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             opt0.text = "Por favor seleccione una opción...";
                             opt0.setAttribute("disabled", true);
                             activity_name_previous.append(opt0);
-                        
-                            activity_name_previous.on("change", function() {
+
+                            activity_name_previous.on("change", function () {
                                 activity_stage_previous.empty();
                                 for (let activity of activities) {
                                     if (activity[1] === activity_name_previous.val()) {
                                         stages = activity[2].split(",");
-                                        for(let stage of stages){
-                                            if (activity_name.val() !== activity_name_previous.val() || activity_stage.val() !== stage){
+                                        for (let stage of stages) {
+                                            if (activity_name.val() !== activity_name_previous.val() || activity_stage.val() !== stage) {
                                                 let opt = document.createElement('option');
                                                 opt.value = stage;
                                                 opt.text = stage;
@@ -547,12 +538,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                                 }
                             });
 
-                            if (context["activity_name_previous"] !== ""){
+                            if (context["activity_name_previous"] !== "") {
                                 activity_name_previous.val(context["activity_name_previous"]).change();
                                 let opts = document.getElementById('activity_stage_previous').options;
                                 var option_exists = false;
-                                for (let opt of opts){
-                                    if (opt.value === context["activity_stage_previous"]){
+                                for (let opt of opts) {
+                                    if (opt.value === context["activity_stage_previous"]) {
                                         activity_stage_previous.val(context["activity_stage_previous"]).change();
                                         option_exists = true;
                                         break;
@@ -572,27 +563,27 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         }
                     });
                     activity_previous.val(context["activity_name_previous"] !== "" ? "yes" : "no").change();
-                    if (activity_previous.val() === "yes"){
+                    if (activity_previous.val() === "yes") {
                         display_title.val(context["display_title"])
-                        if(!activity_exists){
+                        if (!activity_exists) {
                             activity_name_previous.val("none").change();
                         } else {
                             activity_name_previous.val(context["activity_name_previous"]).change();
 
-                            if (!stage_exists){
+                            if (!stage_exists) {
                                 activity_stage_previous.val("none").change();
                             } else {
                                 activity_stage_previous.val(context["activity_stage_previous"]).change();
                             }
                         }
                     }
-                    activity_stage.on("change", function() {
-                        if (activity_previous.val() === "yes"){
+                    activity_stage.on("change", function () {
+                        if (activity_previous.val() === "yes") {
                             activity_name_previous.val("none").change();
                         }
                     });
-                    activity_name.on("change", function() {
-                        if (activity_previous.val() === "yes"){
+                    activity_name.on("change", function () {
+                        if (activity_previous.val() === "yes") {
                             activity_name_previous.val("none").change();
                         }
                     });
@@ -606,7 +597,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         let opt = document.createElement("option");
                         opt.value = activity[1];
                         opt.text = activity[1];
-                        if (context["activity_name_previous"] == activity[1]){
+                        if (context["activity_name_previous"] == activity[1]) {
                             opt.setAttribute("selected", true);
                             activity_exists = true;
                         }
@@ -617,12 +608,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     opt0.text = "Por favor seleccione una opción...";
                     opt0.setAttribute("disabled", true);
                     activity_name_previous.append(opt0);
-                    activity_name_previous.on("change", function() {
+                    activity_name_previous.on("change", function () {
                         activity_stage_previous.empty();
                         for (let activity of activities) {
                             if (activity[1] === activity_name_previous.val()) {
-                                stages = activity[2].split(",");
-                                for(let stage of stages){
+                                let stages = activity[2].split(",");
+                                for (let stage of stages) {
                                     let opt = document.createElement('option');
                                     opt.value = stage;
                                     opt.text = stage;
@@ -638,28 +629,25 @@ function IterativeAssessedActivityStudio(runtime, element) {
                             }
                         }
                     });
-                    if(!activity_exists){
+                    if (!activity_exists) {
                         // reset por borrado externo
                         // y si no hay ninguna? forzar a borrar xblock... como?
                         activity_name_previous.val("none").change();
                     } else {
                         activity_name_previous.val(context["activity_name_previous"]).change();
                         var stage_exists = false;
-                        for (let stage_option of document.getElementById("activity_stage_previous").options){
-                            if (stage_option.value === context["activity_stage_previous"]){
+                        for (let stage_option of document.getElementById("activity_stage_previous").options) {
+                            if (stage_option.value === context["activity_stage_previous"]) {
                                 stage_exists = true;
                                 activity_stage_previous.val(stage_option.value).change();
                                 break;
                             }
                         }
-                        if (!stage_exists){
+                        if (!stage_exists) {
                             activity_stage_previous.val("none").change()
                         }
                     }
                 }
-            }
-            if (block_type === "report"){
-                    
             }
         }
     }

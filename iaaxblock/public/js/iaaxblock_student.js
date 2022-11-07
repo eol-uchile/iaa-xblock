@@ -1,5 +1,7 @@
 function IterativeAssessedActivityStudent(runtime, element, settings) {
 
+    let context = $("#context-iaa").data();
+
     let buttonSubmit = $(element).find(".iaa-submit");
     let buttonReport = $(element).find(".iaa-report-button");
     let submission = $(element).find(".iaa-submission");
@@ -25,40 +27,129 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     function generateDocument() {
-        const doc = new docx.Document({
-            sections: [{
-                properties: {},
-                children: [
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun("Hello World"),
-                            new docx.TextRun({
-                                text: "Foo Bar",
-                                bold: true,
-                            }),
-                            new docx.TextRun({
-                                text: "\tGithub is the best",
-                                bold: true,
-                            }),
-                        ],
-                    }),
+        const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
+        let last_children = [];
+        last_children.push(new Paragraph({
+            text: "Título",
+            heading: HeadingLevel.HEADING_1,
+        }))
+        last_children.push(new Paragraph({
+            text: "REDFID - Actividad iterativa",
+            heading: HeadingLevel.HEADING_2,
+        }))
+        last_children.push(new Paragraph({
+            text: "",
+            heading: HeadingLevel.HEADING_2,
+        }))
+        for (let stage of settings.summary) {
+            last_children.push(
+                new Paragraph({
+                    text: "Fase " + stage[0] + " (" + stage[1] + ")"
+                }))
+            last_children.push(
+                new Paragraph({
+                    text: "Tu respuesta:",
+                }))
+            last_children.push(
+                new Paragraph({
+                    text: stage[2],
+                }))
+            last_children.push(
+                new Paragraph({
+                    text: stage[3],
+                    italic: true
+                }));
+        }
+        const doc = new Document({
+            creator: "Clippy",
+            title: "Sample Document",
+            description: "A brief example of using docx",
+            styles: {
+                paragraphStyles: [
+                    {
+                        id: "Heading1",
+                        name: "Heading 1",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        run: {
+                            color: "999999",
+                            size: 28,
+                            bold: true
+                        },
+                        paragraph: {
+                            spacing: {
+                                after: 120,
+                            },
+                        },
+                    },
+                    {
+                        id: "Heading2",
+                        name: "Heading 2",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        run: {
+                            size: 20,
+                            bold: true,
+                        },
+                        paragraph: {
+                            spacing: {
+                                before: 240,
+                                after: 120,
+                            },
+                        },
+                    },
+                    {
+                        id: "wellSpaced",
+                        name: "Well Spaced",
+                        basedOn: "Normal",
+                        quickFormat: true,
+                        paragraph: {
+                            spacing: { line: 276, before: 20 * 72 * 0.1, after: 20 * 72 * 0.05 },
+                        },
+                    },
+                    {
+                        id: "ListParagraph",
+                        name: "List Paragraph",
+                        basedOn: "Normal",
+                        quickFormat: true,
+                    },
                 ],
-            }]
+            },
+            numbering: {
+                config: [
+                    {
+                        reference: "my-crazy-numbering",
+                        levels: [
+                            {
+                                level: 0,
+                                format: "lowerLetter",
+                                text: "%1)",
+                                alignment: AlignmentType.LEFT,
+                            },
+                        ],
+                    },
+                ],
+            },
+            sections: [{
+                children: last_children
+            }],
         });
 
         docx.Packer.toBlob(doc).then(blob => {
-            console.log(blob);
             saveAs(blob, "example.docx");
-            console.log("Document created successfully");
         });
     }
 
-    buttonReport.on("click", function (e) {
-        e.preventDefault()
-        buttonReport.attr("disabled", true);
-        generateDocument();
-        buttonReport.removeAttr("disabled");
-    })
+    if (buttonReport != null){
+        buttonReport.on("click", function (e) {
+            e.preventDefault()
+            buttonReport.attr("disabled", true);
+            generateDocument();
+            buttonReport.removeAttr("disabled");
+        })
+    }
 
     function afterSubmission(result) {
         if (result["msg"] !== "error") {

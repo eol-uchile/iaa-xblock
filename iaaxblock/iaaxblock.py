@@ -1,5 +1,4 @@
 import json
-from uuid import uuid4
 import pkg_resources
 from xblock.core import XBlock
 from django.template.context import Context
@@ -7,7 +6,6 @@ from xblock.fields import Integer, String, Scope, Boolean, Float
 from xblockutils.resources import ResourceLoader
 from xblock.fragment import Fragment
 import datetime
-
 
 loader = ResourceLoader(__name__)
 
@@ -119,6 +117,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         initialize_js_func,
         additional_css=[],
         additional_js=[],
+        settings={}
     ):
         #  pylint: disable=dangerous-default-value, too-many-arguments
         """
@@ -131,9 +130,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         for item in additional_js:
             url = self.runtime.local_resource_url(self, item)
             fragment.add_javascript_url(url)
-        settings = {
-            'image_path': self.runtime.local_resource_url(self, 'public/images/'),
-        }
+        settings = settings
         fragment.initialize_js(initialize_js_func, json_args=settings)
         return fragment
     
@@ -278,7 +275,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                         "title": self.title,
                         "block_type": self.block_type,
                         'location': str(self.location).split('@')[-1],
-                        'indicator_class': indicator_class,
+                        'indicator_class': indicator_class
                     }
                 )
 
@@ -298,7 +295,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     'public/js/iaaxblock_instructor.js',
                 ],
             )
-            if self.block_type == "report":
+            if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
                 frag.add_javascript_url("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js")
             return frag
@@ -403,12 +400,12 @@ class IterativeAssessedActivityXBlock(XBlock):
                     for stage in stages_list:
                         submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
                         if len(submission) == 0:
-                            this_summary_submission = ""
-                            this_summary_submission_time = ""
+                            this_summary_submission = "No se ha respondido aún."
+                            this_summary_submission_time = "—"
                         else:
                             this_summary_submission = submission[0]["submission"]
                             this_summary_submission_time = submission[0]["submission_time"]
-                        summary.append((stage.stage_label, this_summary_submission, this_summary_submission_time))
+                        summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
                     
                     context.update(
                         {
@@ -418,16 +415,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "summary_text": self.summary_text,
                             "summary": summary,
                             'indicator_class': indicator_class,
-                        }
-                    )
-                
-                else:
-
-                    context.update(
-                        {
-                            "title": self.title,
-                            "block_type": self.block_type,
-                            'indicator_class': indicator_class,
+                            'context': json.dumps({"summary": summary})
                         }
                     )
 
@@ -445,8 +433,9 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_student.js',
                 ],
+                settings=({"summary": summary} if self.block_type == "summary" else {})
             )
-            if self.block_type == "report":
+            if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
                 frag.add_javascript_url("https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js")
             return frag
@@ -628,8 +617,6 @@ class IterativeAssessedActivityXBlock(XBlock):
         elif self.block_type == "summary":
             self.activity_name = data.get('activity_name')
             self.summary_text = data.get('summary_text')
-        else:
-            pass
 
         if self.block_type == "full":
             if previous_block_type == "none":
