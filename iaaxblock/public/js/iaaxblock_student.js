@@ -1,6 +1,6 @@
 function IterativeAssessedActivityStudent(runtime, element, settings) {
 
-    let context = $("#context-iaa").data();
+    let statusDiv = $(element).find('.status');
 
     let buttonSubmit = $(element).find(".iaa-submit");
     let buttonReport = $(element).find(".iaa-report-button");
@@ -61,9 +61,9 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                 }));
         }
         const doc = new Document({
-            creator: "Clippy",
-            title: "Sample Document",
-            description: "A brief example of using docx",
+            creator: "REDFID",
+            title: "Resumen",
+            description: "IAA Summary",
             styles: {
                 paragraphStyles: [
                     {
@@ -152,6 +152,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     function afterSubmission(result) {
+        statusDiv.removeClass("unanswered");
+        statusDiv.addClass(result.indicator_class);
         if (result["msg"] !== "error") {
             showSuccessMessage("¡Respuesta enviada exitosamente!");
             submission.attr("disabled", true);

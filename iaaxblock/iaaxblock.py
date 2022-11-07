@@ -682,7 +682,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         new_submission.save()
         self.submission = data.get("submission")
         self.submission_time = str(new_submission_time)
-        return {"result": 'success'}
+        return {"result": 'success', "indicator_class": self.get_indicator_class()}
 
     
     @XBlock.json_handler
