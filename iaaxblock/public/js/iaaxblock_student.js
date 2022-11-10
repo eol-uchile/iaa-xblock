@@ -153,18 +153,22 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
 
     function afterSubmission(result) {
         statusDiv.removeClass("unanswered");
+        statusDiv.removeClass('correct');
         statusDiv.addClass(result.indicator_class);
         if (result["msg"] !== "error") {
             showSuccessMessage("¡Respuesta enviada exitosamente!");
             submission.attr("disabled", true);
+            buttonSubmit.attr("disabled", true);
         } else {
             showErrorMessage("Algo salió mal.");
             buttonSubmit.removeAttr("disabled");
         }
+        buttonSubmit.html("<span>" + buttonSubmit[0].dataset.value + "</span>");
     }
 
-    buttonSubmit.on("click", function (e) {
+    buttonSubmit.click(function (e) {
         e.preventDefault();
+        buttonSubmit.html("<span>" + buttonSubmit[0].dataset.checking + "</span>");
         buttonSubmit.attr("disabled", true);
         if ($.isFunction(runtime.notify)) {
             runtime.notify('submit', {
@@ -173,7 +177,6 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             });
         }
         var data = { "submission": submission.val() }
-        console.log(data);
         let error_msg = validate(data);
         if (error_msg !== "") {
             showErrorMessage(error_msg);
