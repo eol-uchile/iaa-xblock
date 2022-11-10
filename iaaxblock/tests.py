@@ -225,6 +225,11 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
 
+    def test_duplicate(self):
+        self.xblock4 = IAATestCase.make_an_xblock()
+        self.xblock4.studio_post_duplicate()
+
+
     # def test_make_submission(self):
     #     """
     #     Checks if a submission is sent correctly.
