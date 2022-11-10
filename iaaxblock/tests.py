@@ -56,6 +56,7 @@ class IAATestCase(TransactionTestCase):
         self.xblock1 = IAATestCase.make_an_xblock()
         self.xblock2 = IAATestCase.make_an_xblock()
         self.xblock3 = IAATestCase.make_an_xblock()
+        self.xblock4 = IAATestCase.make_an_xblock()
 
 
     def tearDown(self):
@@ -65,6 +66,7 @@ class IAATestCase(TransactionTestCase):
         self.xblock1.iaa_delete()
         self.xblock2.iaa_delete()
         self.xblock3.iaa_delete()
+        self.xblock4.iaa_delete()
 
 
     def test_validate_field_data(self):
@@ -225,9 +227,57 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
 
-    def test_duplicate(self):
-        self.xblock4 = IAATestCase.make_an_xblock()
-        self.xblock4.studio_post_duplicate()
+    #def test_duplicate(self):
+        #self.xblock4 = IAATestCase.make_an_xblock()
+        #self.xblock4.studio_post_duplicate()
+
+    def test_studentAnswer(self):
+        '''
+            preparo el bloque
+        '''
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock4.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        self.assertEqual(self.xblock4.block_type, "full")
+        self.assertEqual(self.xblock4.activity_name, "TestActivity")
+        self.assertEqual(self.xblock4.activity_stage, 1)
+        self.assertEqual(self.xblock4.stage_label, "TestStageLabel1")
+        self.assertEqual(self.xblock4.question, "TestQuestion1")
+        self.assertEqual(self.xblock4.activity_previous, False)
+        activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=self.xblock4.activity_name)
+        self.assertEqual(activity.activity_name, "TestActivity")
+        self.assertEqual(activity.id_course, COURSE_ID)
+        stage = IAAStage.objects.filter(activity=activity, stage_number=self.xblock4.activity_stage).values("stage_number", "stage_label")
+        self.assertEqual(len(stage), 1)
+        self.assertEqual(stage[0]["stage_number"], 1)
+        self.assertEqual(stage[0]["stage_label"], "TestStageLabel1")
+
+        self.xblock4.studio_submit(request)
+
+        '''
+           Preparo respuesta
+        '''
+        
+        answer = TestRequest()
+        dataanswer = json.dumps({
+            "submission" : "Respondere esperando feedback"
+        })
+        answer.body = dataanswer.encode('utf-8')
+
+        self.xblock4.student_submit(answer)
+
+    def test_teacherFeedback(self):
+        print("Hola")
 
 
     # def test_make_submission(self):

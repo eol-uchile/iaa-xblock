@@ -664,6 +664,8 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         from .models import IAAActivity, IAAStage, IAASubmission
 
+        print("Student answer")
+
         id_course = self.course_id
         id_student = self.scope_ids.user_id
         self.score = 1
