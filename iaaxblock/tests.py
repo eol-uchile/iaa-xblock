@@ -57,6 +57,8 @@ class IAATestCase(TransactionTestCase):
         self.xblock2 = IAATestCase.make_an_xblock()
         self.xblock3 = IAATestCase.make_an_xblock()
         self.xblock4 = IAATestCase.make_an_xblock()
+        self.xblock5 = IAATestCase.make_an_xblock()
+        self.xblock6 = IAATestCase.make_an_xblock()
 
 
     def tearDown(self):
@@ -66,7 +68,6 @@ class IAATestCase(TransactionTestCase):
         self.xblock1.iaa_delete()
         self.xblock2.iaa_delete()
         self.xblock3.iaa_delete()
-        self.xblock4.iaa_delete()
 
 
     def test_validate_field_data(self):
@@ -227,13 +228,9 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
 
-    #def test_duplicate(self):
-        #self.xblock4 = IAATestCase.make_an_xblock()
-        #self.xblock4.studio_post_duplicate()
-
     def test_studentAnswer(self):
         '''
-            preparo el bloque
+            preparar el bloque
         '''
         request = TestRequest()
         request.method = 'POST'
@@ -265,9 +262,9 @@ class IAATestCase(TransactionTestCase):
         self.xblock4.studio_submit(request)
 
         '''
-           Preparo respuesta
+           Preparar respuesta
         '''
-        
+
         answer = TestRequest()
         dataanswer = json.dumps({
             "submission" : "Respondere esperando feedback"
@@ -277,7 +274,80 @@ class IAATestCase(TransactionTestCase):
         self.xblock4.student_submit(answer)
 
     def test_teacherFeedback(self):
-        print("Hola")
+        '''
+            preparar feedback
+        '''
+        feedback = TestRequest()
+        datafeedback = json.dumps({
+            "submission" : "Respondere esperando feedback"
+        })
+        feedback.body = datafeedback.encode('utf-8')
+
+        self.xblock4.instructor_submit(feedback)
+
+
+    def test_duplicate(self):
+        #Duplicar el Xblock
+        self.xblock6 = self.xblock5.studio_post_duplicate("",self.xblock5)
+        
+        
+
+    def test_studentAnswerFeedbackStage2(self):
+        '''
+            preparar el bloque
+        '''
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "2",
+            "stage_label": "TestStageLabel2",
+            "question": "TestQuestion2",
+            "activity_previous": "yes",
+            "activity_stage_previous": "1",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock5.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        self.assertEqual(self.xblock5.block_type, "full")
+        self.assertEqual(self.xblock5.activity_name, "TestActivity")
+        self.assertEqual(self.xblock5.activity_stage, 2)
+        self.assertEqual(self.xblock5.stage_label, "TestStageLabel2")
+        self.assertEqual(self.xblock5.question, "TestQuestion2")
+        self.assertEqual(self.xblock5.activity_previous, True)
+        self.assertEqual(self.xblock5.activity_stage_previous, 1)
+        activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=self.xblock5.activity_name)
+        self.assertEqual(activity.activity_name, "TestActivity")
+        self.assertEqual(activity.id_course, COURSE_ID)
+        stage = IAAStage.objects.filter(activity=activity, stage_number=self.xblock4.activity_stage).values("stage_number", "stage_label")
+        self.assertEqual(len(stage), 0)
+
+        self.xblock5.studio_submit(request)
+
+        '''
+           Preparar respuesta
+        '''
+
+        answer = TestRequest()
+        dataanswer = json.dumps({
+            "submission" : "Respondere esperando feedback"
+        })
+        answer.body = dataanswer.encode('utf-8')
+
+        self.xblock5.student_submit(answer)
+
+        '''
+            preparar feedback
+        '''
+
+        feedback = TestRequest()
+        datafeedback = json.dumps({
+            "submission" : "Respondere esperando feedback"
+        })
+        feedback.body = datafeedback.encode('utf-8')
+
+        self.xblock5.instructor_submit(feedback)
 
 
     # def test_make_submission(self):
