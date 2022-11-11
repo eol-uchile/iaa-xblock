@@ -58,7 +58,6 @@ class IAATestCase(TransactionTestCase):
         self.xblock3 = IAATestCase.make_an_xblock()
         self.xblock4 = IAATestCase.make_an_xblock()
         self.xblock5 = IAATestCase.make_an_xblock()
-        self.xblock6 = IAATestCase.make_an_xblock()
 
 
     def tearDown(self):
@@ -279,7 +278,7 @@ class IAATestCase(TransactionTestCase):
         '''
         feedback = TestRequest()
         datafeedback = json.dumps({
-            "submission" : "Respondere esperando feedback"
+            "submission" : "Y este es el feedback"
         })
         feedback.body = datafeedback.encode('utf-8')
 
@@ -288,9 +287,8 @@ class IAATestCase(TransactionTestCase):
 
     def test_duplicate(self):
         #Duplicar el Xblock
-        self.xblock6 = self.xblock5.studio_post_duplicate("",self.xblock5)
-        
-        
+        duplicated = self.xblock5.studio_post_duplicate("",self.xblock5)
+
 
     def test_studentAnswerFeedbackStage2(self):
         '''
@@ -331,7 +329,7 @@ class IAATestCase(TransactionTestCase):
 
         answer = TestRequest()
         dataanswer = json.dumps({
-            "submission" : "Respondere esperando feedback"
+            "submission" : "Respondere otra vez esperando feedback"
         })
         answer.body = dataanswer.encode('utf-8')
 
@@ -343,7 +341,7 @@ class IAATestCase(TransactionTestCase):
 
         feedback = TestRequest()
         datafeedback = json.dumps({
-            "submission" : "Respondere esperando feedback"
+            "submission" : "y este es el segundo feedback"
         })
         feedback.body = datafeedback.encode('utf-8')
 
