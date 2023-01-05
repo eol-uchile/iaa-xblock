@@ -100,6 +100,12 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Text shown before the summary."
     )
 
+    summary_list = String(
+        default="",
+        scope=Scope.settings,
+        help="Stages to include in the summary."
+    )
+
     has_author_view = True
 
     has_score = True
@@ -413,6 +419,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "block_type": self.block_type,
                             "activity_name": self.activity_name,
                             "summary_text": self.summary_text,
+                            "summary_list": self.summary_list,
                             "summary": summary,
                             'indicator_class': indicator_class,
                             'context': json.dumps({"summary": summary})
@@ -466,6 +473,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             "activity_name_previous": self.activity_name_previous,
             "activity_stage_previous": str(self.activity_stage_previous),
             "summary_text": self.summary_text,
+            "summary_list": self.summary_list,
             "activities": json.dumps(activities)
         }
         context.update(
@@ -554,6 +562,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 "activity_name": self.activity_name,
                 "block_type": self.block_type,
                 "summary_text": self.summary_text,
+                "summary_list": self.summary_list,
                 'location': str(self.location).split('@')[-1],
             }
         else:
@@ -617,6 +626,7 @@ class IterativeAssessedActivityXBlock(XBlock):
         elif self.block_type == "summary":
             self.activity_name = data.get('activity_name')
             self.summary_text = data.get('summary_text')
+            self.summary_list = data.get('summary_list')
 
         if self.block_type == "full":
             if previous_block_type == "none":

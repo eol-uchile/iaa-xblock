@@ -82,6 +82,9 @@
             {% endif %}
             {% if block_type == "summary" %}
                 <meta id="context-iaa" data-context="{{context}}">
+                {% if activity_name == "empty" %}
+                <div class="centered">Actividad no disponible.</div>
+                {% else %}
                 <div>
                     <h3 class="summary-text">{{summary_text}}</h3>
                     <div>
@@ -102,6 +105,7 @@
                     <p class="summary-element summary-submission-time">{{activity.2}}</p>
                     {% endfor %}
                 </div>
+                {% endif %}
             {% endif %}
             <div>
                 <p id="iaa-student-error-msg" class="iaa-error-msg"></p>

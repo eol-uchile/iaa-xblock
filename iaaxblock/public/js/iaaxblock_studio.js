@@ -29,6 +29,33 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let question = $(element).find("#question");
     let input_summary_text = $(element).find("#input_summary_text");
     let summary_text = $(element).find("#summary_text");
+    let input_summary_list = $(element).find("#input_summary_list");
+    let summary_list = $(element).find("#summary_list");
+
+
+    function checkSummaryStages(activity_name, stages){
+        console.log(activity_name);
+        console.log(stages)
+        for(let activity of activities){
+            if(activity[1] == activity_name){
+                let splitted = activity[2].split(",");
+                let splitted_chosen = stages.split(",");
+                console.log(splitted)
+                console.log(splitted_chosen)
+                for(let stage of splitted_chosen){
+                    if(!splitted.includes(stage)){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        if(activity_name == "empty"){
+            return true;
+        }
+        return false;
+    }
+
 
     function validate(data) {
         if (data["title"] === "") {
@@ -49,8 +76,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         return "Ya existe en este curso una actividad con ese nombre."
                     }
                 }
-                if (data["activity_name"] === "new" || data["activity_name"] === "TestActivity") {
-                    return "Los nombres de actividad 'new' y 'TestActivity' son inválidos."
+                if (data["activity_name"] === "new" || data["activity_name"] === "empty" || data["activity_name"] === "TestActivity") {
+                    return "Los nombres de actividad 'new', 'empty' y 'TestActivity' son inválidos."
                 }
             }
             if (data["activity_stage"] === "none") {
@@ -93,6 +120,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
             }
             if (data["summary_text"] === "") {
                 return "Por favor indique el texto de resumen."
+            }
+            if (data["summary_list"] === "") {
+                return "Por favor indique las fases a mostrar."
+            }
+            if(!checkSummaryStages(data["activity_name"], data["summary_list"])){
+                return "Formato inválido de fases a mostrar. Use números separados por comas que correspondan a fases existentes."
             }
         }
         return "";
@@ -138,7 +171,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 title: title.val(),
                 activity_name: activity_name.val(),
                 block_type: block_type.val(),
-                summary_text: summary_text.val()
+                summary_text: summary_text.val(),
+                summary_list: summary_list.val()
             };
         }
 
@@ -358,6 +392,13 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     }
                     if (block_type.val() === "summary") {
                         input_summary_text.removeAttr("hidden");
+                        input_summary_list.removeAttr("hidden");
+                        for(let activity of activities){
+                            if(activity[1] === activity_name.val()){
+                                summary_list.val(activity[2]).change();
+                                break;
+                            }
+                        }
                     }
                 });
 
@@ -472,10 +513,29 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 question.val(context["question"]);
             } else if (block_type.val() === "summary") {
                 input_activity_name.removeAttr("hidden");
-                activity_name.val(context["activity_name"]).change();
-                activity_name.attr("disabled", true);
+                activity_name.empty();
+                if(activities.length === 0){
+                    let opt0 = document.createElement("option");
+                    opt0.value = "empty";
+                    opt0.text = "No hay actividades.";
+                    activity_name.append(opt0);
+                    activity_name.val("empty").change();
+                    activity_name.attr("disabled", true);
+                }
+                else {
+                    for (let activity of activities) {
+                        let opt = document.createElement("option");
+                        opt.value = activity[1];
+                        opt.text = activity[1];
+                        activity_name.append(opt);
+                        activity_name.val(context["activity_name"]).change();
+                    }
+                    activity_name.val(context["activity_name"]).change();
+                }
                 input_summary_text.removeAttr("hidden");
-                summary_text.val(context["summary_text"])
+                summary_text.val(context["summary_text"]);
+                input_summary_list.removeAttr("hidden");
+                summary_list.val(context["summary_list"]);
             }
             if (block_type.val() !== "summary") {
                 if (block_type.val() === "full") {

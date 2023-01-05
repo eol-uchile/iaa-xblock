@@ -90,15 +90,19 @@
                 {% endif %}
             {% endif %}
             {% if block_type == "summary" %}
-            <p>Este XBlock mostrará al estudiante todas las respuestas proporcionadas a la siguiente actividad de problema iterativo:</p>
-            <div>
-                <table class="iaa-table">
-                    <tr>
-                        <th><b>Actividad</b></th>
-                        <td>{{activity_name}}</td>
-                    </tr>
-                </table>
-            </div>
+                {% if activity_name == "empty" %}
+                <div class="centered">No se cuenta con actividades.</div>
+                {% else %}
+                <p>Este XBlock mostrará al estudiante todas las respuestas proporcionadas a la siguiente actividad de problema iterativo:</p>
+                <div>
+                    <table class="iaa-table">
+                        <tr>
+                            <th><b>Actividad</b></th>
+                            <td>{{activity_name}}</td>
+                        </tr>
+                    </table>
+                </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
