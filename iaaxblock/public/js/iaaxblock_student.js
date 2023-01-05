@@ -21,6 +21,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
 
     function validate(data) {
         if (data.submission.length < 10) {
+            buttonSubmit.removeAttr("disabled");
+            buttonSubmit.html("<span>Enviar</span>")
             return "La respuesta debe tener como mínimo un largo de 10 caracteres."
         }
         return "";
@@ -30,35 +32,61 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
         let last_children = [];
         last_children.push(new Paragraph({
-            text: "Título",
+            text: settings.title,
             heading: HeadingLevel.HEADING_1,
+            alignment: AlignmentType.CENTER
         }))
         last_children.push(new Paragraph({
-            text: "REDFID - Actividad iterativa",
+            text: settings.activity_name,
             heading: HeadingLevel.HEADING_2,
+            alignment: AlignmentType.CENTER
+        }))
+        last_children.push(
+            new Paragraph({
+                text: settings.user_id,
+                italic: true,
+                alignment: AlignmentType.CENTER
+            }));
+        last_children.push(new Paragraph({
+            text: "",
+            heading: HeadingLevel.HEADING_2,
+        }))
+        last_children.push(new Paragraph({
+            text: settings.summary_text,
+            heading: HeadingLevel.HEADING_2,
+            alignment: AlignmentType.LEFT
         }))
         last_children.push(new Paragraph({
             text: "",
             heading: HeadingLevel.HEADING_2,
         }))
         for (let stage of settings.summary) {
-            last_children.push(
-                new Paragraph({
-                    text: "Fase " + stage[0] + " (" + stage[1] + ")"
-                }))
-            last_children.push(
-                new Paragraph({
-                    text: "Tu respuesta:",
-                }))
-            last_children.push(
-                new Paragraph({
-                    text: stage[2],
-                }))
-            last_children.push(
-                new Paragraph({
-                    text: stage[3],
-                    italic: true
-                }));
+            if (settings.summary_list.split("").includes.stage){
+                last_children.push(
+                    new Paragraph({
+                        text: "Fase " + stage[0] + " (" + stage[1] + ")",
+                        heading: HeadingLevel.HEADING_2,
+                    }))
+                last_children.push(
+                    new Paragraph({
+                        text: stage[3],
+                        italic: true
+                    }));
+                last_children.push(
+                    new Paragraph({
+                        text: "",
+                    }))
+                last_children.push(
+                    new Paragraph({
+                        text: stage[2],
+                        alignment: AlignmentType.CENTER,
+                        heading: HeadingLevel.HEADING_2
+                    }))
+                last_children.push(
+                    new Paragraph({
+                        text: "",
+                    }))
+            }
         }
         const doc = new Document({
             creator: "REDFID",

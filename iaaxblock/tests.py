@@ -175,7 +175,8 @@ class IAATestCase(TransactionTestCase):
         data2 = json.dumps({
             "block_type": "summary",
             "activity_name": "TestActivity",
-            "summary_text": "TestSummaryText"
+            "summary_text": "TestSummaryText",
+            "summary_list": "1"
         })
         request2.body = data2.encode('utf-8')
         response2 = self.xblock2.studio_submit(request2)
@@ -183,6 +184,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.block_type, "summary")
         self.assertEqual(self.xblock2.activity_name, "TestActivity")
         self.assertEqual(self.xblock2.summary_text, "TestSummaryText")
+        self.assertEqual(self.xblock2.summary_list, "1")
 
     def test_create_full_with_display(self):
         """
@@ -283,6 +285,16 @@ class IAATestCase(TransactionTestCase):
         #Duplicar el Xblock
         # El problema que tenemos es que esta función solo permite duplicar un bloque pero no 
         duplicated = self.xblock5.studio_post_duplicate("",self.xblock5)
+        self.assertEqual(duplicated, True)
+
+
+        item = IAAActivity.objects.last()
+        random = item.id + 1
+        new_name = self.xblock5.activity_name + "_copy{}".format(str(random + 1))
+        activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=new_name)
+        self.assertEqual(activity.activity_name, new_name)
+        self.assertEqual(activity.id_course, COURSE_ID)
+
 
     def test_studentAnswerFeedbackStage2(self):
         '''
@@ -338,36 +350,137 @@ class IAATestCase(TransactionTestCase):
             "submission" : "y este es el segundo feedback"
         })
         feedback.body = datafeedback.encode('utf-8')
-
         self.xblock5.instructor_submit(feedback)
     
-    def test_delete_full(self):
-        pass
-
-    def test_delete_display(self):
-        pass
-
-    def test_delete_summary(self):
-        pass
-
-    def test_duplicate_full(self):
-        pass
-
-    def test_duplicate_display(self):
-        pass
-
-    def test_duplicate_summary(self):
-        pass
 
     def test_edit_full (self):
-        # probar primero habilitar el display, sacar el display y volver a habilitarlo)
-        pass
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "2",
+            "stage_label": "TestStageLabel2",
+            "question": "TestQuestion2",
+            "activity_previous": "yes",
+            "activity_name_previous": "TestActivity",
+            "activity_stage_previous": "1",
+            "display_title": "TestDisplayTitle"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock2.studio_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        request3 = TestRequest()
+        request3.method = 'POST'
+        data3 = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "2",
+            "stage_label": "TestStageLabel2",
+            "question": "TestQuestion2",
+            "activity_previous": "no",
+            "display_title": "TestDisplayTitle"
+        })
+        request3.body = data3.encode('utf-8')
+        response3 = self.xblock2.studio_submit(request3)
+        self.assertEqual(response3.json_body["result"], "success")
+
 
     def test_edit_display(self):
-        pass
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "block_type": "display",
+            "activity_name_previous": "TestActivity",
+            "activity_stage_previous": "1",
+            "display_title": "TestDisplayTitle"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock2.studio_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        request3 = TestRequest()
+        request3.method = 'POST'
+        data3 = json.dumps({
+            "block_type": "display",
+            "activity_name_previous": "TestActivity",
+            "activity_stage_previous": "1",
+            "display_title": "AnotherDisplayTitle"
+        })
+        request3.body = data3.encode('utf-8')
+        response3 = self.xblock2.studio_submit(request3)
+        self.assertEqual(response3.json_body["result"], "success")
+        self.assertEqual(self.xblock2.block_type, "display")
+        self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
+        self.assertEqual(self.xblock2.activity_stage_previous, 1)
+        self.assertEqual(self.xblock2.display_title, "AnotherDisplayTitle")
+
 
     def test_edit_summary(self):
-        pass
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "block_type": "summary",
+            "activity_name": "TestActivity",
+            "summary_text": "TestSummaryText",
+            "summary_list": "1"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock2.studio_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        request3 = TestRequest()
+        request3.method = 'POST'
+        data3 = json.dumps({
+            "block_type": "summary",
+            "activity_name": "TestActivity",
+            "summary_text": "TestSummaryTextEdited",
+            "summary_list": "1"
+        })
+        request3.body = data3.encode('utf-8')
+        response3 = self.xblock2.studio_submit(request3)
+        self.assertEqual(response3.json_body["result"], "success")
+        self.assertEqual(self.xblock2.block_type, "summary")
+        self.assertEqual(self.xblock2.activity_name, "TestActivity")
+        self.assertEqual(self.xblock2.summary_text, "TestSummaryTextEdited")
+        self.assertEqual(self.xblock2.summary_list, "1")
         
     def test_submit_full_submission(self):
         # Responder el blouqe

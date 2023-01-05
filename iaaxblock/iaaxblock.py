@@ -160,8 +160,6 @@ class IterativeAssessedActivityXBlock(XBlock):
         if source_item.block_type == "full":
             item = IAAActivity.objects.last()
             random = item.id + 1
-            i = 1
-            new_name = ""
             new_name = source_item.activity_name + "_copy{}".format(str(random + 1))
             self.activity_name = new_name
             self.activity_stage = 1
@@ -419,7 +417,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "block_type": self.block_type,
                             "activity_name": self.activity_name,
                             "summary_text": self.summary_text,
-                            "summary_list": self.summary_list,
+                            "summary_list": self.summary_list.split(""),
                             "summary": summary,
                             'indicator_class': indicator_class,
                             'context': json.dumps({"summary": summary})
@@ -440,7 +438,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_student.js',
                 ],
-                settings=({"summary": summary} if self.block_type == "summary" else {})
+                settings=({"user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
