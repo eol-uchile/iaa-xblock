@@ -67,6 +67,8 @@ class IAATestCase(TransactionTestCase):
         self.xblock1.iaa_delete()
         self.xblock2.iaa_delete()
         self.xblock3.iaa_delete()
+        self.xblock4.iaa_delete()
+        self.xblock5.iaa_delete()
 
 
     def test_validate_field_data(self):
@@ -86,8 +88,6 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock1.submission, "")
         self.assertEqual(self.xblock1.submission_time, "")
         self.assertEqual(self.xblock1.summary_text, "")
-
-
 
     def test_create_full(self):
         """
@@ -119,9 +119,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(len(stage), 1)
         self.assertEqual(stage[0]["stage_number"], 1)
         self.assertEqual(stage[0]["stage_label"], "TestStageLabel1")
-
-
-
+        
     def test_create_display(self):
         """
         Checks if a 'display' type XBlock was created successfully.
@@ -155,7 +153,6 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.activity_stage_previous, 1)
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
-
     def test_create_summary(self):
         """
         Checks if a 'summary' type XBlock was created successfully.
@@ -186,7 +183,6 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.block_type, "summary")
         self.assertEqual(self.xblock2.activity_name, "TestActivity")
         self.assertEqual(self.xblock2.summary_text, "TestSummaryText")
-
 
     def test_create_full_with_display(self):
         """
@@ -225,7 +221,6 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
         self.assertEqual(self.xblock2.activity_stage_previous, 1)
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
-
 
     def test_studentAnswer(self):
         '''
@@ -284,11 +279,10 @@ class IAATestCase(TransactionTestCase):
 
         self.xblock4.instructor_submit(feedback)
 
-
     def test_duplicate(self):
         #Duplicar el Xblock
+        # El problema que tenemos es que esta función solo permite duplicar un bloque pero no 
         duplicated = self.xblock5.studio_post_duplicate("",self.xblock5)
-
 
     def test_studentAnswerFeedbackStage2(self):
         '''
@@ -346,39 +340,74 @@ class IAATestCase(TransactionTestCase):
         feedback.body = datafeedback.encode('utf-8')
 
         self.xblock5.instructor_submit(feedback)
+    
+    def test_delete_full(self):
+        pass
 
+    def test_delete_display(self):
+        pass
 
-    # def test_make_submission(self):
-    #     """
-    #     Checks if a submission is sent correctly.
-    #     """
-    #     request = TestRequest()
-    #     request.method = 'POST'
-    #     data = json.dumps({
-    #         "block_type": "full",
-    #         "activity_name": "TestActivity",
-    #         "activity_stage": "1",
-    #         "stage_label": "TestStageLabel1",
-    #         "question": "TestQuestion1",
-    #         "activity_previous": "no",
-    #     })
-    #     request.body = data.encode('utf-8')
-    #     response = self.xblock1.studio_submit(request)
-    #     self.assertEqual(response.json_body["result"], "success")
-    #     request2 = TestRequest()
-    #     request2.method = 'POST'
-    #     data2 = json.dumps({
-    #         "submission": "TestSubmission"
-    #     })
-    #     request2.body = data2.encode('utf-8')
-    #     response2 = self.xblock1.student_submit(request2)
-    #     self.assertEqual(response2.json_body["result"], "success")
-    #     activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=self.xblock1.activity_name)
-    #     stage = IAAStage.objects.get(activity=activity, stage_number=self.xblock1.activity_stage)
-    #     submissions = IAASubmission.objects.filter(stage=stage).values("submission")
-    #     self.assertEqual(len(submissions), 1)
-    #     self.assertEqual(submissions[0]["submission"], "TestSubmission")
+    def test_delete_summary(self):
+        pass
 
+    def test_duplicate_full(self):
+        pass
+
+    def test_duplicate_display(self):
+        pass
+
+    def test_duplicate_summary(self):
+        pass
+
+    def test_edit_full (self):
+        # probar primero habilitar el display, sacar el display y volver a habilitarlo)
+        pass
+
+    def test_edit_display(self):
+        pass
+
+    def test_edit_summary(self):
+        pass
+        
+    def test_submit_full_submission(self):
+        # Responder el blouqe
+        pass
+
+    def test_submit_full_feedback(self):
+        # Dar feedback desde el instructor.
+        pass
+
+    def test_make_submission(self):
+        """
+        Checks if a submission is sent correctly.
+        """
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock1.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        request2 = TestRequest()
+        request2.method = 'POST'
+        data2 = json.dumps({
+            "submission": "TestSubmission"
+        })
+        request2.body = data2.encode('utf-8')
+        response2 = self.xblock1.student_submit(request2)
+        self.assertEqual(response2.json_body["result"], "success")
+        activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=self.xblock1.activity_name)
+        stage = IAAStage.objects.get(activity=activity, stage_number=self.xblock1.activity_stage)
+        submissions = IAASubmission.objects.filter(stage=stage).values("submission")
+        self.assertEqual(len(submissions), 1)
+        self.assertEqual(submissions[0]["submission"], "TestSubmission")
+        pass
 
 
 

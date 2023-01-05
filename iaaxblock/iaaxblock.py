@@ -404,7 +404,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             this_summary_submission_time = "—"
                         else:
                             this_summary_submission = submission[0]["submission"]
-                            this_summary_submission_time = submission[0]["submission_time"]
+                            this_summary_submission_time = str(submission[0]["submission_time"])
                         summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
                     
                     context.update(
