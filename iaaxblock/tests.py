@@ -284,16 +284,26 @@ class IAATestCase(TransactionTestCase):
     def test_duplicate(self):
         #Duplicar el Xblock
         # El problema que tenemos es que esta función solo permite duplicar un bloque pero no 
+        items0 = len(IAAActivity.objects.all())
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "block_type": "full",
+            "activity_name": "TestActivity",
+            "activity_stage": "1",
+            "stage_label": "TestStageLabel1",
+            "question": "TestQuestion1",
+            "activity_previous": "no",
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock5.studio_submit(request)
+        self.assertEqual(response.json_body["result"], "success")
+        items1 = len(IAAActivity.objects.all())
         duplicated = self.xblock5.studio_post_duplicate("",self.xblock5)
         self.assertEqual(duplicated, True)
-
-
-        item = IAAActivity.objects.last()
-        random = item.id + 1
-        new_name = self.xblock5.activity_name + "_copy{}".format(str(random + 1))
-        activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=new_name)
-        self.assertEqual(activity.activity_name, new_name)
-        self.assertEqual(activity.id_course, COURSE_ID)
+        items2 = len(IAAActivity.objects.all())
+        self.assertEqual(items0, items1)
+        self.assertEqual(items1, items2-1)
 
 
     def test_studentAnswerFeedbackStage2(self):

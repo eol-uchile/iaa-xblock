@@ -61,7 +61,9 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             heading: HeadingLevel.HEADING_2,
         }))
         for (let stage of settings.summary) {
-            if (settings.summary_list.split("").includes.stage){
+            console.log(stage)
+            console.log(settings.summary_list)
+            if (settings.summary_list.split("").includes(stage[0].toString())){
                 last_children.push(
                     new Paragraph({
                         text: "Fase " + stage[0] + " (" + stage[1] + ")",

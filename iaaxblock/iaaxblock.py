@@ -400,24 +400,24 @@ class IterativeAssessedActivityXBlock(XBlock):
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                     summary = []
                     stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
-
                     for stage in stages_list:
-                        submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
-                        if len(submission) == 0:
-                            this_summary_submission = "No se ha respondido aún."
-                            this_summary_submission_time = "—"
-                        else:
-                            this_summary_submission = submission[0]["submission"]
-                            this_summary_submission_time = str(submission[0]["submission_time"])
-                        summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
-                    
+                        if str(stage.stage_number) in self.summary_list.split(","):
+                            submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
+                            if len(submission) == 0:
+                                this_summary_submission = "No se ha respondido aún."
+                                this_summary_submission_time = "—"
+                            else:
+                                this_summary_submission = submission[0]["submission"]
+                                this_summary_submission_time = str(submission[0]["submission_time"])
+                            summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
+                        
                     context.update(
                         {
                             "title": self.title,
                             "block_type": self.block_type,
                             "activity_name": self.activity_name,
                             "summary_text": self.summary_text,
-                            "summary_list": self.summary_list.split(""),
+                            "summary_list": self.summary_list.split(","),
                             "summary": summary,
                             'indicator_class': indicator_class,
                             'context': json.dumps({"summary": summary})
@@ -671,8 +671,6 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         """
         from .models import IAAActivity, IAAStage, IAASubmission
-
-        print("Student answer")
 
         id_course = self.course_id
         id_student = self.scope_ids.user_id

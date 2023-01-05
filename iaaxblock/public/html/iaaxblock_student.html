@@ -99,12 +99,10 @@
                         <span id="report-button" class="iaa-report-button" >Descargar reporte (.docx)</span>
                     </div>
                     {% for activity in summary %}
-                    {% if activity.0 in summary_list %}
                     <hr>
                     <p class="summary-element-header activity-stage-label">Fase {{activity.0}} ({{activity.1}})</p>
                     <p class="summary-element-header summary-submission">{{activity.3}}</p>
                     <p class="summary-element summary-submission-time">{{activity.2}}</p>
-                    {% endif %}
                     {% endfor %}
                 </div>
                 {% endif %}
