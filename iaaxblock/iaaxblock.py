@@ -163,10 +163,8 @@ class IterativeAssessedActivityXBlock(XBlock):
             new_name = source_item.activity_name + "_copy{}".format(str(random + 1))
             self.activity_name = new_name
             self.activity_stage = 1
-            new_activity = IAAActivity(id_course=self.course_id, activity_name=self.activity_name)
-            new_activity.save()
-            new_stage = IAAStage(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
-            new_stage.save()
+            new_activity = IAAActivity.objects.create(id_course=self.course_id, activity_name=self.activity_name)
+            new_stage = IAAStage.objects.create(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
         return True
 
 

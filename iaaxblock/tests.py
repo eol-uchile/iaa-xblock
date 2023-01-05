@@ -11,7 +11,7 @@ from xblock.field_data import DictFieldData
 
 from .iaaxblock import IterativeAssessedActivityXBlock
 from .models import IAAActivity, IAAStage, IAAFeedback, IAASubmission
-
+import json
 COURSE_ID = "some_course_id"
 
 
@@ -283,27 +283,21 @@ class IAATestCase(TransactionTestCase):
 
     def test_duplicate(self):
         #Duplicar el Xblock
-        # El problema que tenemos es que esta función solo permite duplicar un bloque pero no 
-        items0 = len(IAAActivity.objects.all())
-        request = TestRequest()
-        request.method = 'POST'
-        data = json.dumps({
-            "block_type": "full",
-            "activity_name": "TestActivity",
-            "activity_stage": "1",
-            "stage_label": "TestStageLabel1",
-            "question": "TestQuestion1",
-            "activity_previous": "no",
-        })
-        request.body = data.encode('utf-8')
-        response = self.xblock5.studio_submit(request)
-        self.assertEqual(response.json_body["result"], "success")
-        items1 = len(IAAActivity.objects.all())
-        duplicated = self.xblock5.studio_post_duplicate("",self.xblock5)
+        self.assertEqual(IAAActivity.objects.all().count(), 0)
+        activity = IAAActivity.objects.create(id_course=COURSE_ID, activity_name='TestActivity')
+        stage = IAAStage.objects.create(activity=activity, stage_label='TestStageLabel1', stage_number='1')
+        fake_xblock =  Mock(
+            stage_number = stage.stage_number,
+            activity_name = activity.activity_name,
+            block_type = 'full'
+        )
+        duplicated = self.xblock5.studio_post_duplicate("", fake_xblock)
         self.assertEqual(duplicated, True)
-        items2 = len(IAAActivity.objects.all())
-        self.assertEqual(items0, items1)
-        self.assertEqual(items1, items2-1)
+        item = IAAActivity.objects.last()
+        random = item.id + 1
+        activity_name = 'TestActivity_copy{}'.format(random)
+        self.assertTrue(IAAActivity.objects.filter(activity_name=activity_name).exists())
+
 
 
     def test_studentAnswerFeedbackStage2(self):
@@ -498,7 +492,43 @@ class IAATestCase(TransactionTestCase):
 
     def test_submit_full_feedback(self):
         # Dar feedback desde el instructor.
-        pass
+        activity = IAAActivity.objects.create(id_course=COURSE_ID, activity_name='TestActivity')
+        stage = IAAStage.objects.create(activity=activity, stage_label='TestStageLabel1', stage_number='1')
+        request = TestRequest()
+        request.method = 'POST'
+        data = json.dumps({
+            "id_student": "1",
+            "feedback":"this is a feedback"
+        })
+        request.body = data.encode('utf-8')
+        self.xblock1.activity_name = activity.activity_name
+        self.xblock1.stage_number = stage.stage_number
+        self.xblock1.scope_ids.user_id = 101 #instructor id
+        self.assertEqual(IAAFeedback.objects.all().count(), 0)
+        response = self.xblock1.instructor_submit(request)
+        data_response = json.loads(response._app_iter[0].decode())
+        self.assertEqual(data_response['result'], 'success')
+        self.assertEqual(IAAFeedback.objects.all().count(), 1)
+        feedback = IAAFeedback.objects.first()
+        self.assertEqual(feedback.stage, stage)
+        self.assertEqual(feedback.id_student, '1')
+        self.assertEqual(feedback.id_instructor, '101')
+        self.assertEqual(feedback.feedback, 'this is a feedback')
+        #new feedback
+        data = json.dumps({
+            "id_student": "1",
+            "feedback":"this is a new feedback"
+        })
+        request.body = data.encode('utf-8')
+        response = self.xblock1.instructor_submit(request)
+        data_response = json.loads(response._app_iter[0].decode())
+        self.assertEqual(data_response['result'], 'success')
+        self.assertEqual(IAAFeedback.objects.all().count(), 1)
+        feedback = IAAFeedback.objects.first()
+        self.assertEqual(feedback.stage, stage)
+        self.assertEqual(feedback.id_student, '1')
+        self.assertEqual(feedback.id_instructor, '101')
+        self.assertEqual(feedback.feedback, 'this is a new feedback')
 
     def test_make_submission(self):
         """
@@ -515,6 +545,7 @@ class IAATestCase(TransactionTestCase):
             "activity_previous": "no",
         })
         request.body = data.encode('utf-8')
+        self.xblock1.scope_ids.user_id = 99
         response = self.xblock1.studio_submit(request)
         self.assertEqual(response.json_body["result"], "success")
         request2 = TestRequest()
@@ -530,10 +561,3 @@ class IAATestCase(TransactionTestCase):
         submissions = IAASubmission.objects.filter(stage=stage).values("submission")
         self.assertEqual(len(submissions), 1)
         self.assertEqual(submissions[0]["submission"], "TestSubmission")
-        pass
-
-
-
-
-
-
