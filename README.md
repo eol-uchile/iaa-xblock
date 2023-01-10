@@ -24,9 +24,10 @@ $ python manage.py lms migrate iaaxblock
 
 ## TODO
 
-- Agregar selección de estilos.
-- Mejoras visuales dentro del contenedor.
+- Mejora de estilos de la funcionalidad de feedback.
+- Instructor debe poder descargar cualquier archivo Word de cualquier alumno.
+- Posibilidad de mostrar múltiples respuestas anteriores dentro de un mismo contenedor.
 
 ## Licencia
 
-Desarrollado para el CMMEdu.
+Desarrollado para REDFID.
