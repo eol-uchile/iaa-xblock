@@ -41,10 +41,19 @@ a.LinkButton {
 
 .iaa-report-button {
   display: inline-block;
-  background: darkblue;
+  background: #df595a;
   border-radius: 4px;
-  font-family: "arial-black";
   font-size: 14px;
+  color: #FFF;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.iaa-copy-button {
+  display: inline-block;
+  background: #df595a;
+  border-radius: 4px;
+  font-size: 10px;
   color: #FFF;
   padding: 8px 12px;
   cursor: pointer;
@@ -55,6 +64,10 @@ a.LinkButton {
 }
 
 .iaa-display-button:disabled {
+  background: gray;
+}
+
+.iaa-copy-button:disabled {
   background: gray;
 }
 
@@ -161,7 +174,7 @@ a.LinkButton {
 }
 
 .submission-previous {
-  margin: 0;
+  margin: 12px 0 12px 0;
   background: #eee;
   padding: 1em;
   border-radius: 1em;
@@ -185,6 +198,11 @@ a.LinkButton {
 .iaa-success-msg {
   text-align: center;
   color:seagreen;
+}
+
+.iaa-error-msg {
+  text-align: center;
+  color:tomato;
 }
 
 .iaa-container_block .Reconociendo-RedFid .exptop .recono-title {

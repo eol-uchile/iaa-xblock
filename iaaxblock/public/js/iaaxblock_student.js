@@ -198,6 +198,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     buttonSubmit.click(function (e) {
+        showErrorMessage("");
+        showSuccessMessage("");
         e.preventDefault();
         buttonSubmit.html("<span>" + buttonSubmit[0].dataset.checking + "</span>");
         buttonSubmit.attr("disabled", true);
@@ -253,8 +255,11 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             submission_previous = result.submission_previous
             submission_previous_time = result.submission_previous_time;
         }
-        console.log(area)
-        area.html(`<figure class='submission-previous'><blockquote>${submission_previous}</blockquote><figcaption style='text-align:right;'>${submission_previous_time}</figcaption></figure>`);
+        let copy_button = (settings.block_type === "full" && !submission.prop("disabled") && (result.submission_previous !== "EMPTY" && result.submission_previous !== "ERROR")) ? `<span id="${settings.location}-copy-button" class="iaa-copy-button">Copiar</span>`  : "";
+        area.html(`<figure class='submission-previous'><blockquote>${submission_previous}</blockquote><figcaption style='text-align:right;'>${submission_previous_time}</figcaption><div style="text-align: center">${copy_button}</div></figure>`);
+        $(element).find(`#${settings.location}-copy-button`).on('click', function (eventObject) {
+            submission.val(submission_previous);
+        });
         area.removeClass(".iaa-display-area-hidden");
         lockDisplayButtons(false);
     }

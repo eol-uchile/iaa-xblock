@@ -22,45 +22,21 @@
                         <span id="{{location}}-display-button" class="iaa-display-button" >Ver</span>
                     </div>
                     <div id="{{location}}-submission-previous" class="iaa-display-area"></div>
-                    <!--
-                    {% if submission_previous_time == "ERROR" %}
-                        <p class="iaa-student-error-msg">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
-                    {% elif submission_previous_time == "EMPTY" %}
-                        <p class="iaa-student-warning-msg">Aún no proporcionas una respuesta.</p>
-                    {% else %}
-                        <figure class="submission-previous">
-                            <blockquote>
-                                {{submission_previous}}
-                            </blockquote>
-                            <figcaption>
-                                {{submission_previous_time}}
-                            </figcaption>
-                        </figure>
-                    {% endif %}
-                    -->
                 </div>
             {% endif %}
             {% if block_type == "full" %}
                 <meta id="context-iaa" data-context="{{context}}">
                 <div>
                     {% if activity_previous %}
-                        {% if submission_previous_time == "ERROR" %}
-                            <p class="iaa-student-error-msg">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
-                        {% elif submission_previous_time == "EMPTY" %}
-                            <p class="iaa-student-warning-msg">Aún no proporcionas una respuesta.</p>
-                        {% else %}
-                            <h3 class="display-title">{{display_title}}</h3>
-                            <figure class="submission-previous">
-                                <blockquote>
-                                    {{submission_previous}}
-                                </blockquote>
-                                <figcaption>
-                                    {{submission_previous_time}}
-                                </figcaption>
-                            </figure>
-                        {% endif %}
+                    <div>
+                        <h3 class="display-title"><b>{{display_title}}</b></h3>
+                        <div class="display-button-div">
+                            <span id="{{location}}-display-button" class="iaa-display-button" >Ver</span>
+                        </div>
+                        <div id="{{location}}-submission-previous" class="iaa-display-area"></div>
+                    </div>
                     {% endif %}
-                    <p class="question">{{question}}</p>
+                    <h3 class="question"><b>{{question}}</b></p>
                     <textarea class="iaa-submission">{{submission}}</textarea>
                 </div>
                 <div class="action iaa-action">

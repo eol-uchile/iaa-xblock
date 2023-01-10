@@ -318,26 +318,6 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 if self.block_type == "full":
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
-                    if not self.activity_previous:
-                        this_submission_previous = ""
-                        this_submission_time_previous = ""
-                        stage_label_previous = ""
-                    else:
-                        try:
-                            current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
-                            current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
-                            stage_label_previous = current_stage_previous.stage_label
-                            current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
-                            if len(current_submission_previous) == 0:
-                                this_submission_previous = "EMPTY"
-                                this_submission_time_previous = "EMPTY"
-                            else:
-                                this_submission_previous = current_submission_previous[0]["submission"]
-                                this_submission_time_previous = current_submission_previous[0]["submission_time"]
-                        except:
-                            this_submission_previous = "ERROR"
-                            this_submission_time_previous = "ERROR"
-                            stage_label_previous = "ERROR"
                     current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                     feedbacks = [(x["id_instructor"], x["feedback"], x["feedback_time"]) for x in IAAFeedback.objects.filter(stage=current_stage, id_student=id_student).values('id_instructor', 'feedback', 'feedback_time')]
                     context.update(
@@ -346,9 +326,6 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "block_type": self.block_type,
                             "activity_name_previous": self.activity_name_previous,
                             "activity_stage_previous": self.activity_stage_previous,
-                            "stage_label_previous": stage_label_previous,
-                            "submission_previous": this_submission_previous,
-                            "submission_previous_time": this_submission_time_previous,
                             "activity_previous": self.activity_previous,
                             "display_title": self.display_title,
                             "activity_name": self.activity_name,
@@ -418,7 +395,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_student.js',
                 ],
-                settings=({"location": str(self.location).split('@')[-1], "user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {"location": str(self.location).split('@')[-1]})
+                settings=({"location": str(self.location).split('@')[-1], "user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
