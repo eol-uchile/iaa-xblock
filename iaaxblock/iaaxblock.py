@@ -35,8 +35,8 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Variant of this block."
     )
 
-    activity_stage = Integer(
-        default=0,
+    activity_stage = String(
+        default="",
         scope=Scope.settings,
         help="Stage of this activity."
     )
@@ -65,8 +65,8 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Activity of the shown submission."
     )
 
-    activity_stage_previous = Integer(
-        default=0,
+    activity_stage_previous = String(
+        default="",
         scope=Scope.settings,
         help="Stage of the shown submission."
     )
@@ -162,7 +162,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             random = item.id + 1
             new_name = source_item.activity_name + "_copy{}".format(str(random + 1))
             self.activity_name = new_name
-            self.activity_stage = 1
+            self.activity_stage = "1"
             new_activity = IAAActivity.objects.create(id_course=self.course_id, activity_name=self.activity_name)
             new_stage = IAAStage.objects.create(activity=new_activity, stage_label=self.stage_label, stage_number=self.activity_stage)
         return True
@@ -358,7 +358,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     summary = []
                     stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
                     for stage in stages_list:
-                        if str(stage.stage_number) in self.summary_list.split(","):
+                        if stage.stage_number in self.summary_list.split(","):
                             submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
                             if len(submission) == 0:
                                 this_summary_submission = "No se ha respondido aún."
@@ -413,7 +413,8 @@ class IterativeAssessedActivityXBlock(XBlock):
         activities = []
         for i in range(len(activities_no_stage)):
             activity = activities_no_stage[i]
-            stages_list = [str(x["stage_number"]) for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number")]
+            stages_list = [x["stage_number"] for x in IAAStage.objects.filter(activity=activity).values("stage_number")]
+            stages_list.sort()
             if len(stages_list) != 0:
                 stages = ",".join(stages_list)
             activities.append([activity.id, activity.activity_name, stages])
@@ -421,12 +422,12 @@ class IterativeAssessedActivityXBlock(XBlock):
             "title": self.title,
             "activity_name": self.activity_name,
             "block_type": self.block_type,
-            "activity_stage": str(self.activity_stage),
+            "activity_stage": self.activity_stage,
             "stage_label": self.stage_label,
             "question": self.question,
             "display_title": self.display_title,
             "activity_name_previous": self.activity_name_previous,
-            "activity_stage_previous": str(self.activity_stage_previous),
+            "activity_stage_previous": self.activity_stage_previous,
             "summary_text": self.summary_text,
             "summary_list": self.summary_list,
             "activities": json.dumps(activities)
@@ -447,7 +448,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             additional_js=[
                 'public/js/iaaxblock_studio.js',
             ],
-        )    
+        )
         return frag
 
 
@@ -466,12 +467,12 @@ class IterativeAssessedActivityXBlock(XBlock):
             from .models import IAAActivity, IAAStage
             id_course = self.course_id
             activity = IAAActivity.objects.filter(id_course=id_course, activity_name=self.activity_name).first()
-            stages_list = [[str(x["stage_number"]), x["stage_label"]] for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number", "stage_label")]
+            stages_list = [[x["stage_number"], x["stage_label"]] for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number", "stage_label")]
             js_context = {
                 "title": self.title,
                 "activity_name": self.activity_name,
                 "block_type": self.block_type,
-                "activity_stage": str(self.activity_stage),
+                "activity_stage": self.activity_stage,
                 "stage_label": self.stage_label,
                 "question": self.question,
                 "stages": stages_list,
@@ -485,7 +486,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     previous_stage = IAAStage.objects.get(activity=previous_activity, stage_number=self.activity_stage_previous)
                     stage_label_previous = previous_stage.stage_label
                     js_context["activity_name_previous"] = self.activity_name_previous
-                    js_context["activity_stage_previous"] = str(self.activity_stage_previous)
+                    js_context["activity_stage_previous"] = self.activity_stage_previous
                     js_context["stage_label_previous"] = stage_label_previous
                 except:
                     js_context["activity_name_previous"] = "ERROR"
@@ -505,7 +506,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 previous_stage = IAAStage.objects.get(activity=previous_activity, stage_number=self.activity_stage_previous)
                 stage_label_previous = previous_stage.stage_label
                 js_context["activity_name_previous"] = self.activity_name_previous
-                js_context["activity_stage_previous"] = str(self.activity_stage_previous)
+                js_context["activity_stage_previous"] = self.activity_stage_previous
                 js_context["stage_label_previous"] = stage_label_previous
             except:
                 js_context["activity_name_previous"] = "ERROR"
@@ -561,22 +562,22 @@ class IterativeAssessedActivityXBlock(XBlock):
         self.block_type = data.get('block_type')
         if self.block_type == "full":
             self.activity_name = data.get('activity_name')
-            self.activity_stage = int(data.get('activity_stage'))
+            self.activity_stage = data.get('activity_stage')
             self.stage_label = data.get('stage_label')
             self.question = data.get('question')
             if data.get('activity_previous') == "yes":
                 self.activity_previous = True
                 self.activity_name_previous = data.get('activity_name_previous')
-                self.activity_stage_previous = int(data.get('activity_stage_previous'))
+                self.activity_stage_previous = data.get('activity_stage_previous')
                 self.display_title = data.get('display_title')
             else:
                 self.activity_previous = False
                 self.activity_name_previous = ""
-                self.activity_stage_previous = 0
+                self.activity_stage_previous = ""
                 self.display_title = ""
         elif self.block_type == "display":
             self.activity_name_previous = data.get('activity_name_previous')
-            self.activity_stage_previous = int(data.get('activity_stage_previous'))
+            self.activity_stage_previous = data.get('activity_stage_previous')
             self.display_title = data.get('display_title')
         elif self.block_type == "summary":
             self.activity_name = data.get('activity_name')

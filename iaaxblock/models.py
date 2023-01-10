@@ -14,7 +14,7 @@ class IAAStage(models.Model):
         on_delete=models.CASCADE
     )
     stage_label = models.TextField()
-    stage_number = models.IntegerField()
+    stage_number = models.TextField()
 
 
 class IAASubmission(models.Model):
