@@ -6,6 +6,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     let buttonReport = $(element).find(".iaa-report-button");
     let submission = $(element).find(".iaa-submission");
     var handlerUrl = runtime.handlerUrl(element, 'student_submit');
+    var displayUrl = runtime.handlerUrl(element, 'fetch_previous_submission');
+    var summaryUrl = runtime.handlerUrl(element, 'fetch_summary');
 
     function showErrorMessage(msg) {
         $(element).find('#iaa-student-error-msg').html(msg);
@@ -23,12 +25,12 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         if (data.submission.length < 10) {
             buttonSubmit.removeAttr("disabled");
             buttonSubmit.html("<span>Enviar</span>")
-            return "La respuesta debe tener como mínimo un largo de 10 caracteres."
+            return "¡Respuesta muy corta!"
         }
         return "";
     }
 
-    function generateDocument() {
+    function generateDocument(summary, summary_text, summary_list) {
         const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
         let last_children = [];
         last_children.push(new Paragraph({
@@ -52,7 +54,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             heading: HeadingLevel.HEADING_2,
         }))
         last_children.push(new Paragraph({
-            text: settings.summary_text,
+            text: summary_text,
             heading: HeadingLevel.HEADING_2,
             alignment: AlignmentType.LEFT
         }))
@@ -60,23 +62,12 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             text: "",
             heading: HeadingLevel.HEADING_2,
         }))
-        for (let stage of settings.summary) {
-            console.log(stage)
-            console.log(settings.summary_list)
-            if (settings.summary_list.split("").includes(stage[0].toString())){
+        for (let stage of summary) {
+            if (summary_list.split("").includes(stage[0].toString())){
                 last_children.push(
                     new Paragraph({
-                        text: "Fase " + stage[0] + " (" + stage[1] + ")",
+                        text: stage[1],
                         heading: HeadingLevel.HEADING_2,
-                    }))
-                last_children.push(
-                    new Paragraph({
-                        text: stage[3],
-                        italic: true
-                    }));
-                last_children.push(
-                    new Paragraph({
-                        text: "",
                     }))
                 last_children.push(
                     new Paragraph({
@@ -88,6 +79,12 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                     new Paragraph({
                         text: "",
                     }))
+                last_children.push(
+                    new Paragraph({
+                        text: stage[3],
+                        italic: true,
+                        alignment: AlignmentType.RIGHT,
+                }));
             }
         }
         const doc = new Document({
@@ -168,7 +165,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         });
 
         docx.Packer.toBlob(doc).then(blob => {
-            saveAs(blob, "example.docx");
+            saveAs(blob, "documento_iterativo.docx");
         });
     }
 
@@ -197,6 +194,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     buttonSubmit.click(function (e) {
+        showErrorMessage("");
+        showSuccessMessage("");
         e.preventDefault();
         buttonSubmit.html("<span>" + buttonSubmit[0].dataset.checking + "</span>");
         buttonSubmit.attr("disabled", true);
@@ -224,6 +223,108 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             }
         }
     });
+
+    function lockDisplayButtons(lock) {
+        let buttons = $(element).find(`#${settings.location}-display-button`);
+        for (let button of buttons) {
+            if (lock) {
+                button.setAttribute("disabled", true);
+            } else {
+                button.removeAttribute("disabled");
+            }
+        }
+    }
+
+    function lockSummaryButtons(lock) {
+        let buttons = $(element).find(`#${settings.location}-summary-button`);
+        for (let button of buttons) {
+            if (lock) {
+                button.setAttribute("disabled", true);
+            } else {
+                button.removeAttribute("disabled");
+            }
+        }
+    }
+
+    function afterDisplay(result) {
+        let displayButton = $(element).find(`#${settings.location}-display-button`).eq(0);
+        displayButton.remove();
+        let area = $(element).find(`#${settings.location}-submission-previous`).eq(0);
+        var submission_previous;
+        var submission_previous_time;
+        if (result.submission_previous === "EMPTY"){
+            submission_previous = "Aún no proporcionas una respuesta.";
+            submission_previous_time = "";
+        } else if (result.submission_previous === "ERROR"){
+            submission_previous = "Ha ocurrido un error, por favor contacte al administrador.";
+            submission_previous_time = "";
+        } else {
+            submission_previous = result.submission_previous
+            submission_previous_time = result.submission_previous_time;
+        }
+        let copy_button = (settings.block_type === "full" && !submission.prop("disabled") && (result.submission_previous !== "EMPTY" && result.submission_previous !== "ERROR")) ? `<span id="${settings.location}-copy-button" class="iaa-copy-button">Copiar</span>`  : "";
+        area.html(`<figure class='submission-previous'><blockquote>${submission_previous}</blockquote><figcaption style='text-align:right;'>${submission_previous_time}</figcaption><div style="text-align: center">${copy_button}</div></figure>`);
+        $(element).find(`#${settings.location}-copy-button`).on('click', function (eventObject) {
+            submission.val(submission_previous);
+        });
+        area.removeClass(".iaa-display-area-hidden");
+        lockDisplayButtons(false);
+    }
+
+
+    $(element).find(`#${settings.location}-display-button`).on('click', function (eventObject) {
+        lockDisplayButtons(true);
+        var data = {}
+        $.post(displayUrl, JSON.stringify(data)).done(function (response) {
+            afterDisplay(response)
+        });
+    });
+
+
+    $(element).find(`#iaa-summary-button`).on('click', function (eventObject) {
+        lockSummaryButtons(true);
+        var data = {}
+        $.post(summaryUrl, JSON.stringify(data)).done(function (response) {
+            afterSummary(response)
+        });
+    });
+
+    function generateDoc(eventObject, result){
+        eventObject.preventDefault()
+        eventObject.target.setAttribute("disabled", true);
+        generateDocument(result.summary, settings.summary_text, settings.summary_list);
+        eventObject.target.removeAttribute("disabled");
+    }
+
+    function afterSummary(result) {
+        let area = $(element).find(`#iaa-summary`).eq(0);
+        if (result.result === "failed"){
+            area.html(`<div class="centered">Ha ocurrido un error, por favor contacte al administrador.</div>`);
+            area.removeClass(".iaa-summary-area-hidden");
+        } else {
+            let summaryButton = $(element).find(`#iaa-summary-button`).eq(0);
+            summaryButton.remove();     
+            var summary = "";
+            for(let activity of result.summary){
+                summary = summary + `<p class="summary-element-header activity-stage-label">`;
+                summary = summary + `${activity[1]}`;
+                summary = summary + `</p>`
+                summary = summary + `<p class="summary-element summary-submission">`;
+                summary = summary + `${activity[2]}`;
+                summary = summary + `</p>`
+                summary = summary + `<p class="summary-element-footer summary-submission-time">`;
+                summary = summary + `${activity[3]}`;
+                summary = summary + `</p><hr>`
+            }
+            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
+            area.html(summary);
+            $(element).find(`#report-button`).on('click', function (eventObject) {
+                generateDoc(eventObject, result);
+            });
+            area.removeClass(".iaa-summary-area-hidden");
+            lockDisplayButtons(false);
+        }
+    }
 
 
     $(function ($) {

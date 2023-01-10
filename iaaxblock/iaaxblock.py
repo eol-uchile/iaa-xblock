@@ -318,26 +318,6 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 if self.block_type == "full":
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
-                    if not self.activity_previous:
-                        this_submission_previous = ""
-                        this_submission_time_previous = ""
-                        stage_label_previous = ""
-                    else:
-                        try:
-                            current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
-                            current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
-                            stage_label_previous = current_stage_previous.stage_label
-                            current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
-                            if len(current_submission_previous) == 0:
-                                this_submission_previous = "EMPTY"
-                                this_submission_time_previous = "EMPTY"
-                            else:
-                                this_submission_previous = current_submission_previous[0]["submission"]
-                                this_submission_time_previous = current_submission_previous[0]["submission_time"]
-                        except:
-                            this_submission_previous = "ERROR"
-                            this_submission_time_previous = "ERROR"
-                            stage_label_previous = "ERROR"
                     current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                     feedbacks = [(x["id_instructor"], x["feedback"], x["feedback_time"]) for x in IAAFeedback.objects.filter(stage=current_stage, id_student=id_student).values('id_instructor', 'feedback', 'feedback_time')]
                     context.update(
@@ -346,9 +326,6 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "block_type": self.block_type,
                             "activity_name_previous": self.activity_name_previous,
                             "activity_stage_previous": self.activity_stage_previous,
-                            "stage_label_previous": stage_label_previous,
-                            "submission_previous": this_submission_previous,
-                            "submission_previous_time": this_submission_time_previous,
                             "activity_previous": self.activity_previous,
                             "display_title": self.display_title,
                             "activity_name": self.activity_name,
@@ -364,30 +341,12 @@ class IterativeAssessedActivityXBlock(XBlock):
                     )
 
                 elif self.block_type == "display":
-                    try:
-                        current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
-                        current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
-                        stage_label_previous = current_stage_previous.stage_label
-                    except:
-                        this_submission_previous = "ERROR"
-                        this_submission_time_previous = "ERROR"
-                        stage_label_previous = "ERROR"
-                    current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
-                    if len(current_submission_previous) == 0:
-                        this_submission_previous = "EMPTY"
-                        this_submission_time_previous = "EMPTY"
-                    else:
-                        this_submission_previous = current_submission_previous[0]["submission"]
-                        this_submission_time_previous = current_submission_previous[0]["submission_time"]
                     context.update(
                         {
                             "title": self.title,
                             "block_type": self.block_type,
                             "activity_name_previous": self.activity_name_previous,
                             "activity_stage_previous": self.activity_stage_previous,
-                            "stage_label_previous": stage_label_previous,
-                            "submission_previous": this_submission_previous,
-                            "submission_previous_time": this_submission_time_previous,
                             "display_title": self.display_title,
                             'location': str(self.location).split('@')[-1],
                             'indicator_class': indicator_class,
@@ -436,7 +395,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_student.js',
                 ],
-                settings=({"user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {})
+                settings=({"location": str(self.location).split('@')[-1], "user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -691,6 +650,63 @@ class IterativeAssessedActivityXBlock(XBlock):
         return {"result": 'success', "indicator_class": self.get_indicator_class()}
 
     
+    @XBlock.json_handler
+    def fetch_previous_submission(self, data, suffix=''):
+        """
+        """
+        from .models import IAAActivity, IAAStage, IAASubmission
+
+        id_course = self.course_id
+        id_student = self.scope_ids.user_id
+        current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
+        current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
+        current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
+        try:
+            current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
+            current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
+            stage_label_previous = current_stage_previous.stage_label
+            current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
+            if len(current_submission_previous) == 0:
+                this_submission_previous = "EMPTY"
+                this_submission_time_previous = "EMPTY"
+            else:
+                this_submission_previous = current_submission_previous[0]["submission"]
+                this_submission_time_previous = str(current_submission_previous[0]["submission_time"])
+        except:
+            this_submission_previous = "ERROR"
+            this_submission_time_previous = "ERROR"
+            stage_label_previous = "ERROR"
+        return {"result": 'success', 'submission_previous': this_submission_previous, 'submission_previous_time': this_submission_time_previous, "stage_label_previous": stage_label_previous, "indicator_class": self.get_indicator_class()}
+
+
+    @XBlock.json_handler
+    def fetch_summary(self, data, suffix=''):
+        """
+        """
+        from .models import IAAActivity, IAAStage, IAASubmission
+
+        id_course = self.course_id
+        id_student = self.scope_ids.user_id
+        try:
+            current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
+            summary = []
+            stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
+            for stage in stages_list:
+                if str(stage.stage_number) in self.summary_list.split(","):
+                    submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
+                    if len(submission) == 0:
+                        this_summary_submission = "No se ha respondido aún."
+                        this_summary_submission_time = "—"
+                    else:
+                        this_summary_submission = submission[0]["submission"]
+                        this_summary_submission_time = str(submission[0]["submission_time"])
+                    summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
+            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class()}
+        except:
+            return {"result": "failed", "indicator_class": self.get_indicator_class()}
+
+
+
     @XBlock.json_handler
     def instructor_submit(self, data, suffix=''):
         """
