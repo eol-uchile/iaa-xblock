@@ -6,6 +6,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     let buttonReport = $(element).find(".iaa-report-button");
     let submission = $(element).find(".iaa-submission");
     var handlerUrl = runtime.handlerUrl(element, 'student_submit');
+    var displayUrl = runtime.handlerUrl(element, 'fetch_previous_submission');
 
     function showErrorMessage(msg) {
         $(element).find('#iaa-student-error-msg').html(msg);
@@ -223,6 +224,48 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                 });
             }
         }
+    });
+
+    function lockDisplayButtons(lock) {
+        let buttons = $(element).find(`#${settings.location}-display-button`);
+        for (let button of buttons) {
+            if (lock) {
+                button.setAttribute("disabled", true);
+            } else {
+                button.removeAttribute("disabled");
+            }
+        }
+    }
+
+    function afterDisplay(result) {
+        let displayButton = $(element).find(`#${settings.location}-display-button`).eq(0);
+        displayButton.remove();
+        let area = $(element).find(`#${settings.location}-submission-previous`).eq(0);
+        var submission_previous;
+        var submission_previous_time;
+        if (result.submission_previous === "EMPTY"){
+            submission_previous = "Aún no proporcionas una respuesta.";
+            submission_previous_time = "";
+        } else if (result.submission_previous === "ERROR"){
+            submission_previous = "Ha ocurrido un error, por favor contacte al administrador.";
+            submission_previous_time = "";
+        } else {
+            submission_previous = result.submission_previous
+            submission_previous_time = result.submission_previous_time;
+        }
+        console.log(area)
+        area.html(`<figure class='submission-previous'><blockquote>${submission_previous}</blockquote><figcaption style='text-align:right;'>${submission_previous_time}</figcaption></figure>`);
+        area.removeClass(".iaa-display-area-hidden");
+        lockDisplayButtons(false);
+    }
+
+
+    $(element).find(`#${settings.location}-display-button`).on('click', function (eventObject) {
+        lockDisplayButtons(true);
+        var data = {}
+        $.post(displayUrl, JSON.stringify(data)).done(function (response) {
+            afterDisplay(response)
+        });
     });
 
 

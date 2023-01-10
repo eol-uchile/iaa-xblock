@@ -17,12 +17,17 @@
             {% if block_type == "display" %}
                 <meta id="context-iaa" data-context="{{context}}">
                 <div>
+                    <h3 class="display-title">{{display_title}}</h3>
+                    <div class="display-button-div">
+                        <span id="{{location}}-display-button" class="iaa-display-button" >Ver</span>
+                    </div>
+                    <div id="{{location}}-submission-previous" class="iaa-display-area"></div>
+                    <!--
                     {% if submission_previous_time == "ERROR" %}
                         <p class="iaa-student-error-msg">Esta actividad presenta un error. No se puede mostrar la respuesta anterior. Por favor, avise al personal encargado.</p>
                     {% elif submission_previous_time == "EMPTY" %}
                         <p class="iaa-student-warning-msg">Aún no proporcionas una respuesta.</p>
                     {% else %}
-                        <h3 class="display-title">{{display_title}}</h3>
                         <figure class="submission-previous">
                             <blockquote>
                                 {{submission_previous}}
@@ -32,6 +37,7 @@
                             </figcaption>
                         </figure>
                     {% endif %}
+                    -->
                 </div>
             {% endif %}
             {% if block_type == "full" %}

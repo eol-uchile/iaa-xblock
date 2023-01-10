@@ -29,6 +29,16 @@ a.LinkButton {
   cursor: pointer;
 }
 
+.iaa-display-button {
+  display: inline-block;
+  background: #df595a;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #FFF;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
 .iaa-report-button {
   display: inline-block;
   background: darkblue;
@@ -44,9 +54,27 @@ a.LinkButton {
   background: gray;
 }
 
+.iaa-display-button:disabled {
+  background: gray;
+}
+
 .iaa-report-button:disabled {
   background: gray;
 }
+
+.display-button-div {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.iaa-display-area-hidden {
+  display: none !important;
+}
+
+.iaa-display-button-hidden {
+  display: none !important;
+}
+
 
 .iaa-table {
   margin-left: auto;
