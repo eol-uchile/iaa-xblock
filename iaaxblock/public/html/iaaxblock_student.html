@@ -64,29 +64,35 @@
             {% endif %}
             {% if block_type == "summary" %}
                 <meta id="context-iaa" data-context="{{context}}">
+
                 {% if activity_name == "empty" %}
                 <div class="centered">Actividad no disponible.</div>
                 {% else %}
+
+
+
                 <div>
                     <h3 class="summary-text">{{summary_text}}</h3>
-                    <div>
-                        <table class="iaa-table">
-                            <tr>
-                                <th><b>Actividad</b></th>
-                                <td>{{activity_name}}</td>
-                            </tr>
-                        </table>
+                    <div class="display-button-div">
+                        <span id="iaa-summary-button" class="iaa-summary-button" >Ver</span>
                     </div>
-                    <div class="centered">
+                    <div id="iaa-summary" class="iaa-summary-area"></div>
+
+                    <!--
+                    <div class="centered report-button-area">
                         <span id="report-button" class="iaa-report-button" >Descargar reporte (.docx)</span>
                     </div>
                     {% for activity in summary %}
                     <hr>
-                    <p class="summary-element-header activity-stage-label">Fase {{activity.0}} ({{activity.1}})</p>
-                    <p class="summary-element-header summary-submission">{{activity.3}}</p>
-                    <p class="summary-element summary-submission-time">{{activity.2}}</p>
+                    <p class="summary-element-header activity-stage-label">{{activity.1}}</p>
+                    <p class="summary-element summary-submission">{{activity.2}}</p>
+                    <p class="summary-element-footer summary-submission-time">{{activity.3}}</p>
                     {% endfor %}
+                    -->
                 </div>
+
+
+
                 {% endif %}
             {% endif %}
             <div>

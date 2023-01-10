@@ -665,19 +665,45 @@ class IterativeAssessedActivityXBlock(XBlock):
             current_activity_previous = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name_previous)
             current_stage_previous = IAAStage.objects.get(activity=current_activity_previous, stage_number=self.activity_stage_previous)
             stage_label_previous = current_stage_previous.stage_label
+            current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
+            if len(current_submission_previous) == 0:
+                this_submission_previous = "EMPTY"
+                this_submission_time_previous = "EMPTY"
+            else:
+                this_submission_previous = current_submission_previous[0]["submission"]
+                this_submission_time_previous = str(current_submission_previous[0]["submission_time"])
         except:
             this_submission_previous = "ERROR"
             this_submission_time_previous = "ERROR"
             stage_label_previous = "ERROR"
-        current_submission_previous = IAASubmission.objects.filter(stage=current_stage_previous, id_student=id_student).values("submission", "submission_time")
-        if len(current_submission_previous) == 0:
-            this_submission_previous = "EMPTY"
-            this_submission_time_previous = "EMPTY"
-        else:
-            this_submission_previous = current_submission_previous[0]["submission"]
-            this_submission_time_previous = str(current_submission_previous[0]["submission_time"])
         return {"result": 'success', 'submission_previous': this_submission_previous, 'submission_previous_time': this_submission_time_previous, "stage_label_previous": stage_label_previous, "indicator_class": self.get_indicator_class()}
 
+
+    @XBlock.json_handler
+    def fetch_summary(self, data, suffix=''):
+        """
+        """
+        from .models import IAAActivity, IAAStage, IAASubmission
+
+        id_course = self.course_id
+        id_student = self.scope_ids.user_id
+        try:
+            current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
+            summary = []
+            stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
+            for stage in stages_list:
+                if str(stage.stage_number) in self.summary_list.split(","):
+                    submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
+                    if len(submission) == 0:
+                        this_summary_submission = "No se ha respondido aún."
+                        this_summary_submission_time = "—"
+                    else:
+                        this_summary_submission = submission[0]["submission"]
+                        this_summary_submission_time = str(submission[0]["submission_time"])
+                    summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
+            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class()}
+        except:
+            return {"result": "failed", "indicator_class": self.get_indicator_class()}
 
 
 

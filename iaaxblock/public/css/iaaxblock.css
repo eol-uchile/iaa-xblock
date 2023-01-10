@@ -59,6 +59,20 @@ a.LinkButton {
   cursor: pointer;
 }
 
+.iaa-summary-button {
+  display: inline-block;
+  background: #df595a;
+  border-radius: 4px;
+  font-size: 10px;
+  color: #FFF;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.summary-text {
+  margin: 0 0 25px 0;
+}
+
 .iaa-feedback-button:disabled {
   background: gray;
 }
@@ -75,6 +89,10 @@ a.LinkButton {
   background: gray;
 }
 
+.iaa-summary-button:disabled {
+  background: gray;
+}
+
 .display-button-div {
   text-align: center;
   padding-top: 8px;
@@ -85,6 +103,14 @@ a.LinkButton {
 }
 
 .iaa-display-button-hidden {
+  display: none !important;
+}
+
+.iaa-summary-area-hidden {
+  display: none !important;
+}
+
+.iaa-summary-button-hidden {
   display: none !important;
 }
 
@@ -167,6 +193,10 @@ a.LinkButton {
   height: 200px;
 }
 
+.report-button-area{
+  margin: 30px 0 12px 0;
+}
+
 .iaa-action {
   justify-content: center;
   display: flex;
@@ -218,4 +248,8 @@ a.LinkButton {
 
 .summary-element {
   text-align: center;
+}
+
+.summary-element-footer {
+  text-align: right;
 }
