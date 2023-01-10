@@ -78,11 +78,11 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock1.title, "Iterative Assessed Activity")
         self.assertEqual(self.xblock1.block_type, "none")
         self.assertEqual(self.xblock1.activity_name, "")
-        self.assertEqual(self.xblock1.activity_stage, 0)
+        self.assertEqual(self.xblock1.activity_stage, "")
         self.assertEqual(self.xblock1.stage_label, "")
         self.assertEqual(self.xblock1.activity_previous, False)
         self.assertEqual(self.xblock1.activity_name_previous, "")
-        self.assertEqual(self.xblock1.activity_stage_previous, 0)
+        self.assertEqual(self.xblock1.activity_stage_previous, "")
         self.assertEqual(self.xblock1.display_title, "")
         self.assertEqual(self.xblock1.question, "")
         self.assertEqual(self.xblock1.submission, "")
@@ -108,7 +108,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(response.json_body["result"], "success")
         self.assertEqual(self.xblock1.block_type, "full")
         self.assertEqual(self.xblock1.activity_name, "TestActivity")
-        self.assertEqual(self.xblock1.activity_stage, 1)
+        self.assertEqual(self.xblock1.activity_stage, "1")
         self.assertEqual(self.xblock1.stage_label, "TestStageLabel1")
         self.assertEqual(self.xblock1.question, "TestQuestion1")
         self.assertEqual(self.xblock1.activity_previous, False)
@@ -117,7 +117,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(activity.id_course, COURSE_ID)
         stage = IAAStage.objects.filter(activity=activity, stage_number=self.xblock1.activity_stage).values("stage_number", "stage_label")
         self.assertEqual(len(stage), 1)
-        self.assertEqual(stage[0]["stage_number"], 1)
+        self.assertEqual(stage[0]["stage_number"], "1")
         self.assertEqual(stage[0]["stage_label"], "TestStageLabel1")
         
     def test_create_display(self):
@@ -150,7 +150,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(response2.json_body["result"], "success")
         self.assertEqual(self.xblock2.block_type, "display")
         self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
-        self.assertEqual(self.xblock2.activity_stage_previous, 1)
+        self.assertEqual(self.xblock2.activity_stage_previous, "1")
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
     def test_create_summary(self):
@@ -221,7 +221,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(response2.json_body["result"], "success")
         self.assertEqual(self.xblock2.block_type, "full")
         self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
-        self.assertEqual(self.xblock2.activity_stage_previous, 1)
+        self.assertEqual(self.xblock2.activity_stage_previous, "1")
         self.assertEqual(self.xblock2.display_title, "TestDisplayTitle")
 
     def test_studentAnswer(self):
@@ -243,7 +243,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(response.json_body["result"], "success")
         self.assertEqual(self.xblock4.block_type, "full")
         self.assertEqual(self.xblock4.activity_name, "TestActivity")
-        self.assertEqual(self.xblock4.activity_stage, 1)
+        self.assertEqual(self.xblock4.activity_stage, "1")
         self.assertEqual(self.xblock4.stage_label, "TestStageLabel1")
         self.assertEqual(self.xblock4.question, "TestQuestion1")
         self.assertEqual(self.xblock4.activity_previous, False)
@@ -252,7 +252,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(activity.id_course, COURSE_ID)
         stage = IAAStage.objects.filter(activity=activity, stage_number=self.xblock4.activity_stage).values("stage_number", "stage_label")
         self.assertEqual(len(stage), 1)
-        self.assertEqual(stage[0]["stage_number"], 1)
+        self.assertEqual(stage[0]["stage_number"], "1")
         self.assertEqual(stage[0]["stage_label"], "TestStageLabel1")
 
         self.xblock4.studio_submit(request)
@@ -320,11 +320,11 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(response.json_body["result"], "success")
         self.assertEqual(self.xblock5.block_type, "full")
         self.assertEqual(self.xblock5.activity_name, "TestActivity")
-        self.assertEqual(self.xblock5.activity_stage, 2)
+        self.assertEqual(self.xblock5.activity_stage, "2")
         self.assertEqual(self.xblock5.stage_label, "TestStageLabel2")
         self.assertEqual(self.xblock5.question, "TestQuestion2")
         self.assertEqual(self.xblock5.activity_previous, True)
-        self.assertEqual(self.xblock5.activity_stage_previous, 1)
+        self.assertEqual(self.xblock5.activity_stage_previous, "1")
         activity = IAAActivity.objects.get(id_course=COURSE_ID, activity_name=self.xblock5.activity_name)
         self.assertEqual(activity.activity_name, "TestActivity")
         self.assertEqual(activity.id_course, COURSE_ID)
@@ -441,7 +441,7 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(response3.json_body["result"], "success")
         self.assertEqual(self.xblock2.block_type, "display")
         self.assertEqual(self.xblock2.activity_name_previous, "TestActivity")
-        self.assertEqual(self.xblock2.activity_stage_previous, 1)
+        self.assertEqual(self.xblock2.activity_stage_previous, "1")
         self.assertEqual(self.xblock2.display_title, "AnotherDisplayTitle")
 
 

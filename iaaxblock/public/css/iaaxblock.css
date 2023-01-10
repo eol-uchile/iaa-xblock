@@ -235,6 +235,11 @@ a.LinkButton {
   color:tomato;
 }
 
+.iaa-studio-error-msg {
+  text-align: center;
+  color:tomato;
+}
+
 .iaa-container_block .Reconociendo-RedFid .exptop .recono-title {
   padding-left: 54px;
   padding-top: 12px;
