@@ -115,7 +115,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 return "ID inválido, debe ser un número con hasta 2 decimales. Ejemplos: 1, 2.1, 1.12"
             }
             if (repeatedStageNumber(data["activity_name"], data["activity_stage"])){
-                return `Ya existe el ID ${data["activity_stage"]} en la actividad ${data["activity_name"]}.`
+                return `Ya existe el ID "${data["activity_stage"]}" en la actividad "${data["activity_name"]}".`
             }
             if (data["stage_label"] === "") {
                 return "Por favor proporcione una sección."
@@ -134,7 +134,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     return "ID inválido, debe ser un número con hasta 2 decimales. Ejemplos: 1, 2.1, 1.12"
                 }
                 if (!repeatedStageNumber(data["activity_name_previous"], data["activity_stage_previous"])){
-                    return `No existe el ID ${data["activity_stage_previous"]} en la actividad ${data["activity_name_previous"]}.`
+                    return `No existe el ID "${data["activity_stage_previous"]}" en la actividad "${data["activity_name_previous"]}".`
                 }
                 if (data["activity_stage_previous"] === data["activity_stage"] && data["activity_name_previous"] === "activity_name"){
                     return "No se puede mostrar como respuesta anterior aquella correspondiente a este mismo bloque."
@@ -154,7 +154,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 return "ID inválido, debe ser un número con hasta 2 decimales. Ejemplos: 1, 2.1, 1.12"
             }
             if (!repeatedStageNumber(data["activity_name_previous"], data["activity_stage_previous"])){
-                return `No existe el ID ${data["activity_stage_previous"]} en la actividad ${data["activity_name_previous"]}.`
+                return `No existe el ID "${data["activity_stage_previous"]}" en la actividad "${data["activity_name_previous"]}".`
             }
             if (data["display_title"] === "") {
                 return "Por favor proporcione un título a la respuesta anterior."
@@ -471,6 +471,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 if (block_type.val() === "display") {
                     input_display_title.removeAttr("hidden");
                     input_activity_name_previous.removeAttr("hidden");
+                    input_activity_stage_previous.removeAttr("hidden");
                     activity_name_previous.empty();
                     for (let activity of activities) {
                         let opt = document.createElement("option");

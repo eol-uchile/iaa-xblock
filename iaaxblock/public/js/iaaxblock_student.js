@@ -96,7 +96,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                         },
                         paragraph: {
                             spacing: {
-                                after: 120,
+                                after: 400,
                             },
                         },
                     },
