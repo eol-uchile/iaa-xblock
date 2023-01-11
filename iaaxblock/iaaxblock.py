@@ -94,6 +94,24 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Datetime of this student's submission."
     )
 
+    summary_type = String(
+        default="section",
+        scope=Scope.settings,
+        help="Wether it is a 'section' or 'full' summary."
+    )
+
+    summary_visibility = String(
+        default="all",
+        scope=Scope.settings,
+        help="Who can see the summary."
+    )
+
+    summary_section = String(
+        default="",
+        scope=Scope.settings,
+        help="Name of the section to summarize."
+    )
+
     summary_text = String(
         default="",
         scope=Scope.settings,
@@ -216,7 +234,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                 enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
                 students = []
-                student_names = [x["email"] for x in enrolled]
+                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
                 student_ids = [x["id"] for x in enrolled]
                 current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                 for i in range(len(student_names)):
@@ -261,12 +279,20 @@ class IterativeAssessedActivityXBlock(XBlock):
 
             elif self.block_type == "summary":
 
+                enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
+                students = []
+                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
+                student_ids = [x["id"] for x in enrolled]
+                for i in range(len(student_names)):
+                    students.append((student_ids[i], student_names[i]))
+
                 context.update(
                     {
                         "title": self.title,
                         "block_type": self.block_type,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
+                        "students": students
                     }
                 )
             
@@ -294,8 +320,13 @@ class IterativeAssessedActivityXBlock(XBlock):
                     'public/css/iaaxblock.css',
                 ],
                 additional_js=[
-                    'public/js/iaaxblock_instructor.js',
+                    'public/js/iaaxblock_instructor.js'
                 ],
+                settings=({
+                    "activity_name": self.activity_name,
+                    "summary_text": self.summary_text,
+                    "summary_list": self.summary_list
+                })
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -376,6 +407,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "summary_text": self.summary_text,
                             "summary_list": self.summary_list.split(","),
                             "summary": summary,
+                            "summary_visibility": self.summary_visibility,
                             'indicator_class': indicator_class,
                             'context': json.dumps({"summary": summary})
                         }
@@ -395,7 +427,18 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_student.js',
                 ],
-                settings=({"location": str(self.location).split('@')[-1], "user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
+                settings=({
+                    "location": str(self.location).split('@')[-1], 
+                    "user_id": id_student, 
+                    "summary": summary, 
+                    "title": self.title, 
+                    "activity_name": self.activity_name, 
+                    "summary_text": self.summary_text, 
+                    "summary_list": self.summary_list,
+                    "summary_type": self.summary_type,
+                    "summary_visibility": self.summary_visibility,
+                    "summary_section": self.summary_section
+                } if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -413,11 +456,15 @@ class IterativeAssessedActivityXBlock(XBlock):
         activities = []
         for i in range(len(activities_no_stage)):
             activity = activities_no_stage[i]
-            stages_list = [x["stage_number"] for x in IAAStage.objects.filter(activity=activity).values("stage_number")]
-            stages_list.sort()
+            stages_list = []
+            labels_list = []
+            for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number", "stage_label"):
+                stages_list.append(x["stage_number"])
+                labels_list.append(x["stage_label"])
             if len(stages_list) != 0:
                 stages = ",".join(stages_list)
-            activities.append([activity.id, activity.activity_name, stages])
+                labels = "###".join(labels_list)
+            activities.append([activity.id, activity.activity_name, stages, labels])
         js_context = {
             "title": self.title,
             "activity_name": self.activity_name,
@@ -428,6 +475,9 @@ class IterativeAssessedActivityXBlock(XBlock):
             "display_title": self.display_title,
             "activity_name_previous": self.activity_name_previous,
             "activity_stage_previous": self.activity_stage_previous,
+            "summary_type": self.summary_type,
+            "summary_section": self.summary_section,
+            "summary_visibility": self.summary_visibility,
             "summary_text": self.summary_text,
             "summary_list": self.summary_list,
             "activities": json.dumps(activities)
@@ -581,6 +631,10 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.display_title = data.get('display_title')
         elif self.block_type == "summary":
             self.activity_name = data.get('activity_name')
+            self.summary_type = data.get('summary_type')
+            if self.summary_type == "section":
+                self.summary_section = data.get('summary_section')
+            self.summary_visibility = data.get('summary_visibility')
             self.summary_text = data.get('summary_text')
             self.summary_list = data.get('summary_list')
 
@@ -687,16 +741,19 @@ class IterativeAssessedActivityXBlock(XBlock):
         from .models import IAAActivity, IAAStage, IAASubmission
 
         id_course = self.course_id
-        id_student = self.scope_ids.user_id
+        if data["user_id"] == "self":
+            id_student = self.scope_ids.user_id
+        else:
+            id_student = data["user_id"]
         try:
             current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
             summary = []
             stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
             for stage in stages_list:
-                if str(stage.stage_number) in self.summary_list.split(","):
+                if stage.stage_number in self.summary_list.split(","):
                     submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
                     if len(submission) == 0:
-                        this_summary_submission = "No se ha respondido aún."
+                        this_summary_submission = "No se registra respuesta."
                         this_summary_submission_time = "—"
                     else:
                         this_summary_submission = submission[0]["submission"]

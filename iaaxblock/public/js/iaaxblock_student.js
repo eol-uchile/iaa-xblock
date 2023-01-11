@@ -1,5 +1,7 @@
 function IterativeAssessedActivityStudent(runtime, element, settings) {
 
+    
+
     let statusDiv = $(element).find('.status');
 
     let buttonSubmit = $(element).find(".iaa-submit");
@@ -34,46 +36,34 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
         let last_children = [];
         last_children.push(new Paragraph({
-            text: settings.title,
+            text: settings.activity_name,
             heading: HeadingLevel.HEADING_1,
             alignment: AlignmentType.CENTER
         }))
         last_children.push(new Paragraph({
-            text: settings.activity_name,
-            heading: HeadingLevel.HEADING_2,
-            alignment: AlignmentType.CENTER
-        }))
-        last_children.push(
-            new Paragraph({
-                text: settings.user_id,
-                italic: true,
-                alignment: AlignmentType.CENTER
-            }));
-        last_children.push(new Paragraph({
-            text: "",
-            heading: HeadingLevel.HEADING_2,
-        }))
-        last_children.push(new Paragraph({
             text: summary_text,
-            heading: HeadingLevel.HEADING_2,
             alignment: AlignmentType.LEFT
         }))
         last_children.push(new Paragraph({
             text: "",
-            heading: HeadingLevel.HEADING_2,
+            heading: HeadingLevel.HEADING_1,
         }))
+        let labels = [];
         for (let stage of summary) {
-            if (summary_list.split("").includes(stage[0].toString())){
-                last_children.push(
+            if (summary_list.split(",").includes(stage[0])){
+                if (!labels.includes(stage[1])){
+                    labels.push(stage[1]);
+                    last_children.push(
                     new Paragraph({
                         text: stage[1],
                         heading: HeadingLevel.HEADING_2,
+                        size: 18
                     }))
+                }
                 last_children.push(
                     new Paragraph({
                         text: stage[2],
-                        alignment: AlignmentType.CENTER,
-                        heading: HeadingLevel.HEADING_2
+                        alignment: AlignmentType.LEFT
                     }))
                 last_children.push(
                     new Paragraph({
@@ -100,13 +90,13 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                         next: "Normal",
                         quickFormat: true,
                         run: {
-                            color: "999999",
+                            color: "000000",
                             size: 28,
                             bold: true
                         },
                         paragraph: {
                             spacing: {
-                                after: 120,
+                                after: 400,
                             },
                         },
                     },
@@ -117,13 +107,14 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                         next: "Normal",
                         quickFormat: true,
                         run: {
-                            size: 20,
+                            color: "000000",
+                            size: 24,
                             bold: true,
                         },
                         paragraph: {
                             spacing: {
                                 before: 240,
-                                after: 120,
+                                after: 600,
                             },
                         },
                     },
@@ -163,11 +154,12 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                 children: last_children
             }],
         });
-
+    
         docx.Packer.toBlob(doc).then(blob => {
             saveAs(blob, "documento_iterativo.docx");
         });
     }
+
 
     if (buttonReport != null){
         buttonReport.on("click", function (e) {
@@ -283,7 +275,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
 
     $(element).find(`#iaa-summary-button`).on('click', function (eventObject) {
         lockSummaryButtons(true);
-        var data = {}
+        var data = {user_id: "self"}
         $.post(summaryUrl, JSON.stringify(data)).done(function (response) {
             afterSummary(response)
         });
@@ -305,18 +297,20 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             let summaryButton = $(element).find(`#iaa-summary-button`).eq(0);
             summaryButton.remove();     
             var summary = "";
+            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
+            let sections = [];
             for(let activity of result.summary){
-                summary = summary + `<p class="summary-element-header activity-stage-label">`;
-                summary = summary + `${activity[1]}`;
-                summary = summary + `</p>`
+                if (!sections.includes(activity[1])){
+                    summary = summary + `<h3 class="summary-element-header summary-section"><b>${activity[1]}</b></h3>`;
+                    sections.push(activity[1])
+                }
                 summary = summary + `<p class="summary-element summary-submission">`;
                 summary = summary + `${activity[2]}`;
                 summary = summary + `</p>`
                 summary = summary + `<p class="summary-element-footer summary-submission-time">`;
                 summary = summary + `${activity[3]}`;
-                summary = summary + `</p><hr>`
+                summary = summary + `</p><hr>`  
             }
-            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
             area.html(summary);
             $(element).find(`#report-button`).on('click', function (eventObject) {
                 generateDoc(eventObject, result);

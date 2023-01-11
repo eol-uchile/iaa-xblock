@@ -69,29 +69,15 @@
                 <div class="centered">Actividad no disponible.</div>
                 {% else %}
 
-
-
-                <div>
-                    <h3 class="summary-text">{{summary_text}}</h3>
-                    <div class="display-button-div">
-                        <span id="iaa-summary-button" class="iaa-summary-button" >Ver</span>
+                    {% if summary_visibility != "instructors" %}
+                    <div>
+                        <h3 class="summary-text">{{summary_text}}</h3>
+                        <div class="display-button-div">
+                            <span id="iaa-summary-button" class="iaa-summary-button" >Ver</span>
+                        </div>
+                        <div id="iaa-summary" class="iaa-summary-area"></div>
                     </div>
-                    <div id="iaa-summary" class="iaa-summary-area"></div>
-
-                    <!--
-                    <div class="centered report-button-area">
-                        <span id="report-button" class="iaa-report-button" >Descargar reporte (.docx)</span>
-                    </div>
-                    {% for activity in summary %}
-                    <hr>
-                    <p class="summary-element-header activity-stage-label">{{activity.1}}</p>
-                    <p class="summary-element summary-submission">{{activity.2}}</p>
-                    <p class="summary-element-footer summary-submission-time">{{activity.3}}</p>
-                    {% endfor %}
-                    -->
-                </div>
-
-
+                    {% endif %}
 
                 {% endif %}
             {% endif %}

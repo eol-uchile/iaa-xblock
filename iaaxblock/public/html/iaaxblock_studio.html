@@ -43,7 +43,7 @@
         </li>
         <li id="input_question" class="field comp-setting-entry is-set" hidden>
             <div class="wrapper-comp-setting">
-                <label class="label setting-label" for="question">Pregunta</label>
+                <label class="label setting-label" for="question">Enunciado</label>
                 <input class="input setting-input" name="question" id="question" value="" type="text" />
             </div>
         </li>
@@ -74,6 +74,31 @@
                 <label class="label setting-label" for="display_title">Título de respuesta anterior</label>
                 <input class="input setting-input" name="display_title" id="display_title"
                     value="" type="text" />
+            </div>
+        </li>
+        <li id="input_summary_type" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="summary_type">Tipo de resumen</label>
+                <select class="input setting-input" name="summary_type" id="summary_type">
+                    <option value="full">Completo</option>
+                    <option value="section">Sección</option>
+                </select>
+            </div>
+        </li>
+        <li id="input_summary_section" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="summary_section">Sección</label>
+                <select class="input setting-input" name="summary_section" id="summary_section">
+                </select>
+            </div>
+        </li>
+        <li id="input_summary_visibility" class="field comp-setting-entry is-set" hidden>
+            <div class="wrapper-comp-setting">
+                <label class="label setting-label" for="summary_visibility">Visibilidad</label>
+                <select class="input setting-input" name="summary_visibility" id="summary_visibility">
+                    <option value="instructors">Instructores</option>
+                    <option value="all">Instructores y alumnos</option>
+                </select>
             </div>
         </li>
         <li id="input_summary_text" class="field comp-setting-entry is-set" hidden>
