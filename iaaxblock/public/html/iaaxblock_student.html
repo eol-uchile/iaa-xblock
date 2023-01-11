@@ -69,13 +69,15 @@
                 <div class="centered">Actividad no disponible.</div>
                 {% else %}
 
-                <div>
-                    <h3 class="summary-text">{{summary_text}}</h3>
-                    <div class="display-button-div">
-                        <span id="iaa-summary-button" class="iaa-summary-button" >Ver</span>
+                    {% if summary_visibility != "instructors" %}
+                    <div>
+                        <h3 class="summary-text">{{summary_text}}</h3>
+                        <div class="display-button-div">
+                            <span id="iaa-summary-button" class="iaa-summary-button" >Ver</span>
+                        </div>
+                        <div id="iaa-summary" class="iaa-summary-area"></div>
                     </div>
-                    <div id="iaa-summary" class="iaa-summary-area"></div>
-                </div>
+                    {% endif %}
 
                 {% endif %}
             {% endif %}

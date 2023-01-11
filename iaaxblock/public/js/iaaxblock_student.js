@@ -63,7 +63,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                 last_children.push(
                     new Paragraph({
                         text: stage[2],
-                        alignment: AlignmentType.CENTER
+                        alignment: AlignmentType.LEFT
                     }))
                 last_children.push(
                     new Paragraph({
@@ -275,7 +275,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
 
     $(element).find(`#iaa-summary-button`).on('click', function (eventObject) {
         lockSummaryButtons(true);
-        var data = {}
+        var data = {user_id: "self"}
         $.post(summaryUrl, JSON.stringify(data)).done(function (response) {
             afterSummary(response)
         });

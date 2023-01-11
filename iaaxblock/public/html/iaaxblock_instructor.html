@@ -73,7 +73,25 @@
             {% elif block_type == "display" %}
                 <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
             {% elif block_type == "summary" %}
-                <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
+                <meta id="context-iaa" data-context="{{context}}">
+
+                {% if activity_name == "empty" %}
+                <div class="centered">Actividad no disponible.</div>
+                {% else %}
+                <div>
+                    <p>Seleccione un alumno:</p>
+                    <div class="select-student">
+                        <select id="iaa-select-student">
+                            <option value="none">Por favor seleccione una opción...</option>
+                            {% for student in students %}
+                            <option value="{{student.0}}">{{student.1}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div id="iaa-summary" class="iaa-summary-area"></div>
+                </div>
+                {% endif %}
             {% endif %}
             <div>
                 <p id="iaa-instructor-error-msg" class="iaa-error-msg"></p>

@@ -234,7 +234,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                 enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
                 students = []
-                student_names = [x["email"] for x in enrolled]
+                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
                 student_ids = [x["id"] for x in enrolled]
                 current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                 for i in range(len(student_names)):
@@ -279,12 +279,20 @@ class IterativeAssessedActivityXBlock(XBlock):
 
             elif self.block_type == "summary":
 
+                enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
+                students = []
+                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
+                student_ids = [x["id"] for x in enrolled]
+                for i in range(len(student_names)):
+                    students.append((student_ids[i], student_names[i]))
+
                 context.update(
                     {
                         "title": self.title,
                         "block_type": self.block_type,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
+                        "students": students
                     }
                 )
             
@@ -314,6 +322,11 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_instructor.js'
                 ],
+                settings=({
+                    "activity_name": self.activity_name,
+                    "summary_text": self.summary_text,
+                    "summary_list": self.summary_list
+                })
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -394,6 +407,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "summary_text": self.summary_text,
                             "summary_list": self.summary_list.split(","),
                             "summary": summary,
+                            "summary_visibility": self.summary_visibility,
                             'indicator_class': indicator_class,
                             'context': json.dumps({"summary": summary})
                         }
@@ -727,7 +741,10 @@ class IterativeAssessedActivityXBlock(XBlock):
         from .models import IAAActivity, IAAStage, IAASubmission
 
         id_course = self.course_id
-        id_student = self.scope_ids.user_id
+        if data["user_id"] == "self":
+            id_student = self.scope_ids.user_id
+        else:
+            id_student = data["user_id"]
         try:
             current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
             summary = []

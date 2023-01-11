@@ -1,5 +1,7 @@
 function IterativeAssessedActivityInstructor(runtime, element, settings) {
 
+    var summaryUrl = runtime.handlerUrl(element, 'fetch_summary');
+
     function showErrorMessage(msg) {
         $(element).find('.iaa-istructor-error-msg').html(msg);
     }
@@ -43,7 +45,7 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
                 last_children.push(
                     new Paragraph({
                         text: stage[2],
-                        alignment: AlignmentType.CENTER
+                        alignment: AlignmentType.LEFT
                     }))
                 last_children.push(
                     new Paragraph({
@@ -189,14 +191,14 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
         }
     });
 
-
-    $(element).find(`#iaa-summary-button`).on('click', function (eventObject) {
-        lockSummaryButtons(true);
-        var data = {}
+    $(element).find("#iaa-select-student").on("change", function() {
+        let selected = $(element).find("#iaa-select-student").val();
+        var data = {user_id: selected}
         $.post(summaryUrl, JSON.stringify(data)).done(function (response) {
             afterSummary(response)
         });
     });
+
 
     function generateDoc(eventObject, result){
         eventObject.preventDefault()
@@ -233,7 +235,6 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
                 generateDoc(eventObject, result);
             });
             area.removeClass(".iaa-summary-area-hidden");
-            lockDisplayButtons(false);
         }
     }
 
