@@ -312,7 +312,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     'public/css/iaaxblock.css',
                 ],
                 additional_js=[
-                    'public/js/iaaxblock_instructor.js',
+                    'public/js/iaaxblock_instructor.js'
                 ],
             )
             if self.block_type == "summary":
@@ -413,7 +413,18 @@ class IterativeAssessedActivityXBlock(XBlock):
                 additional_js=[
                     'public/js/iaaxblock_student.js',
                 ],
-                settings=({"location": str(self.location).split('@')[-1], "user_id": id_student, "summary": summary, "title": self.title, "activity_name": self.activity_name, "summary_text": self.summary_text, "summary_list": self.summary_list} if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
+                settings=({
+                    "location": str(self.location).split('@')[-1], 
+                    "user_id": id_student, 
+                    "summary": summary, 
+                    "title": self.title, 
+                    "activity_name": self.activity_name, 
+                    "summary_text": self.summary_text, 
+                    "summary_list": self.summary_list,
+                    "summary_type": self.summary_type,
+                    "summary_visibility": self.summary_visibility,
+                    "summary_section": self.summary_section
+                } if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -722,10 +733,10 @@ class IterativeAssessedActivityXBlock(XBlock):
             summary = []
             stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
             for stage in stages_list:
-                if str(stage.stage_number) in self.summary_list.split(","):
+                if stage.stage_number in self.summary_list.split(","):
                     submission = IAASubmission.objects.filter(stage=stage, id_student=id_student).values("submission", "submission_time")
                     if len(submission) == 0:
-                        this_summary_submission = "No se ha respondido aún."
+                        this_summary_submission = "No se registra respuesta."
                         this_summary_submission_time = "—"
                     else:
                         this_summary_submission = submission[0]["submission"]

@@ -111,7 +111,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             if (data["activity_stage"] === "") {
                 return "Por favor seleccione un ID."
             }
-            if (!checkStageNumbcheckSummaryStageser(data["activity_stage"])){
+            if (!checkStageNumber(data["activity_stage"])){
                 return "ID inválido, debe ser un número con hasta 2 decimales. Ejemplos: 1, 2.1, 1.12"
             }
             if (repeatedStageNumber(data["activity_name"], data["activity_stage"])){
@@ -174,9 +174,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 if (data["summary_section"] == null){
                     return "Por favor indique una sección para el resumen."
                 }
-            }
-            if (data["summary_text"] === "") {
-                return "Por favor indique el texto de resumen."
             }
             if (data["summary_list"] === "") {
                 return "Por favor indique las etapas a mostrar."

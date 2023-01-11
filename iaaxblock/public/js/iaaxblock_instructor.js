@@ -12,6 +12,134 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
         $(element).find('#iaa-instructor-success-msg').html(msg);
     }
 
+    function generateDocument(summary, summary_text, summary_list) {
+        const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
+        let last_children = [];
+        last_children.push(new Paragraph({
+            text: settings.activity_name,
+            heading: HeadingLevel.HEADING_1,
+            alignment: AlignmentType.CENTER
+        }))
+        last_children.push(new Paragraph({
+            text: summary_text,
+            alignment: AlignmentType.LEFT
+        }))
+        last_children.push(new Paragraph({
+            text: "",
+            heading: HeadingLevel.HEADING_1,
+        }))
+        let labels = [];
+        for (let stage of summary) {
+            if (summary_list.split(",").includes(stage[0])){
+                if (!labels.includes(stage[1])){
+                    labels.push(stage[1]);
+                    last_children.push(
+                    new Paragraph({
+                        text: stage[1],
+                        heading: HeadingLevel.HEADING_2,
+                        size: 18
+                    }))
+                }
+                last_children.push(
+                    new Paragraph({
+                        text: stage[2],
+                        alignment: AlignmentType.CENTER
+                    }))
+                last_children.push(
+                    new Paragraph({
+                        text: "",
+                    }))
+                last_children.push(
+                    new Paragraph({
+                        text: stage[3],
+                        italic: true,
+                        alignment: AlignmentType.RIGHT,
+                }));
+            }
+        }
+        const doc = new Document({
+            creator: "REDFID",
+            title: "Resumen",
+            description: "IAA Summary",
+            styles: {
+                paragraphStyles: [
+                    {
+                        id: "Heading1",
+                        name: "Heading 1",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        run: {
+                            color: "000000",
+                            size: 28,
+                            bold: true
+                        },
+                        paragraph: {
+                            spacing: {
+                                after: 120,
+                            },
+                        },
+                    },
+                    {
+                        id: "Heading2",
+                        name: "Heading 2",
+                        basedOn: "Normal",
+                        next: "Normal",
+                        quickFormat: true,
+                        run: {
+                            color: "000000",
+                            size: 24,
+                            bold: true,
+                        },
+                        paragraph: {
+                            spacing: {
+                                before: 240,
+                                after: 600,
+                            },
+                        },
+                    },
+                    {
+                        id: "wellSpaced",
+                        name: "Well Spaced",
+                        basedOn: "Normal",
+                        quickFormat: true,
+                        paragraph: {
+                            spacing: { line: 276, before: 20 * 72 * 0.1, after: 20 * 72 * 0.05 },
+                        },
+                    },
+                    {
+                        id: "ListParagraph",
+                        name: "List Paragraph",
+                        basedOn: "Normal",
+                        quickFormat: true,
+                    },
+                ],
+            },
+            numbering: {
+                config: [
+                    {
+                        reference: "my-crazy-numbering",
+                        levels: [
+                            {
+                                level: 0,
+                                format: "lowerLetter",
+                                text: "%1)",
+                                alignment: AlignmentType.LEFT,
+                            },
+                        ],
+                    },
+                ],
+            },
+            sections: [{
+                children: last_children
+            }],
+        });
+    
+        docx.Packer.toBlob(doc).then(blob => {
+            saveAs(blob, "documento_iterativo.docx");
+        });
+    }
+
     function lockButtons(lock) {
         let buttons = $(element).find('.iaa-feedback-button');
         for (let button of buttons) {
@@ -60,4 +188,53 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
             });
         }
     });
+
+
+    $(element).find(`#iaa-summary-button`).on('click', function (eventObject) {
+        lockSummaryButtons(true);
+        var data = {}
+        $.post(summaryUrl, JSON.stringify(data)).done(function (response) {
+            afterSummary(response)
+        });
+    });
+
+    function generateDoc(eventObject, result){
+        eventObject.preventDefault()
+        eventObject.target.setAttribute("disabled", true);
+        generateDocument(result.summary, settings.summary_text, settings.summary_list);
+        eventObject.target.removeAttribute("disabled");
+    }
+
+    function afterSummary(result) {
+        let area = $(element).find(`#iaa-summary`).eq(0);
+        if (result.result === "failed"){
+            area.html(`<div class="centered">Ha ocurrido un error, por favor contacte al administrador.</div>`);
+            area.removeClass(".iaa-summary-area-hidden");
+        } else {
+            let summaryButton = $(element).find(`#iaa-summary-button`).eq(0);
+            summaryButton.remove();     
+            var summary = "";
+            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
+            let sections = [];
+            for(let activity of result.summary){
+                if (!sections.includes(activity[1])){
+                    summary = summary + `<h3 class="summary-element-header summary-section"><b>${activity[1]}</b></h3>`;
+                    sections.push(activity[1])
+                }
+                summary = summary + `<p class="summary-element summary-submission">`;
+                summary = summary + `${activity[2]}`;
+                summary = summary + `</p>`
+                summary = summary + `<p class="summary-element-footer summary-submission-time">`;
+                summary = summary + `${activity[3]}`;
+                summary = summary + `</p><hr>`  
+            }
+            area.html(summary);
+            $(element).find(`#report-button`).on('click', function (eventObject) {
+                generateDoc(eventObject, result);
+            });
+            area.removeClass(".iaa-summary-area-hidden");
+            lockDisplayButtons(false);
+        }
+    }
+
 }

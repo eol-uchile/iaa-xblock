@@ -93,7 +93,7 @@
                 {% if activity_name == "empty" %}
                 <div class="centered">No se cuenta con actividades.</div>
                 {% else %}
-                <p>Este XBlock mostrará al estudiante todas las respuestas proporcionadas a la siguiente actividad de problema iterativo:</p>
+                <p>Este XBlock mostrará al {% if summary_visibility == "instructor" %}instructor{% else %}instructor y a los alumnos{% endif %} todas las respuestas proporcionadas a la siguiente actividad de problema iterativo:</p>
                 <div>
                     <table class="iaa-table">
                         <tr>
