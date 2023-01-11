@@ -24,24 +24,38 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let activity_stage_previous = $(element).find("#activity_stage_previous");
     let input_question = $(element).find("#input_question");
     let question = $(element).find("#question");
+    let input_summary_type = $(element).find("#input_summary_type");
+    let summary_type = $(element).find("#summary_type");
+    let input_summary_visibility = $(element).find("#input_summary_visibility");
+    let summary_visibility = $(element).find("#summary_visibility");
+    let input_summary_section = $(element).find("#input_summary_section");
+    let summary_section = $(element).find("#summary_section");
     let input_summary_text = $(element).find("#input_summary_text");
     let summary_text = $(element).find("#summary_text");
     let input_summary_list = $(element).find("#input_summary_list");
     let summary_list = $(element).find("#summary_list");
 
 
-    function checkSummaryStages(activity_name, stages){
-        console.log(activity_name);
-        console.log(stages)
+    function checkSummaryStages(activity_name, stages, type, section){
         for(let activity of activities){
             if(activity[1] == activity_name){
                 let splitted = activity[2].split(",");
+                let splitted_l = activity[3].split("###");
                 let splitted_chosen = stages.split(",");
-                console.log(splitted)
-                console.log(splitted_chosen)
-                for(let stage of splitted_chosen){
-                    if(!splitted.includes(stage)){
+                for(let i=0; i<splitted_chosen.length; i++){
+                    if(!splitted.includes(splitted_chosen[i])){
                         return false;
+                    }
+                    var index;
+                    for(let j=0; j<splitted.length; j++){
+                        if(splitted[j] === splitted_chosen[i]){
+                            index = j;
+                        }
+                    }
+                    if (type === "section"){
+                        if (splitted_l[index] !== section){
+                            return false;
+                        }
                     }
                 }
                 return true;
@@ -97,7 +111,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
             if (data["activity_stage"] === "") {
                 return "Por favor seleccione un ID."
             }
-            if (!checkStageNumber(data["activity_stage"])){
+            if (!checkStageNumbcheckSummaryStageser(data["activity_stage"])){
                 return "ID inválido, debe ser un número con hasta 2 decimales. Ejemplos: 1, 2.1, 1.12"
             }
             if (repeatedStageNumber(data["activity_name"], data["activity_stage"])){
@@ -149,13 +163,25 @@ function IterativeAssessedActivityStudio(runtime, element) {
             if (data["activity_name"] === "none") {
                 return "Por favor indique el nombre de la actividad."
             }
+            if (data["summary_type"] !== "full" && data["summary_type"] !== "section"){
+                return "Por favor indique un tipo de resumen."
+            }
+            if (data["summary_visibility"] !== "instructors" && data["summary_visibility"] !== "all"){
+                return "Por favor indique una visibilidad para el resumen."
+            }
+            console.log(data["summary_section"])
+            if (data["summary_type"] === "section"){
+                if (data["summary_section"] == null){
+                    return "Por favor indique una sección para el resumen."
+                }
+            }
             if (data["summary_text"] === "") {
                 return "Por favor indique el texto de resumen."
             }
             if (data["summary_list"] === "") {
-                return "Por favor indique las fases a mostrar."
+                return "Por favor indique las etapas a mostrar."
             }
-            if(!checkSummaryStages(data["activity_name"], data["summary_list"])){
+            if(!checkSummaryStages(data["activity_name"], data["summary_list"], data["summary_type"], data["summary_section"])){
                 return "Formato inválido de fases a mostrar. Use números separados por comas que correspondan a fases existentes."
             }
         }
@@ -202,9 +228,13 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 title: title.val(),
                 activity_name: activity_name.val(),
                 block_type: block_type.val(),
+                summary_type: summary_type.val(),
+                summary_visibility: summary_visibility.val(),
+                summary_section: summary_section.val(),
                 summary_text: summary_text.val(),
                 summary_list: summary_list.val()
             };
+            console.log(data)
         }
 
         var error_msg = validate(data);
@@ -227,6 +257,48 @@ function IterativeAssessedActivityStudio(runtime, element) {
         eventObject.preventDefault();
         runtime.notify('cancel', {});
     });
+
+    function getSummary(section, summary_type){
+        if (summary_type === "full"){
+            for(let activity of activities){
+                if(activity[1] === activity_name.val()){
+                    return [activity[2], activity[3]];
+                }
+            }
+        } else {
+            for(let activity of activities){
+                if(activity[1] === activity_name.val()){
+                    var list = "";
+                    var splitted_list = activity[2].split(",");
+                    var splitted_labels = activity[3].split("###");
+                    console.log(splitted_labels);
+                    for(let i=0; i< splitted_list.length; i++){
+                        if (splitted_labels[i] === section){
+                            list += splitted_list[i];
+                            list += ",";
+                        }
+                    }
+                    list = list.replace(/,$/, "");
+                    return [list, null];
+                }
+            }
+        }
+    }
+    
+    function getSummarySections(){
+        var sections = [];
+        for(let activity of activities){
+            if(activity[1] === activity_name.val()){
+                var sections_comma = activity[3].split("###");
+                for (let sect of sections_comma){
+                    if(!sections.includes(sect)){
+                        sections.push(sect);
+                    }
+                }
+            }
+        }
+        return sections;
+    }
 
     function onLoad() {
 
@@ -264,7 +336,11 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_activity_stage_previous.attr("hidden", true);
                 input_display_title.attr("hidden", true);
                 input_question.attr("hidden", true);
+                input_summary_type.attr("hidden", true);
+                input_summary_visibility.attr("hidden", true);
+                input_summary_section.attr("hidden", true);
                 input_summary_text.attr("hidden", true);
+                input_summary_list.attr("hidden", true);
                 activity_previous.val("no").change();
                 input_activity_previous.attr("hidden", true);
 
@@ -355,14 +431,43 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         });
                     }
                     if (block_type.val() === "summary") {
+                        input_summary_type.removeAttr("hidden");
+                        input_summary_visibility.removeAttr("hidden");
                         input_summary_text.removeAttr("hidden");
                         input_summary_list.removeAttr("hidden");
-                        for(let activity of activities){
-                            if(activity[1] === activity_name.val()){
-                                summary_list.val(activity[2]).change();
-                                break;
+                        summary_type.on("change", function () {
+                            if (summary_type.val() === "section"){
+                                input_summary_section.removeAttr("hidden");
+                                let options = getSummarySections();
+                                summary_section.empty();
+                                for (let option of options){
+                                    let opt = document.createElement("option");
+                                    opt.value = option;
+                                    opt.text = option;
+                                    summary_section.append(opt);
+                                }
+                                let opt0 = document.createElement("option");
+                                opt0.value = "";
+                                opt0.text = "Por favor seleccione una opción...";
+                                summary_section.append(opt0);
+                                opt0.setAttribute("selected", true);
+                                opt0.setAttribute("disabled", true);
+                                summary_section.on("change", function () {
+                                    if (summary_section.val() !== ""){
+                                        let summary = getSummary(summary_section.val(), "section");
+                                        summary_list.val(summary[0]);
+                                    }
+                                });
+                                summary_section.val("").change();
+                                summary_list.val("");
+                            } else {
+                                input_summary_section.attr("hidden", true);
+                                summary_list.val(getSummary(null, "full")[0]);
                             }
-                        }
+                        })
+                        summary_type.val("full").change();
+                        summary_visibility.val("instructors").change();
+                        summary_text.val("");
                     }
                 });
 
@@ -389,6 +494,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
 
             // XBlock is being edited
         } else {
+            console.log(context)
             input_title.removeAttr("hidden");
             title.val(context["title"])
             input_block_type.removeAttr("hidden");
@@ -422,6 +528,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_question.removeAttr("hidden");
                 question.val(context["question"]);
             } else if (block_type.val() === "summary") {
+
                 input_activity_name.removeAttr("hidden");
                 activity_name.empty();
                 if(activities.length === 0){
@@ -440,12 +547,61 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         activity_name.append(opt);
                         activity_name.val(context["activity_name"]).change();
                     }
+                    activity_name.on("change", function() {
+
+                        input_summary_type.removeAttr("hidden");
+                        input_summary_text.removeAttr("hidden");
+                        input_summary_list.removeAttr("hidden");
+                        input_summary_visibility.removeAttr("hidden");
+
+                        summary_type.on("change", function() {
+                            if (summary_type.val() === "section"){
+                                input_summary_section.removeAttr("hidden");
+                                let options = getSummarySections();
+                                summary_section.empty();
+                                for (let option of options){
+                                    let opt = document.createElement("option");
+                                    opt.value = option;
+                                    opt.text = option;
+                                    summary_section.append(opt);
+                                }
+                                let opt0 = document.createElement("option");
+                                opt0.value = "";
+                                opt0.text = "Por favor seleccione una opción...";
+                                summary_section.append(opt0);
+                                opt0.setAttribute("selected", true);
+                                opt0.setAttribute("disabled", true);
+                                summary_section.on("change", function () {
+                                    if (summary_section.val() !== ""){
+                                        let summary = getSummary(summary_section.val(), "section");
+                                        summary_list.val(summary[0]);
+                                    }
+                                });
+                                summary_section.val("").change();
+                                summary_list.val("");
+                            } else {
+                                input_summary_section.attr("hidden", true);
+                                summary_list.val(getSummary(null, "full")[0]);
+                            }
+                        });
+
+                        if (activity_name.val() === context["activity_name"]){
+                            summary_type.val(context["summary_type"]).change();
+                            if (summary_type.val() === "section"){
+                                summary_section.val(context["summary_section"]).change();
+                            }
+                            summary_visibility.val(context["summary_visibility"]).change();
+                            summary_text.val(context["summary_text"]);
+                            summary_list.val(context["summary_list"]);
+                        } else {
+                            summary_type.val("full").change();
+                            summary_visibility.val("instructors").change();
+                            summary_text.val("");
+                            summary_list.val("");
+                        }
+                    });
                     activity_name.val(context["activity_name"]).change();
                 }
-                input_summary_text.removeAttr("hidden");
-                summary_text.val(context["summary_text"]);
-                input_summary_list.removeAttr("hidden");
-                summary_list.val(context["summary_list"]);
             }
             if (block_type.val() !== "summary") {
                 if (block_type.val() === "full") {

@@ -94,6 +94,24 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Datetime of this student's submission."
     )
 
+    summary_type = String(
+        default="section",
+        scope=Scope.settings,
+        help="Wether it is a 'section' or 'full' summary."
+    )
+
+    summary_visibility = String(
+        default="all",
+        scope=Scope.settings,
+        help="Who can see the summary."
+    )
+
+    summary_section = String(
+        default="",
+        scope=Scope.settings,
+        help="Name of the section to summarize."
+    )
+
     summary_text = String(
         default="",
         scope=Scope.settings,
@@ -413,11 +431,15 @@ class IterativeAssessedActivityXBlock(XBlock):
         activities = []
         for i in range(len(activities_no_stage)):
             activity = activities_no_stage[i]
-            stages_list = [x["stage_number"] for x in IAAStage.objects.filter(activity=activity).values("stage_number")]
-            stages_list.sort()
+            stages_list = []
+            labels_list = []
+            for x in IAAStage.objects.filter(activity=activity).order_by("stage_number").values("stage_number", "stage_label"):
+                stages_list.append(x["stage_number"])
+                labels_list.append(x["stage_label"])
             if len(stages_list) != 0:
                 stages = ",".join(stages_list)
-            activities.append([activity.id, activity.activity_name, stages])
+                labels = "###".join(labels_list)
+            activities.append([activity.id, activity.activity_name, stages, labels])
         js_context = {
             "title": self.title,
             "activity_name": self.activity_name,
@@ -428,6 +450,9 @@ class IterativeAssessedActivityXBlock(XBlock):
             "display_title": self.display_title,
             "activity_name_previous": self.activity_name_previous,
             "activity_stage_previous": self.activity_stage_previous,
+            "summary_type": self.summary_type,
+            "summary_section": self.summary_section,
+            "summary_visibility": self.summary_visibility,
             "summary_text": self.summary_text,
             "summary_list": self.summary_list,
             "activities": json.dumps(activities)
@@ -581,6 +606,10 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.display_title = data.get('display_title')
         elif self.block_type == "summary":
             self.activity_name = data.get('activity_name')
+            self.summary_type = data.get('summary_type')
+            if self.summary_type == "section":
+                self.summary_section = data.get('summary_section')
+            self.summary_visibility = data.get('summary_visibility')
             self.summary_text = data.get('summary_text')
             self.summary_list = data.get('summary_list')
 
