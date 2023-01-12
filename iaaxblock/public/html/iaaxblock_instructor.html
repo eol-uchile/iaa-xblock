@@ -30,10 +30,12 @@
                             <th hidden>ID</th>
                             <th>Estudiante</th>
                             <th>Respuesta</th>
-                            <th>Fecha/Hora Respuesta</th>
+                            <th>Fecha</th>
+                            <!--
                             <th>Feedback</th>
                             <th>Fecha/Hora Feedback</th>
                             <th>Enviar feedback</th>
+                            --->
                         </tr>
                         {% for student in students %}
                         <tr>
@@ -53,6 +55,7 @@
                                 {{student.3}}
                                 {% endif %}
                             </td>
+                            <!--
                             <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
                             <td>
                                 {% if student.5 == "" %}
@@ -66,6 +69,7 @@
                             <span id="{{location}}-feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
                             {% endif %}
                             </td>
+                            -->
                         </tr>
                         {% endfor %}
                     </table>

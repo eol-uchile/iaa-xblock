@@ -1,3 +1,6 @@
+{% if block_type == 'summary' and summary_visibility == 'instructors' %}
+<div></div>
+{% else %}
 <div class="iaa-container_block xmodule_display xmodule_HtmlModule">
     <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
         <div class="exptop"><p class="recono-title">{{title}}</p></div>
@@ -68,8 +71,6 @@
                 {% if activity_name == "empty" %}
                 <div class="centered">Actividad no disponible.</div>
                 {% else %}
-
-                    {% if summary_visibility != "instructors" %}
                     <div>
                         <h3 class="summary-text">{{summary_text}}</h3>
                         <div class="display-button-div">
@@ -77,7 +78,6 @@
                         </div>
                         <div id="iaa-summary" class="iaa-summary-area"></div>
                     </div>
-                    {% endif %}
 
                 {% endif %}
             {% endif %}
@@ -89,3 +89,4 @@
         </div>
     </div>
 </div>
+{% endif %}

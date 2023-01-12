@@ -24,8 +24,7 @@ $ python manage.py lms migrate iaaxblock
 
 ## TODO
 
-- Mejora de estilos de la funcionalidad de feedback.
-- Instructor debe poder descargar cualquier archivo Word de cualquier alumno.
+- Repaso general y mejora de estilos de la funcionalidad de feedback.
 - Posibilidad de mostrar múltiples respuestas anteriores dentro de un mismo contenedor.
 
 ## Licencia
