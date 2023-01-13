@@ -69,6 +69,10 @@ a.LinkButton {
   cursor: pointer;
 }
 
+.display-title {
+  margin-bottom: 15px;
+}
+
 .summary-text {
   margin: 0 0 10px 0;
 }
