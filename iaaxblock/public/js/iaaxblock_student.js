@@ -1,6 +1,6 @@
 function IterativeAssessedActivityStudent(runtime, element, settings) {
 
-    
+    var busyValidating = false;
 
     let statusDiv = $(element).find('.status');
 
@@ -173,6 +173,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     function afterSubmission(result) {
         statusDiv.removeClass("unanswered");
         statusDiv.removeClass('correct');
+        buttonSubmit.attr("disabled", true);
         statusDiv.addClass(result.indicator_class);
         if (result["msg"] !== "error") {
             showSuccessMessage("¡Respuesta enviada exitosamente!");
@@ -186,17 +187,19 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     buttonSubmit.click(function (e) {
+        e.preventDefault();
         showErrorMessage("");
         showSuccessMessage("");
-        e.preventDefault();
         buttonSubmit.html("<span>" + buttonSubmit[0].dataset.checking + "</span>");
-        buttonSubmit.attr("disabled", true);
-        if ($.isFunction(runtime.notify)) {
-            runtime.notify('submit', {
-                message: 'Submitting...',
-                state: 'start'
-            });
+        if (!busyValidating){
+            if ($.isFunction(runtime.notify)) {
+                runtime.notify('submit', {
+                    message: 'Submitting...',
+                    state: 'start'
+                });
+            }
         }
+        var busyValidating = true;
         var data = { "submission": submission.val() }
         let error_msg = validate(data);
         if (error_msg !== "") {
@@ -297,7 +300,6 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             let summaryButton = $(element).find(`#iaa-summary-button`).eq(0);
             summaryButton.remove();     
             var summary = "";
-            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
             let sections = [];
             for(let activity of result.summary){
                 if (!sections.includes(activity[1])){
@@ -311,6 +313,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
                 summary = summary + `${activity[3]}`;
                 summary = summary + `</p><hr>`  
             }
+            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
             area.html(summary);
             $(element).find(`#report-button`).on('click', function (eventObject) {
                 generateDoc(eventObject, result);

@@ -161,10 +161,13 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     def clear_student_state(self, user_id, course_id, item_id, requesting_user_id):
         from .models import IAAActivity, IAAStage, IAASubmission, IAAFeedback
+        from common.djangoapps.student.models import user_by_anonymous_id
+
+        id_student = user_by_anonymous_id(user_id).id
         activity = IAAActivity.objects.get(id_course=self.course_id, activity_name=self.activity_name)
         stage = IAAStage.objects.get(activity=activity, stage_number=self.activity_stage)
-        submissions = IAASubmission.objects.filter(stage=stage)
-        feedbacks = IAAFeedback.objects.filter(stage=stage)
+        submissions = IAASubmission.objects.filter(stage=stage, id_student=id_student)
+        feedbacks = IAAFeedback.objects.filter(stage=stage, id_student=id_student)
         for submission in submissions:
             submission.delete()
         for feedback in feedbacks:
@@ -281,7 +284,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
                 enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
                 students = []
-                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
+                student_names = [x["first_name"] + " " + x["last_name"] for x in enrolled]
                 student_ids = [x["id"] for x in enrolled]
                 for i in range(len(student_names)):
                     students.append((student_ids[i], student_names[i]))

@@ -1,58 +1,64 @@
 <div class="iaa-container_block xmodule_display xmodule_HtmlModule">
     <div class="Reconociendo-RedFid" id="{{xblock.type}}{{location}}">
-        <div class="exptop"><p class="recono-title">{{title}}</p></div>
+        <div class="exptop">
+            <p class="recono-title">{{title}}</p>
+        </div>
         <div class="expmid">
             {% if block_type == "none" %}
-                <div class="iaa-not-created">
-                    <p class="centered">Este XBlock aún no se ha configurado.</p>
-                </div>
+            <div class="iaa-not-created">
+                <p class="centered">Este XBlock aún no se ha configurado.</p>
+            </div>
             {% elif block_type == "full" %}
-                <h3 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.</h3>
-                <div>
-                    <table class="iaa-table">
-                        <tr>
-                            <th><b>Actividad</b></th>
-                            <td>{{activity_name}}</td>
-                        </tr>
-                        <tr>
-                            <th><b>Fase</b></th>
-                            <td>{{activity_stage}}</td>
-                        </tr>
-                        <tr>
-                            <th><b>Etiqueta</b></th>
-                            <td>{{stage_label}}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table class="iaa-table">
-                        <tr>
-                            <th hidden>ID</th>
-                            <th>Estudiante</th>
-                            <th>Respuesta</th>
-                            <th>Fecha/Hora Respuesta</th>
+            <h3 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.
+            </h3>
+            <div>
+                <table class="iaa-table">
+                    <tr>
+                        <th><b>Actividad</b></th>
+                        <td>{{activity_name}}</td>
+                    </tr>
+                    <tr>
+                        <th><b>Fase</b></th>
+                        <td>{{activity_stage}}</td>
+                    </tr>
+                    <tr>
+                        <th><b>Etiqueta</b></th>
+                        <td>{{stage_label}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="iaa-table">
+                    <tr>
+                        <th hidden>ID</th>
+                        <th>Estudiante</th>
+                        <th>Respuesta</th>
+                        <th>Fecha</th>
+                        <!--
                             <th>Feedback</th>
                             <th>Fecha/Hora Feedback</th>
                             <th>Enviar feedback</th>
-                        </tr>
-                        {% for student in students %}
-                        <tr>
-                            <th hidden>{{student.0}}</th>
-                            <td>{{student.1}}</td>
-                            <td>
-                                {% if student.2 == "" %}
-                                —
-                                {% else %}
-                                {{student.2}}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if student.3 == "" %}
-                                —
-                                {% else %}
-                                {{student.3}}
-                                {% endif %}
-                            </td>
+                            --->
+                    </tr>
+                    {% for student in students %}
+                    <tr>
+                        <th hidden>{{student.0}}</th>
+                        <td>{{student.1}}</td>
+                        <td>
+                            {% if student.2 == "" %}
+                            —
+                            {% else %}
+                            {{student.2}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if student.3 == "" %}
+                            —
+                            {% else %}
+                            {{student.3}}
+                            {% endif %}
+                        </td>
+                        <!--
                             <td><textarea id="feedback-{{student.0}}">{{student.4}}</textarea></td>
                             <td>
                                 {% if student.5 == "" %}
@@ -66,32 +72,33 @@
                             <span id="{{location}}-feedback-button-{{student.0}}" class="iaa-feedback-button" >Enviar</span>
                             {% endif %}
                             </td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
+                            -->
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
             {% elif block_type == "display" %}
-                <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
+            <p class="centered">Este XBlock no cuenta con vista de instructor.</p>
             {% elif block_type == "summary" %}
-                <meta id="context-iaa" data-context="{{context}}">
+            <meta id="context-iaa" data-context="{{context}}">
 
-                {% if activity_name == "empty" %}
-                <div class="centered">Actividad no disponible.</div>
-                {% else %}
-                <div>
-                    <p>Seleccione un alumno:</p>
-                    <div class="select-student">
-                        <select id="iaa-select-student">
-                            <option value="none">Por favor seleccione una opción...</option>
-                            {% for student in students %}
-                            <option value="{{student.0}}">{{student.1}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div id="iaa-summary" class="iaa-summary-area"></div>
+            {% if activity_name == "empty" %}
+            <div class="centered">Actividad no disponible.</div>
+            {% else %}
+            <div>
+                <p>Seleccione un alumno:</p>
+                <div class="select-student">
+                    <select id="iaa-select-student">
+                        <option value="none">Por favor seleccione una opción...</option>
+                        {% for student in students %}
+                        <option value="{{student.0}}">{{student.1}}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                {% endif %}
+
+                <div id="iaa-summary" class="iaa-summary-area"></div>
+            </div>
+            {% endif %}
             {% endif %}
             <div>
                 <p id="iaa-instructor-error-msg" class="iaa-error-msg"></p>
@@ -103,4 +110,3 @@
         </div>
     </div>
 </div>
-    
