@@ -372,7 +372,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "display_title": self.display_title,
                             "activity_name": self.activity_name,
                             "activity_stage": self.activity_stage,
-                            "submission": self.submission,
+                            "submission": self.submission.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"),
                             "submission_time": self.submission_time,
                             "stage_label": self.stage_label,
                             "question": self.question,
@@ -740,7 +740,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 this_submission_previous = "EMPTY"
                 this_submission_time_previous = "EMPTY"
             else:
-                this_submission_previous = current_submission_previous[0]["submission"]
+                this_submission_previous = current_submission_previous[0]["submission"].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;")
                 this_submission_time_previous = str(current_submission_previous[0]["submission_time"])
         except:
             this_submission_previous = "ERROR"
@@ -754,12 +754,20 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         """
         from .models import IAAActivity, IAAStage, IAASubmission
+        from django.contrib.auth.models import User
 
+        enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
         id_course = self.course_id
         if data["user_id"] == "self":
             id_student = self.scope_ids.user_id
         else:
             id_student = data["user_id"]
+        name = None
+        for x in enrolled:
+            if x["id"] == id_student:
+                name = x["first_name"] + " " + x["last_name"]
+                name = x["email"]
+                break
         try:
             current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
             summary = []
@@ -771,10 +779,10 @@ class IterativeAssessedActivityXBlock(XBlock):
                         this_summary_submission = "No se registra respuesta."
                         this_summary_submission_time = "—"
                     else:
-                        this_summary_submission = submission[0]["submission"]
+                        this_summary_submission = submission[0]["submission"].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;")
                         this_summary_submission_time = str(submission[0]["submission_time"])
                     summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
-            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class()}
+            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class(), "name": name}
         except:
             return {"result": "failed", "indicator_class": self.get_indicator_class()}
 

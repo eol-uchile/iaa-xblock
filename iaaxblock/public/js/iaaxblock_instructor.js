@@ -14,7 +14,7 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
         $(element).find('#iaa-instructor-success-msg').html(msg);
     }
 
-    function generateDocument(summary, summary_text, summary_list) {
+    function generateDocument(summary, summary_text, summary_list, name) {
         const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
         let last_children = [];
         last_children.push(new Paragraph({
@@ -23,12 +23,13 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
             alignment: AlignmentType.CENTER
         }))
         last_children.push(new Paragraph({
-            text: summary_text,
-            alignment: AlignmentType.LEFT
+            text: name,
+            heading: HeadingLevel.HEADING_1,
+            alignment: AlignmentType.CENTER
         }))
         last_children.push(new Paragraph({
-            text: "",
-            heading: HeadingLevel.HEADING_1,
+            text: summary_text,
+            alignment: AlignmentType.LEFT
         }))
         let labels = [];
         for (let stage of summary) {
@@ -203,7 +204,7 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
     function generateDoc(eventObject, result){
         eventObject.preventDefault()
         eventObject.target.setAttribute("disabled", true);
-        generateDocument(result.summary, settings.summary_text, settings.summary_list);
+        generateDocument(result.summary, settings.summary_text, settings.summary_list, result.name);
         eventObject.target.removeAttribute("disabled");
     }
 

@@ -3,7 +3,6 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     let statusDiv = $(element).find('.status');
 
     let buttonSubmit = $(element).find(".iaa-submit");
-    let buttonReport = $(element).find(".iaa-report-button");
     let submission = $(element).find(".iaa-submission");
     var handlerUrl = runtime.handlerUrl(element, 'student_submit');
     var displayUrl = runtime.handlerUrl(element, 'fetch_previous_submission');
@@ -27,11 +26,11 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             buttonSubmit.html("<span>Enviar</span>")
             return `¡Respuesta muy corta! Por favor escriba al menos ${settings.min_length} caracteres.`
         }
-        return "";
+        return /^[^<>&]+$/.test(data) ? "" : "La respuesta contiene un caracter inválido.";
     }
 
-    function generateDocument(summary, summary_text, summary_list) {
-        const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, ImageRun, UnderlineType } = docx;
+    function generateDocument(summary, summary_text, summary_list, name) {
+        const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
         let last_children = [];
         last_children.push(new Paragraph({
             text: settings.activity_name,
@@ -39,12 +38,13 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             alignment: AlignmentType.CENTER
         }))
         last_children.push(new Paragraph({
-            text: summary_text,
-            alignment: AlignmentType.LEFT
+            text: name,
+            heading: HeadingLevel.HEADING_1,
+            alignment: AlignmentType.CENTER
         }))
         last_children.push(new Paragraph({
-            text: "",
-            heading: HeadingLevel.HEADING_1,
+            text: summary_text,
+            alignment: AlignmentType.LEFT
         }))
         let labels = [];
         for (let stage of summary) {
@@ -156,16 +156,6 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         docx.Packer.toBlob(doc).then(blob => {
             saveAs(blob, "documento_iterativo.docx");
         });
-    }
-
-
-    if (buttonReport != null){
-        buttonReport.on("click", function (e) {
-            e.preventDefault()
-            buttonReport.attr("disabled", true);
-            generateDocument();
-            buttonReport.removeAttr("disabled");
-        })
     }
 
     function afterSubmission(result) {
@@ -287,7 +277,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     function generateDoc(eventObject, result){
         eventObject.preventDefault()
         eventObject.target.setAttribute("disabled", true);
-        generateDocument(result.summary, settings.summary_text, settings.summary_list);
+        generateDocument(result.summary, settings.summary_text, settings.summary_list, result.name);
         eventObject.target.removeAttribute("disabled");
     }
 
