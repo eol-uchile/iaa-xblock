@@ -20,7 +20,7 @@ a.LinkButton {
 
 .iaa-feedback-button {
   display: inline-block;
-  background: darkblue;
+  background: #df595a;
   border-radius: 4px;
   font-family: "arial-black";
   font-size: 14px;
@@ -53,7 +53,7 @@ a.LinkButton {
   display: inline-block;
   background: #df595a;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 14px;
   color: #FFF;
   padding: 8px 12px;
   cursor: pointer;
@@ -63,18 +63,18 @@ a.LinkButton {
   display: inline-block;
   background: #df595a;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 14px;
   color: #FFF;
   padding: 8px 12px;
   cursor: pointer;
 }
 
 .display-title {
-  margin-bottom: 15px;
+  font-weight: bolder;
 }
 
 .summary-text {
-  margin: 0 0 10px 0;
+  font-weight: bolder;
 }
 
 .select-student {
@@ -105,9 +105,14 @@ a.LinkButton {
   background: gray;
 }
 
+.iaa-student-error-msg {
+  text-align: center;
+  color:#df595a;
+}
+
 .display-button-div {
   text-align: center;
-  padding-top: 8px;
+  padding: 15px 0px 30px 0px;
 }
 
 .iaa-display-area-hidden {
@@ -206,13 +211,18 @@ a.LinkButton {
 }
 
 .report-button-area{
-  margin: 30px 0 12px 0;
+  text-align: center;
+  padding: 15px 0px 30px 0px;
 }
 
 .iaa-action {
   justify-content: center;
   display: flex;
   padding-top: 10px;
+}
+
+.question {
+  font-weight: bolder;
 }
 
 .submission-previous {

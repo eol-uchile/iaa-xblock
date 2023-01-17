@@ -53,6 +53,12 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Question shown before the text input."
     )
 
+    min_length = Integer(
+        default=100,
+        scope=Scope.settings,
+        help="Minimum length required for submissions."
+    )
+
     activity_previous = Boolean(
         default=False,
         scope=Scope.settings,
@@ -237,7 +243,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                 enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
                 students = []
-                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
+                student_names = [x["first_name"] + " " + x["last_name"] for x in enrolled]
                 student_ids = [x["id"] for x in enrolled]
                 current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                 for i in range(len(student_names)):
@@ -263,6 +269,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                         "activity_name": self.activity_name,
                         "activity_stage": self.activity_stage,
                         "stage_label": self.stage_label,
+                        "question": self.question,
+                        "min_length": self.min_length,
                         "students": students,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
@@ -364,10 +372,11 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "display_title": self.display_title,
                             "activity_name": self.activity_name,
                             "activity_stage": self.activity_stage,
-                            "submission": self.submission,
+                            "submission": self.submission.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"),
                             "submission_time": self.submission_time,
                             "stage_label": self.stage_label,
                             "question": self.question,
+                            "min_length": self.min_length,
                             "feedbacks": feedbacks,
                             'location': str(self.location).split('@')[-1],
                             'indicator_class': indicator_class,
@@ -441,7 +450,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     "summary_type": self.summary_type,
                     "summary_visibility": self.summary_visibility,
                     "summary_section": self.summary_section
-                } if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
+                } if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1], "min_length": self.min_length})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -475,6 +484,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             "activity_stage": self.activity_stage,
             "stage_label": self.stage_label,
             "question": self.question,
+            "min_length": self.min_length,
             "display_title": self.display_title,
             "activity_name_previous": self.activity_name_previous,
             "activity_stage_previous": self.activity_stage_previous,
@@ -528,6 +538,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 "activity_stage": self.activity_stage,
                 "stage_label": self.stage_label,
                 "question": self.question,
+                "min_length": self.min_length,
                 "stages": stages_list,
                 "activity_previous": self.activity_previous,
                 'location': str(self.location).split('@')[-1],
@@ -618,6 +629,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.activity_stage = data.get('activity_stage')
             self.stage_label = data.get('stage_label')
             self.question = data.get('question')
+            self.min_length = data.get('min_length')
             if data.get('activity_previous') == "yes":
                 self.activity_previous = True
                 self.activity_name_previous = data.get('activity_name_previous')
@@ -728,7 +740,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 this_submission_previous = "EMPTY"
                 this_submission_time_previous = "EMPTY"
             else:
-                this_submission_previous = current_submission_previous[0]["submission"]
+                this_submission_previous = current_submission_previous[0]["submission"].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;")
                 this_submission_time_previous = str(current_submission_previous[0]["submission_time"])
         except:
             this_submission_previous = "ERROR"
@@ -742,12 +754,19 @@ class IterativeAssessedActivityXBlock(XBlock):
         """
         """
         from .models import IAAActivity, IAAStage, IAASubmission
+        from django.contrib.auth.models import User
 
+        enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
         id_course = self.course_id
         if data["user_id"] == "self":
             id_student = self.scope_ids.user_id
         else:
             id_student = data["user_id"]
+        name = None
+        for x in enrolled:
+            if x["id"] == id_student:
+                name = x["first_name"] + " " + x["last_name"]
+                break
         try:
             current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
             summary = []
@@ -759,10 +778,10 @@ class IterativeAssessedActivityXBlock(XBlock):
                         this_summary_submission = "No se registra respuesta."
                         this_summary_submission_time = "—"
                     else:
-                        this_summary_submission = submission[0]["submission"]
+                        this_summary_submission = submission[0]["submission"].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;")
                         this_summary_submission_time = str(submission[0]["submission_time"])
                     summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
-            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class()}
+            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class(), "name": name}
         except:
             return {"result": "failed", "indicator_class": self.get_indicator_class()}
 

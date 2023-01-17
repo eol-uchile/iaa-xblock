@@ -9,8 +9,8 @@
                 <p class="centered">Este XBlock aún no se ha configurado.</p>
             </div>
             {% elif block_type == "full" %}
-            <h3 class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes y proporcionar feedback.
-            </h3>
+            <p class="iaa-padded-subtitle">Aquí podrá ver las respuestas de los estudiantes para la siguiente actividad:
+            </p>
             <div>
                 <table class="iaa-table">
                     <tr>
@@ -18,12 +18,16 @@
                         <td>{{activity_name}}</td>
                     </tr>
                     <tr>
-                        <th><b>Fase</b></th>
+                        <th><b>ID</b></th>
                         <td>{{activity_stage}}</td>
                     </tr>
                     <tr>
-                        <th><b>Etiqueta</b></th>
+                        <th><b>Sección</b></th>
                         <td>{{stage_label}}</td>
+                    </tr>
+                    <tr>
+                        <th><b>Enunciado</b></th>
+                        <td>{{question}}</td>
                     </tr>
                 </table>
             </div>
@@ -89,7 +93,7 @@
                 <p>Seleccione un alumno:</p>
                 <div class="select-student">
                     <select id="iaa-select-student">
-                        <option value="none">Por favor seleccione una opción...</option>
+                        <option value="none" disabled selected>Por favor seleccione una opción...</option>
                         {% for student in students %}
                         <option value="{{student.0}}">{{student.1}}</option>
                         {% endfor %}

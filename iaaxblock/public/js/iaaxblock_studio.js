@@ -24,6 +24,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
     let activity_stage_previous = $(element).find("#activity_stage_previous");
     let input_question = $(element).find("#input_question");
     let question = $(element).find("#question");
+    let input_min_length = $(element).find("#input_min_length");
+    let min_length = $(element).find("#min_length");
     let input_summary_type = $(element).find("#input_summary_type");
     let summary_type = $(element).find("#summary_type");
     let input_summary_visibility = $(element).find("#input_summary_visibility");
@@ -65,6 +67,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
             return true;
         }
         return false;
+    }
+
+    function checkMinLength(number){
+        if (/^(0|[1-9]\d*)$/.test(number)){
+            return parseInt(number) > 9 && parseInt(number) < 1001
+        }
     }
 
     function checkStageNumber(number){
@@ -123,6 +131,12 @@ function IterativeAssessedActivityStudio(runtime, element) {
             if (data["question"] === "") {
                 return "Por favor proporcione un enunciado."
             }
+            if (data["min_length"] === "") {
+                return "Por favor proporcione un largo mínimo."
+            }
+            if(!checkMinLength(data["min_length"])){
+                return "Por favor proporcione un largo mínimo numérico entre 10 y 1000."
+            }
             if (data["activity_previous"] === "yes") {
                 if (data["activity_name_previous"] === "none" || data["activity_name_previous"] == null) {
                     return "Por favor indique el nombre de la actividad de la cual se mostrará una respuesta anterior."
@@ -139,9 +153,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 if (data["activity_stage_previous"] === data["activity_stage"] && data["activity_name_previous"] === "activity_name"){
                     return "No se puede mostrar como respuesta anterior aquella correspondiente a este mismo bloque."
                 }
-                if (data["display_title"] === "") {
-                    return "Por favor proporcione un título a la respuesta anterior."
-                }
             }
         } else if (data["block_type"] === "display") {
             if (data["activity_name_previous"] === "none" || data["activity_name_previous"] == null) {
@@ -155,9 +166,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
             }
             if (!repeatedStageNumber(data["activity_name_previous"], data["activity_stage_previous"])){
                 return `No existe el ID "${data["activity_stage_previous"]}" en la actividad "${data["activity_name_previous"]}".`
-            }
-            if (data["display_title"] === "") {
-                return "Por favor proporcione un título a la respuesta anterior."
             }
         } else {
             if (data["activity_name"] === "none") {
@@ -207,6 +215,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 activity_stage: activity_stage.val(),
                 stage_label: stage_label.val(),
                 question: question.val(),
+                min_length: parseInt(min_length.val()),
                 activity_previous: activity_previous.val(),
                 activity_name_previous: activity_name_previous.val(),
                 activity_stage_previous: activity_stage_previous.val(),
@@ -333,6 +342,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 input_activity_stage_previous.attr("hidden", true);
                 input_display_title.attr("hidden", true);
                 input_question.attr("hidden", true);
+                input_min_length.attr("hidden", true);
                 input_summary_type.attr("hidden", true);
                 input_summary_visibility.attr("hidden", true);
                 input_summary_section.attr("hidden", true);
@@ -379,6 +389,7 @@ function IterativeAssessedActivityStudio(runtime, element) {
                         input_activity_stage.removeAttr("hidden");
                         input_stage_label.removeAttr("hidden");
                         input_question.removeAttr("hidden");
+                        input_min_length.removeAttr("hidden");
                         input_activity_previous.removeAttr("hidden");
 
                         activity_previous.on("change", function () {
@@ -525,6 +536,8 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 stage_label.val(context["stage_label"]);
                 input_question.removeAttr("hidden");
                 question.val(context["question"]);
+                input_min_length.removeAttr("hidden");
+                min_length.val(context["min_length"]);
             } else if (block_type.val() === "summary") {
 
                 input_activity_name.removeAttr("hidden");
