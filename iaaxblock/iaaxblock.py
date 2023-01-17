@@ -766,7 +766,6 @@ class IterativeAssessedActivityXBlock(XBlock):
         for x in enrolled:
             if x["id"] == id_student:
                 name = x["first_name"] + " " + x["last_name"]
-                name = x["email"]
                 break
         try:
             current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
