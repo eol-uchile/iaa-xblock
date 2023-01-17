@@ -53,6 +53,12 @@ class IterativeAssessedActivityXBlock(XBlock):
         help="Question shown before the text input."
     )
 
+    min_length = Integer(
+        default=100,
+        scope=Scope.settings,
+        help="Minimum length required for submissions."
+    )
+
     activity_previous = Boolean(
         default=False,
         scope=Scope.settings,
@@ -237,7 +243,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                 enrolled = User.objects.filter(courseenrollment__course_id=self.course_id,courseenrollment__is_active=1).order_by('id').values('id' ,'first_name', 'last_name', 'email')
                 students = []
-                student_names = [x["first_name"] + x["last_name"] for x in enrolled]
+                student_names = [x["first_name"] + " " + x["last_name"] for x in enrolled]
                 student_ids = [x["id"] for x in enrolled]
                 current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                 for i in range(len(student_names)):
@@ -263,6 +269,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                         "activity_name": self.activity_name,
                         "activity_stage": self.activity_stage,
                         "stage_label": self.stage_label,
+                        "question": self.question,
+                        "min_length": self.min_length,
                         "students": students,
                         'location': str(self.location).split('@')[-1],
                         'indicator_class': indicator_class,
@@ -368,6 +376,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "submission_time": self.submission_time,
                             "stage_label": self.stage_label,
                             "question": self.question,
+                            "min_length": self.min_length,
                             "feedbacks": feedbacks,
                             'location': str(self.location).split('@')[-1],
                             'indicator_class': indicator_class,
@@ -441,7 +450,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                     "summary_type": self.summary_type,
                     "summary_visibility": self.summary_visibility,
                     "summary_section": self.summary_section
-                } if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1]})
+                } if self.block_type == "summary" else {"block_type": self.block_type, "location": str(self.location).split('@')[-1], "min_length": self.min_length})
             )
             if self.block_type == "summary":
                 frag.add_javascript_url("https://unpkg.com/docx@7.1.0/build/index.js")
@@ -475,6 +484,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             "activity_stage": self.activity_stage,
             "stage_label": self.stage_label,
             "question": self.question,
+            "min_length": self.min_length,
             "display_title": self.display_title,
             "activity_name_previous": self.activity_name_previous,
             "activity_stage_previous": self.activity_stage_previous,
@@ -528,6 +538,7 @@ class IterativeAssessedActivityXBlock(XBlock):
                 "activity_stage": self.activity_stage,
                 "stage_label": self.stage_label,
                 "question": self.question,
+                "min_length": self.min_length,
                 "stages": stages_list,
                 "activity_previous": self.activity_previous,
                 'location': str(self.location).split('@')[-1],
@@ -618,6 +629,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.activity_stage = data.get('activity_stage')
             self.stage_label = data.get('stage_label')
             self.question = data.get('question')
+            self.min_length = data.get('min_length')
             if data.get('activity_previous') == "yes":
                 self.activity_previous = True
                 self.activity_name_previous = data.get('activity_name_previous')

@@ -11,8 +11,8 @@
 
             {% if block_type == "full" %}
             {% if activity_previous %}
-            <p>Este XBlock mostrará al estudiante, la respuesta correspondiente a la siguiente instancia de problema
-                iterativo:</p>
+            <p>Este XBlock mostrará al estudiante, la respuesta correspondiente a la siguiente instancia de actividad
+                iterativa:</p>
             {% if activity_name_previous == "ERROR" %}
             <p class="iaa-student-error-msg">ERROR: La instancia referenciada por este XBlock no está disponible. Por
                 favor, actualice desde Studio.</p>
@@ -24,11 +24,11 @@
                         <td>{{activity_name_previous}}</td>
                     </tr>
                     <tr>
-                        <th><b>Fase</b></th>
+                        <th><b>ID</b></th>
                         <td>{{activity_stage_previous}}</td>
                     </tr>
                     <tr>
-                        <th><b>Etiqueta</b></th>
+                        <th><b>Sección</b></th>
                         <td>{{stage_label_previous}}</td>
                     </tr>
                 </table>
@@ -43,12 +43,16 @@
                         <td>{{activity_name}}</td>
                     </tr>
                     <tr>
-                        <th><b>Fase</b></th>
+                        <th><b>ID</b></th>
                         <td>{{activity_stage}}</td>
                     </tr>
                     <tr>
-                        <th><b>Etiqueta</b></th>
+                        <th><b>Sección</b></th>
                         <td>{{stage_label}}</td>
+                    </tr>
+                    <tr>
+                        <th><b>Enunciado</b></th>
+                        <td>{{question}}</td>
                     </tr>
                 </table>
             </div>
@@ -56,8 +60,8 @@
             <div>
                 <table class="iaa-table">
                     <tr>
-                        <th><b>Fase</b></th>
-                        <th><b>Etiqueta</b></th>
+                        <th><b>ID</b></th>
+                        <th><b>Sección</b></th>
                     </tr>
                     {% for stage in stages %}
                     <tr>

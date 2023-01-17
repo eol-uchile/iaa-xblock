@@ -216,11 +216,10 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
             let summaryButton = $(element).find(`#iaa-summary-button`).eq(0);
             summaryButton.remove();     
             var summary = "";
-            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
             let sections = [];
             for(let activity of result.summary){
                 if (!sections.includes(activity[1])){
-                    summary = summary + `<h3 class="summary-element-header summary-section"><b>${activity[1]}</b></h3>`;
+                    summary = summary + `<p class="summary-element-header summary-section"><b>${activity[1]}</b></p>`;
                     sections.push(activity[1])
                 }
                 summary = summary + `<p class="summary-element summary-submission">`;
@@ -230,6 +229,7 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
                 summary = summary + `${activity[3]}`;
                 summary = summary + `</p><hr>`  
             }
+            summary = summary + `<div class="centered report-button-area"><span id="report-button" class="iaa-report-button">Descargar reporte (.docx)</span></div>`
             area.html(summary);
             $(element).find(`#report-button`).on('click', function (eventObject) {
                 generateDoc(eventObject, result);

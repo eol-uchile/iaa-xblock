@@ -1,7 +1,5 @@
 function IterativeAssessedActivityStudent(runtime, element, settings) {
 
-    var busyValidating = false;
-
     let statusDiv = $(element).find('.status');
 
     let buttonSubmit = $(element).find(".iaa-submit");
@@ -24,16 +22,16 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     }
 
     function validate(data) {
-        if (data.submission.length < 10) {
+        if (data.submission.length < settings.min_length) {
             buttonSubmit.removeAttr("disabled");
             buttonSubmit.html("<span>Enviar</span>")
-            return "¡Respuesta muy corta!"
+            return `¡Respuesta muy corta! Por favor escriba al menos ${settings.min_length} caracteres.`
         }
         return "";
     }
 
     function generateDocument(summary, summary_text, summary_list) {
-        const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, TextRun, UnderlineType } = docx;
+        const { AlignmentType, Document, HeadingLevel, Packer, Paragraph, ImageRun, UnderlineType } = docx;
         let last_children = [];
         last_children.push(new Paragraph({
             text: settings.activity_name,
@@ -244,6 +242,8 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     function afterDisplay(result) {
         let displayButton = $(element).find(`#${settings.location}-display-button`).eq(0);
         displayButton.remove();
+        let displayButtonArea = $(element).find(`#${settings.location}-display-button-div`).eq(0);
+        displayButtonArea.attr("hidden", true);
         let area = $(element).find(`#${settings.location}-submission-previous`).eq(0);
         var submission_previous;
         var submission_previous_time;
@@ -303,7 +303,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             let sections = [];
             for(let activity of result.summary){
                 if (!sections.includes(activity[1])){
-                    summary = summary + `<h3 class="summary-element-header summary-section"><b>${activity[1]}</b></h3>`;
+                    summary = summary + `<p class="summary-element-header summary-section"><b>${activity[1]}</b></p>`;
                     sections.push(activity[1])
                 }
                 summary = summary + `<p class="summary-element summary-submission">`;
