@@ -26,7 +26,12 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
             buttonSubmit.html("<span>Enviar</span>")
             return `¡Respuesta muy corta! Por favor escriba al menos ${settings.min_length} caracteres.`
         }
-        return /^[^<>&]+$/.test(data) ? "" : "La respuesta contiene un caracter inválido.";
+        if (data.submission.length > 10000) {
+            buttonSubmit.removeAttr("disabled");
+            buttonSubmit.html("<span>Enviar</span>")
+            return `¡Respuesta muy larga! Por favor escriba máximo 10000 caracteres.`
+        }
+        return "";
     }
 
     function generateDocument(summary, summary_text, summary_list, name) {
