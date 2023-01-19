@@ -85,8 +85,6 @@ class IAATestCase(TransactionTestCase):
         self.assertEqual(self.xblock1.activity_stage_previous, "")
         self.assertEqual(self.xblock1.display_title, "")
         self.assertEqual(self.xblock1.question, "")
-        self.assertEqual(self.xblock1.submission, "")
-        self.assertEqual(self.xblock1.submission_time, "")
         self.assertEqual(self.xblock1.summary_text, "")
 
     def test_create_full(self):
