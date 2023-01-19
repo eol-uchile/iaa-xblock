@@ -348,7 +348,13 @@ class IterativeAssessedActivityXBlock(XBlock):
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                     current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
                     feedbacks = [(x["id_instructor"], x["feedback"], x["feedback_time"]) for x in IAAFeedback.objects.filter(stage=current_stage, id_student=id_student).values('id_instructor', 'feedback', 'feedback_time')]
-                    current_submission = IAASubmission.objects.get(stage=current_stage, id_student=id_student)
+                    try:
+                        current_submission = IAASubmission.objects.get(stage=current_stage, id_student=id_student)
+                        db_submission = current_submission.submission
+                        db_submission_time = current_submission.submission_time
+                    except:
+                        db_submission = ""
+                        db_submission_time = ""
                     context.update(
                         {
                             "title": self.title,
@@ -359,8 +365,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "display_title": self.display_title,
                             "activity_name": self.activity_name,
                             "activity_stage": self.activity_stage,
-                            "submission": current_submission.submission.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"),
-                            "submission_time": current_submission.submission_time,
+                            "submission": db_submission.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"),
+                            "submission_time": db_submission_time,
                             "stage_label": self.stage_label,
                             "question": self.question,
                             "min_length": self.min_length,
@@ -688,7 +694,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         id_course = self.course_id
         id_student = self.scope_ids.user_id
-        if self.score != 0:
+        if self.score != 0.0:
             return {"result": 'repeated', "indicator_class": self.get_indicator_class()}
         else:
             self.score = 1

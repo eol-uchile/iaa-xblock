@@ -168,10 +168,10 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         statusDiv.removeClass('correct');
         buttonSubmit.attr("disabled", true);
         statusDiv.addClass(result.indicator_class);
-        if (result["msg"] !== "repeated"){
+        if (result["result"] === "repeated"){
             showWarningMessage("Ya se encuentra registrada una respuesta. Por favor, actualice la página.");
             buttonSubmit.removeAttr("disabled");
-        } else if (result["msg"] === "success") {
+        } else if (result["result"] === "success") {
             showSuccessMessage("¡Respuesta enviada exitosamente!");
             submission.attr("disabled", true);
             buttonSubmit.attr("disabled", true);
