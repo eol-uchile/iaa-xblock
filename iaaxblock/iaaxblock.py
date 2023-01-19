@@ -359,8 +359,8 @@ class IterativeAssessedActivityXBlock(XBlock):
                             "display_title": self.display_title,
                             "activity_name": self.activity_name,
                             "activity_stage": self.activity_stage,
-                            "submission": current_submission["submission"].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"),
-                            "submission_time": current_submission["submission_time"],
+                            "submission": current_submission.submission.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;"),
+                            "submission_time": current_submission.submission_time,
                             "stage_label": self.stage_label,
                             "question": self.question,
                             "min_length": self.min_length,
@@ -688,21 +688,24 @@ class IterativeAssessedActivityXBlock(XBlock):
 
         id_course = self.course_id
         id_student = self.scope_ids.user_id
-        self.score = 1
-        self.runtime.publish(
-            self,
-            'grade',
-            {
-                'value': 1,
-                'max_value': 1
-            }
-        )
-        current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
-        current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
-        new_submission_time = datetime.datetime.now()
-        new_submission = IAASubmission(stage=current_stage, id_student=id_student, submission=data["submission"], submission_time=new_submission_time)
-        new_submission.save()
-        return {"result": 'success', "indicator_class": self.get_indicator_class()}
+        if self.score != 0:
+            return {"result": 'repeated', "indicator_class": self.get_indicator_class()}
+        else:
+            self.score = 1
+            self.runtime.publish(
+                self,
+                'grade',
+                {
+                    'value': 1,
+                    'max_value': 1
+                }
+            )
+            current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
+            current_stage = IAAStage.objects.get(activity=current_activity, stage_number=self.activity_stage)
+            new_submission_time = datetime.datetime.now()
+            new_submission = IAASubmission(stage=current_stage, id_student=id_student, submission=data["submission"], submission_time=new_submission_time)
+            new_submission.save()
+            return {"result": 'success', "indicator_class": self.get_indicator_class()}
 
     
     @XBlock.json_handler
@@ -798,9 +801,7 @@ class IterativeAssessedActivityXBlock(XBlock):
 
     def get_indicator_class(self):
         indicator_class = 'unanswered'
-        #### llamado db
-        submission = ""
-        if submission != "":
+        if self.score != 0:
             indicator_class = 'correct'
         return indicator_class
 

@@ -237,11 +237,6 @@ a.LinkButton {
   margin: 1em;
 }
 
-.iaa-error.msg {
-  text-align: center;
-  color: #df595a;
-}
-
 .iaa-warning-msg {
   text-align: center;
   color: darkgoldenrod;
