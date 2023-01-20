@@ -168,7 +168,10 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
         statusDiv.removeClass('correct');
         buttonSubmit.attr("disabled", true);
         statusDiv.addClass(result.indicator_class);
-        if (result["msg"] !== "error") {
+        if (result["result"] === "repeated"){
+            showWarningMessage("Ya se encuentra registrada una respuesta. Por favor, actualice la página.");
+            buttonSubmit.removeAttr("disabled");
+        } else if (result["result"] === "success") {
             showSuccessMessage("¡Respuesta enviada exitosamente!");
             submission.attr("disabled", true);
             buttonSubmit.attr("disabled", true);
@@ -182,6 +185,7 @@ function IterativeAssessedActivityStudent(runtime, element, settings) {
     buttonSubmit.click(function (e) {
         e.preventDefault();
         showErrorMessage("");
+        showWarningMessage("");
         showSuccessMessage("");
         buttonSubmit.html("<span>" + buttonSubmit[0].dataset.checking + "</span>");
         if (!busyValidating){

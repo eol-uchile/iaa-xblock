@@ -177,7 +177,6 @@ function IterativeAssessedActivityInstructor(runtime, element, settings) {
         let student_id = eventObject.target.parentNode.parentNode.querySelector('th').innerHTML;
         let feedback = eventObject.target.parentNode.parentNode.querySelectorAll('td')[3].querySelector("textarea").value;
         let previous_datetime = eventObject.target.parentNode.parentNode.querySelectorAll('td')[4].innerText;
-        console.log(previous_datetime);
         var data = {
             "id_student": student_id,
             "feedback": feedback

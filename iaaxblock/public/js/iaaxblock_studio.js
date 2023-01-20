@@ -83,7 +83,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
         if(number !== context["activity_stage"]){
             for(let activity of activities){
                 if(activity[1] === activity_name){
-                    console.log(activity[2].split(",").includes(number))
                     if(activity[2].split(",").includes(number)){
                         return true;
                     }
@@ -177,7 +176,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
             if (data["summary_visibility"] !== "instructors" && data["summary_visibility"] !== "all"){
                 return "Por favor indique una visibilidad para el resumen."
             }
-            console.log(data["summary_section"])
             if (data["summary_type"] === "section"){
                 if (data["summary_section"] == null){
                     return "Por favor indique una sección para el resumen."
@@ -240,7 +238,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 summary_text: summary_text.val(),
                 summary_list: summary_list.val()
             };
-            console.log(data)
         }
 
         var error_msg = validate(data);
@@ -251,7 +248,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
                 runtime.notify('save', { state: 'start' });
             }
             $.post(handlerUrl, JSON.stringify(data)).done(function (response) {
-                console.log(response)
                 if ($.isFunction(runtime.notify)) {
                     runtime.notify('save', { state: 'end' });
                 }
@@ -277,7 +273,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
                     var list = "";
                     var splitted_list = activity[2].split(",");
                     var splitted_labels = activity[3].split("###");
-                    console.log(splitted_labels);
                     for(let i=0; i< splitted_list.length; i++){
                         if (splitted_labels[i] === section){
                             list += splitted_list[i];
@@ -503,7 +498,6 @@ function IterativeAssessedActivityStudio(runtime, element) {
 
             // XBlock is being edited
         } else {
-            console.log(context)
             input_title.removeAttr("hidden");
             title.val(context["title"])
             input_block_type.removeAttr("hidden");
