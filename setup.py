@@ -25,7 +25,7 @@ def package_data(pkg, roots):
 setup(
     name='iaaxblock',
     version='0.1',
-    description='IAA XBlock',
+    description='Documento iterativo',
     license='GPL 3.0',
     packages=[
         'iaaxblock',
