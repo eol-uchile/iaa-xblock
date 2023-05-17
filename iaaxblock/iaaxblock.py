@@ -9,12 +9,21 @@ import datetime
 
 loader = ResourceLoader(__name__)
 
+_ = lambda text: text
+
 @XBlock.needs('i18n')
 class IterativeAssessedActivityXBlock(XBlock):
     """
     This XBlock allows to create open response activities with multiples steps, with the possibility for instructors
     to provide feedback to each submission.
     """
+
+    display_name = String(
+        display_name=_("Display Name"),
+        help=_("Display name for this module"),
+        default="Documento iterativo",
+        scope=Scope.settings,
+    )
 
     title = String(
         default="Iterative Assessed Activity",
@@ -377,6 +386,16 @@ class IterativeAssessedActivityXBlock(XBlock):
                     )
 
                 elif self.block_type == "display":
+                    if self.score != 1:
+                        self.score = 1
+                        self.runtime.publish(
+                            self,
+                            'grade',
+                            {
+                                'value': 1,
+                                'max_value': 1
+                            }
+                        )
                     context.update(
                         {
                             "title": self.title,
@@ -390,6 +409,16 @@ class IterativeAssessedActivityXBlock(XBlock):
                     )
 
                 elif self.block_type == "summary":
+                    if self.score != 1:
+                        self.score = 1
+                        self.runtime.publish(
+                            self,
+                            'grade',
+                            {
+                                'value': 1,
+                                'max_value': 1
+                            }
+                        )
                     current_activity = IAAActivity.objects.get(id_course=id_course, activity_name=self.activity_name)
                     summary = []
                     stages_list = IAAStage.objects.filter(activity=current_activity).order_by("stage_number").all()
@@ -623,6 +652,7 @@ class IterativeAssessedActivityXBlock(XBlock):
             self.stage_label = data.get('stage_label')
             self.question = data.get('question')
             self.min_length = data.get('min_length')
+            self.summary_list = data.get('activity_stage')
             if data.get('activity_previous') == "yes":
                 self.activity_previous = True
                 self.activity_name_previous = data.get('activity_name_previous')
@@ -775,10 +805,9 @@ class IterativeAssessedActivityXBlock(XBlock):
                         this_summary_submission = submission[0]["submission"].replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;")
                         this_summary_submission_time = str(submission[0]["submission_time"])
                     summary.append((stage.stage_number, stage.stage_label, this_summary_submission, this_summary_submission_time))
-            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class(), "name": name}
+            return {"result": "success", "summary": summary, "indicator_class": self.get_indicator_class(), "name": name, "is_summary": self.block_type == "summary"}
         except:
             return {"result": "failed", "indicator_class": self.get_indicator_class()}
-
 
 
     @XBlock.json_handler
